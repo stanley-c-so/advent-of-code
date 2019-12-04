@@ -35,12 +35,12 @@ const modFunc = (...args) => func(...args) % 1000000007;                // used 
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
-const actualInput = 'ACTUAL_INPUT_HERE';
+const actualInput = `ACTUAL_INPUT_HERE`;
 
 // Test case 1
 input = {
   part: 1,
-  ARG_1: 'INPUT_HERE',
+  ARG_1: `INPUT_HERE`,
 };
 expected = 'EXPECTED_HERE';
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -48,7 +48,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 2
 input = {
   part: 1,
-  ARG_1: 'INPUT_HERE',
+  ARG_1: `INPUT_HERE`,
 };
 expected = 'EXPECTED_HERE';
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -58,5 +58,5 @@ input = {
   part: 1,
   ARG_1: 'INPUT_HERE',
 };
-expected = 'EXPECTED_HERE';
+expected = `EXPECTED_HERE`;
 test(func, input, expected, testNum, lowestTest, highestTest);
