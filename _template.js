@@ -1,14 +1,21 @@
-// DAY XX
+// --- Day XX: DESCRIPTION ---
 
-// DESCRIPTION_HERE
+// PART 1:
+
+//
+
+// PART 2:
+
+//
 
 // SWITCHING BETWEEN SOLUTIONS:
 const NAME_OF_ALGO_HERE = solution_1;
 
 function solution_1 (INPUT_HERE) {
 
-  // SOLUTION 1 [O(?) time, O(?) space]:
-  // description
+  // ---PART 1---
+
+  // ---PART 2---
 
 }
 
@@ -23,8 +30,11 @@ const modFunc = (...args) => func(...args) % 1000000007;                // used 
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
+const actualInput = 'ACTUAL_INPUT_HERE';
+
 // Test case 1
 input = {
+  part: 1,
   ARG_1: 'INPUT_HERE',
 };
 expected = 'EXPECTED_HERE';
@@ -32,6 +42,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 2
 input = {
+  part: 1,
   ARG_1: 'INPUT_HERE',
 };
 expected = 'EXPECTED_HERE';
@@ -39,6 +50,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 3
 input = {
+  part: 1,
   ARG_1: 'INPUT_HERE',
 };
 expected = 'EXPECTED_HERE';
