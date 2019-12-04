@@ -130,6 +130,7 @@ input = {
   codeStr: `1,9,10,3,2,3,11,0,99,30,40,50`,
   noun: null,
   verb: null,
+  output: null,
 };
 expected = 3500;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -140,6 +141,7 @@ input = {
   codeStr: `1,0,0,0,99`,
   noun: null,
   verb: null,
+  output: null,
 };
 expected = 2;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -150,6 +152,7 @@ input = {
   codeStr: `2,3,0,3,99`,
   noun: null,
   verb: null,
+  output: null,
 };
 expected = 2;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -160,6 +163,7 @@ input = {
   codeStr: `2,4,4,5,99,0`,
   noun: null,
   verb: null,
+  output: null,
 };
 expected = 2;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -170,6 +174,7 @@ input = {
   codeStr: `1,1,1,4,99,5,6,0,99`,
   noun: null,
   verb: null,
+  output: null,
 };
 expected = 30;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -180,6 +185,7 @@ input = {
   codeStr: actualInput,
   noun: 12,
   verb: 2,
+  output: null,
 };
 expected = 3931283;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -190,7 +196,7 @@ input = {
   codeStr: actualInput,
   noun: null,
   verb: null,
-  output: 19690720
+  output: 19690720,
 };
 expected = 6979;
 test(func, input, expected, testNum, lowestTest, highestTest);
