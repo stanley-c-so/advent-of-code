@@ -13,14 +13,15 @@ const NAME_OF_ALGO_HERE = solution_1;
 
 function solution_1 (part, INPUT_HERE) {
 
-  // ---PART 1---
   // if (part === 1) {
 
 
     
-  // }
+  // } else {
 
-  // ---PART 2---
+  
+
+  // }
 
 }
 
