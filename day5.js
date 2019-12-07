@@ -104,7 +104,7 @@ function solution_1 (part, codeStr, input) {
   const code = codeStr.split(',').map(str => numParser(str));
 
   // HELPER FUNCTION ALLOWS CUSTOM INPUT CODE
-  function helper (code, input) {
+  function helper (input) {
     const clone = [...code];
     const output = [];
 
@@ -147,7 +147,7 @@ function solution_1 (part, codeStr, input) {
     return +output[output.length - 1];
   }
 
-  return helper(code, input);
+  return helper(input);
 }
 
 // TEST CASES
