@@ -97,18 +97,16 @@ function solution_1 (part, codeStr, noun, verb, output) {
     return clone[0];
   }
 
-  // ---PART 1---
   if (part === 1) {
     return helper(code, noun, verb);
-  }
-
-  // ---PART 2---
-  for (let i = 0; i < 100; i++) {
-    for (let j = 0; j < 100; j++) {
-      if (helper(code, i, j) === output) return 100 * i + j;
+  } else {
+    for (let i = 0; i < 100; i++) {
+      for (let j = 0; j < 100; j++) {
+        if (helper(code, i, j) === output) return 100 * i + j;
+      }
     }
-  }
 
+  }
 }
 
 // TEST CASES
