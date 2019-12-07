@@ -121,8 +121,9 @@ function solution_1 (part, mapStr) {
     parents[orbiter] = center;                          // for part 2
   }
 
-  // ---PART 1---
+  // PART 1 VS PART 2
   if (part === 1) {
+
     // STARTING WITH COM, USE DFS (USING HELPER) TO NAVIGATE TREE AND CALCULATE TOTALS
     let total = 0;
     function helper (currentBody, numOrbits) {          // numOrbits is the sum of direct and indirect orbits
@@ -135,28 +136,29 @@ function solution_1 (part, mapStr) {
     }
     helper('COM', 0);                                   // instantiate helper function starting with COM, which has 0 direct orbits and 0 indirect orbits for a total of 0
     return total;
-  }
 
-  // ---PART 2---
+  } else {
 
-  const yourPosition = parents['YOU'];
-  const santaPosition = parents['SAN'];
+    const yourPosition = parents['YOU'];
+    const santaPosition = parents['SAN'];
 
-  // USE BFS STARTING FROM YOUR POSITION UNTIL YOU FIND SANTA
-  const queue = [[yourPosition, null, 0]];
-  while (true) {      // if there are no bugs then there should be a return at some point!
-    const [currentBody, origin, distanceTraveled] = queue.shift();              // origin is the body you came from to get to where you are now - needed so it doesn't retraverse that child or parent
-    if (currentBody === santaPosition) return distanceTraveled;                 // stop condition: when you are finally at the same place as santa
-    if (currentBody in parents && parents[currentBody] !== origin) {            // need to check both that you have a parent (COM has no parent) and that parent is not origin to avoid backtracking
-      queue.push([parents[currentBody], currentBody, distanceTraveled + 1]);
-    }
-    if (currentBody in children) {
-      for (const child of children[currentBody]) {
-        if (child !== origin) {                                                 // do not push an origin into the queue
-          queue.push([child, currentBody, distanceTraveled + 1]);
+    // USE BFS STARTING FROM YOUR POSITION UNTIL YOU FIND SANTA
+    const queue = [[yourPosition, null, 0]];
+    while (true) {      // if there are no bugs then there should be a return at some point!
+      const [currentBody, origin, distanceTraveled] = queue.shift();              // origin is the body you came from to get to where you are now - needed so it doesn't retraverse that child or parent
+      if (currentBody === santaPosition) return distanceTraveled;                 // stop condition: when you are finally at the same place as santa
+      if (currentBody in parents && parents[currentBody] !== origin) {            // need to check both that you have a parent (COM has no parent) and that parent is not origin to avoid backtracking
+        queue.push([parents[currentBody], currentBody, distanceTraveled + 1]);
+      }
+      if (currentBody in children) {
+        for (const child of children[currentBody]) {
+          if (child !== origin) {                                                 // do not push an origin into the queue
+            queue.push([child, currentBody, distanceTraveled + 1]);
+          }
         }
       }
     }
+    
   }
 }
 
