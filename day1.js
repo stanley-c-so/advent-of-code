@@ -41,6 +41,7 @@ const totalFuel = solution_1;
 function solution_1 (part, modulesStr) {
   const modules = modulesStr.split('\n').map(element => Number(element));
   
+  // PART 1 VS PART 2
   if (part === 1) {
     return modules.reduce((total, curModule) => total + Math.max(0, Math.floor(curModule / 3) - 2), 0);
   } else {

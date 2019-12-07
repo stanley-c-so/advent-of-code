@@ -97,6 +97,7 @@ function solution_1 (part, codeStr, noun, verb, output) {
     return clone[0];
   }
 
+  // PART 1 VS PART 2
   if (part === 1) {
     return helper(code, noun, verb);
   } else {
