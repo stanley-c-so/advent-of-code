@@ -144,7 +144,7 @@ function solution_1 (part, codeStr, input) {
       }
     }
     if (!(output.slice(0, output.length - 1).every(num => num === 0))) throw 'ERROR!';    // this makes sure every number except the last is 0. this error should never happen
-    return +output[output.length - 1];
+    return output[output.length - 1];
   }
 
   return helper(input);
