@@ -41,19 +41,19 @@ const totalFuel = solution_1;
 function solution_1 (part, modulesStr) {
   const modules = modulesStr.split('\n').map(element => Number(element));
   
-  // ---PART 1---
-  if (part === 1) return modules.reduce((total, curModule) => total + Math.max(0, Math.floor(curModule / 3) - 2), 0);
-
-  // ---PART 2---
-  let total = 0;
-  for (const curModule of modules) {
-    let fuel = curModule;
-    while (fuel > 0) {
-      fuel = Math.max(0, Math.floor(fuel / 3) - 2);
-      total += fuel;
+  if (part === 1) {
+    return modules.reduce((total, curModule) => total + Math.max(0, Math.floor(curModule / 3) - 2), 0);
+  } else {
+    let total = 0;
+    for (const curModule of modules) {
+      let fuel = curModule;
+      while (fuel > 0) {
+        fuel = Math.max(0, Math.floor(fuel / 3) - 2);
+        total += fuel;
+      }
     }
+    return total;
   }
-  return total;
 }
 
 // TEST CASES
