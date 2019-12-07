@@ -94,34 +94,31 @@ function solution_1 (part, codeStr) {
 
   // UTILITY FUNCTIONS: FIND ALL POSSIBLE PERMUTATIONS OF SEQUENCES FROM start...start + n
   function permutationsStr (n, start = 0) {                                                 // builds the permutations as strings
-    if (!n) return [];
-    if (n === 1) return [start.toString()];
-    const prevSolution = permutationsStr(n - 1, start);
+    if (!n) return [];                                                                      // edge case
+    if (n === 1) return [start.toString()];                                                 // base case
+    const prevSolution = permutationsStr(n - 1, start);                                     // build solution based off of previous solution
     const output = Array.from(
-      {length: prevSolution.length * n},
-      (_, i) => prevSolution[Math.floor(i / n)].slice(0, i % n) + (start + n - 1) + prevSolution[Math.floor(i / n)].slice(i % n)
+      {length: prevSolution.length * n},                                                    // next solution will be n times the length of the previous
+      (_, i) => prevSolution[Math.floor(i / n)].slice(0, i % n) + (start + n - 1) + prevSolution[Math.floor(i / n)].slice(i % n)    // insert current number into every place within previous number block
     );
     return output;
   }
 
   function permutationsArr (n, start = 0) {
-    return permutationsStr(n, start).map(str => str.split('').map(digit => +digit));      // uses string results of permutationsStr and converts them to subarrays
+    return permutationsStr(n, start).map(str => str.split('').map(digit => +digit));        // uses string results of permutationsStr and converts them to subarrays of numbers (e.g. '123' to [1, 2, 3])
   }
-
-  // INGEST INPUT DATA (THE PROGRAM)
-  const code = codeStr.split(',').map(str => numParser(str));
-
-  // HELPER FUNCTION SIMULATES AN AMPLIFIER RUNNING THE PROGRAM BASED ON PHASE SETTING AND INPUT SIGNAL
-  function simulateAmp (code, phase, input, startIdx = 0, phaseInputReceived = false) {   // startIdx and phaseInputReceived optional parameters are useful for part 2
-    const clone = [...code];                                                              // we will be working off of a clone of the code, which should not change between different amps
-    const output = [];
+  
+  // HELPER FUNCTION SIMULATES AN AMPLIFIER RUNNING THE PROGRAM BASED ON CODE, PHASE SETTING AND INPUT SIGNAL, AND, OPTIONALLY, STARTING INDEX AND WHETHER PHASE INPUT WAS PREVIOUSLY RECEIVED
+  function simulateAmp (code, phase, input, startIdx = 0, phaseInputReceived = false) {     // startIdx and phaseInputReceived optional parameters are useful for part 2
+    const clone = [...code];                                                                // we will be working off of a clone of the code, which should not change between different amps
+    const output = [];                                                                      // multiple opcode '04' outputs are supported, but in this day's problem, this never exceeds length 1
 
     let i = startIdx;
-    while (i < clone.length) {                                                            // we use a while loop because the increment varies depending on a lot of things
+    while (i < clone.length) {                                                              // we use a while loop because the increment varies depending on a lot of things
       const opcode = clone[i].slice(-2);
-      const operand1 = +clone[i].substr(-3, 1) ? +clone[i + 1] : +clone[+clone[i + 1]];   // make sure to handle for both position and immediate modes
-      const operand2 = +clone[i].substr(-4, 1) ? +clone[i + 2] : +clone[+clone[i + 2]];   // make sure to handle for both position and immediate modes
-      const operand3 = +clone[i + 3];                                                     // for every case in which there is an operand3, immediate mode is never used
+      const operand1 = +clone[i].substr(-3, 1) ? +clone[i + 1] : +clone[+clone[i + 1]];     // make sure to handle for both position and immediate modes
+      const operand2 = +clone[i].substr(-4, 1) ? +clone[i + 2] : +clone[+clone[i + 2]];     // make sure to handle for both position and immediate modes
+      const operand3 = +clone[i + 3];                                                       // for every case in which there is an operand3, immediate mode is never used
 
       if (opcode === '99') {
         return {
@@ -169,79 +166,65 @@ function solution_1 (part, codeStr) {
     }
   }
 
+  // PART 1 HELPER FUNCTION: TAKES A SEQUENCE OF n PHASES, SIMULATES THE n AMPS, AND RETURNS THE OUTPUT
+  function simulateNAmps (phases) {
+    let result = 0;                                         // first amp runs with initial input of 0
+    for (let i = 0; i < phases.length; i++) {
+      result = simulateAmp(code, phases[i], result).finalOutput;  // new result is calculated based in part on previous result
+    }
+    return result;
+  }
+
+  // PART 2 HELPER FUNCTION: TAKES A SEQUENCE OF n PHASES, SIMULATES THE n AMPS, AND KEEPS LOOPING UNTIL IT RETURNS THE OUTPUT
+  function simulateNAmpsLoop (phases) {
+      
+    // STORE AND MAINTAIN INSTANCES OF CODE FOR EACH AMP
+    const memory = [];
+    for (let i = 0; i < phases.length; i++) {
+      memory.push({
+        code: [...code],
+        i: 0,
+        phaseInputReceived: false,
+      });
+    }
+
+    let iterations = 0;                                               // this variable % the number of amps will determine which amp is currently active
+    let result = 0;                                                   // first amp runs with initial input of 0
+    while (true) {
+      const currentAmp = iterations % phases.length;
+      const [newState, finalOutput, code99, i, phaseInputReceived] = Object.values(simulateAmp(
+        memory[currentAmp].code,
+        phases[currentAmp],
+        result,
+        memory[currentAmp].i,
+        memory[currentAmp].phaseInputReceived
+      ));
+      if (code99) return finalOutput;                                 // if opcode '99' was reached, we are done - return finalOutput
+      memory[currentAmp].code = newState;                             // otherwise, transfer all information returned from calling simulateAmp and update memory
+      memory[currentAmp].i = i;
+      memory[currentAmp].phaseInputReceived = phaseInputReceived;
+      result = finalOutput;                                           // whatever was output from simulateAmp becomes `result` which will be the input in the next iteration
+      iterations++;
+    }
+  }
+
+  // INGEST INPUT DATA (THE PROGRAM)
+  const code = codeStr.split(',').map(str => numParser(str));
+
   // RECORD KEEPING VARIABLES
   let bestOutput = -Infinity;
   let bestSequence;
 
-  // PART 1 VS PART 2
-  if (part === 1) {                                   // RUN simulateNAmps
-
-    // HELPER FUNCTION TAKES A SEQUENCE OF n PHASES, SIMULATES THE n AMPS, AND RETURNS THE OUTPUT
-    function simulateNAmps (phases) {
-      let result = 0;                                         // first amp runs with initial input of 0
-      for (let i = 0; i < phases.length; i++) {
-        result = simulateAmp(code, phases[i], result).finalOutput;  // new result is calculated based in part on previous result
-      }
-      return result;
+  // FOR ALL PERMUTATIONS OF 5 PHASES, RUN THE APPROPRIATE SIMULATION, AND KEEP TRACK OF BEST RESULT
+  for (const sequence of permutationsArr(5, part === 1 ? 0 : 5)) {                                    // part 1: second argument is 0; part 2: second argument is 5
+    const output = part === 1 ? simulateNAmps(sequence) : simulateNAmpsLoop(sequence);                // part 1: run simulateNAmps; part 2: run simulateNAmpsLoop
+    if (output > bestOutput) {
+      bestOutput = output;
+      bestSequence = sequence;
     }
-
-    // FOR ALL PERMUTATIONS OF 5 PHASES, RUN THE APPROPRIATE SIMULATION, AND KEEP TRACK OF BEST RESULT
-    for (const sequence of permutationsArr(5)) {
-      const output = simulateNAmps(sequence);
-      if (output > bestOutput) {
-        bestOutput = output;
-        bestSequence = sequence;
-      }
-    }
-
-    return [bestOutput, bestSequence];
-
-  } else {                                            // RUN simulateNAmpsLoop
-
-    // HELPER FUNCTION TAKES A SEQUENCE OF n PHASES, SIMULATES THE n AMPS, AND KEEPS LOOPING UNTIL IT RETURNS THE OUTPUT
-    function simulateNAmpsLoop (phases) {
-      
-      // NOW WE HAVE TO STORE AND MAINTAIN INSTANCES OF CODE FOR EACH AMP
-      const memory = [];
-      for (let i = 0; i < phases.length; i++) {
-        memory.push({
-          code: [...code],
-          i: 0,
-          phaseInputReceived: false,
-        });
-      }
-
-      let iterations = 0;                                               // this variable % the number of amps will determine which amp is currently active
-      let result = 0;                                                   // first amp runs with initial input of 0
-      while (true) {
-        const currentAmp = iterations % phases.length;
-        const [newState, finalOutput, code99, i, phaseInputReceived] = Object.values(simulateAmp(
-          memory[currentAmp].code,
-          phases[currentAmp],
-          result,
-          memory[currentAmp].i,
-          memory[currentAmp].phaseInputReceived
-        ));
-        if (code99) return finalOutput;                                 // if opcode '99' was reached, we are done - return finalOutput
-        memory[currentAmp].code = newState;                             // otherwise, transfer all information returned from calling simulateAmp and update memory
-        memory[currentAmp].i = i;
-        memory[currentAmp].phaseInputReceived = phaseInputReceived;
-        result = finalOutput;                                           // whatever was output from simulateAmp becomes `result` which will be the input in the next iteration
-        iterations++;
-      }
-    }
-
-    // FOR ALL PERMUTATIONS OF 5 PHASES, RUN THE APPROPRIATE SIMULATION, AND KEEP TRACK OF BEST RESULT
-    for (const sequence of permutationsArr(5, 5)) {
-      const output = simulateNAmpsLoop(sequence);
-      if (output > bestOutput) {
-        bestOutput = output;
-        bestSequence = sequence;
-      }
-    }
-
-    return [bestOutput, bestSequence];
   }
+
+  return [bestOutput, bestSequence];
 }
 
 // TEST CASES
