@@ -111,15 +111,13 @@ function solution_1 (part, wireInput) {
 
   let callback;   // this will differ depending on if it's part 1 or part 2
 
-  // ---PART 1---
+  // PART 1 VS PART 2
   if (part === 1) {
     callback = coord => Math.abs(+(coord.split(',')[0])) + Math.abs(+(coord.split(',')[1]));
   } else {
-  // ---PART 2---
     callback = (coord, wire1Map, wire2Map) => wire1Map[coord] + wire2Map[coord];
   }
 
-  // COMMON
   for (const coord in wire1Map) {
     if (coord !== '0,0' && coord in wire2Map) {
       output = Math.min(
