@@ -85,6 +85,8 @@ function solution_1 (part, imgStr, width, height) {
       throw 'ERROR: the image includes a null value';
     }
 
+    console.log('\n' + 'Image from Part 2:' + '\n');
+
     for (let row = 0; row < height; row++) {
       let currentRow = '';
       for (let col = 0; col < width; col++) {
@@ -92,6 +94,8 @@ function solution_1 (part, imgStr, width, height) {
       }
       console.log(currentRow);
     }
+
+    console.log('');
 
   }
 }
