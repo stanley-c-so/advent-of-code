@@ -31,7 +31,7 @@
 // SWITCHING BETWEEN SOLUTIONS:
 const analyzeLayers = solution_1;
 
-function solution_1 (part, imgStr, width, height) {
+function solution_1 (part, imgStr, width, height, print = true) {
 
   const pixelsPerLayer = width * height;
 
@@ -90,7 +90,7 @@ function solution_1 (part, imgStr, width, height) {
       for (let col = 0; col < width; col++) {
         currentRow += img[row * width + col] + ' ';
       }
-      console.log(currentRow);
+      if (print) console.log(currentRow);               // i don't want my test suite to print twice on expected/actual (since actual = expected here), so `print` controls whether this prints
     }
 
   }
@@ -126,5 +126,5 @@ input = {
   width: 25,
   height: 6,
 };
-expected = func(...Object.values(input));                         // there is no expected value! we just want to print out the image and decode it! the message is UGCUH
+expected = func(...Object.values({...input, print: false}));      // there is no expected value! we just want to print out the image and decode it! the message is UGCUH
 test(func, input, expected, testNum, lowestTest, highestTest);
