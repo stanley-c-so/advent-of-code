@@ -35,6 +35,10 @@ function solution_1 (part, imgStr, width, height) {
 
   const pixelsPerLayer = width * height;
 
+  const black = '0';                                                // these are given by the problem
+  const white = '1';
+  const transparent = '2';
+
   // PART 1 VS PART 2
   if (part === 1) {
     let count0 = 0;
@@ -44,9 +48,9 @@ function solution_1 (part, imgStr, width, height) {
     let count1TimesCount2 = 0;
     let layerWithFewest;                                            // for more data, but it is not required by the question
     for (let i = 0; i < imgStr.length; i++) {
-      if (imgStr[i] === '0') count0++;
-      if (imgStr[i] === '1') count1++;
-      if (imgStr[i] === '2') count2++;
+      if (imgStr[i] === black) count0++;
+      if (imgStr[i] === white) count1++;
+      if (imgStr[i] === transparent) count2++;
       if (i % pixelsPerLayer === pixelsPerLayer - 1) {              // this is the final pixel for the current layer
         if (count0 < fewest0) {
           fewest0 = count0;
@@ -61,10 +65,6 @@ function solution_1 (part, imgStr, width, height) {
     return [count1TimesCount2, layerWithFewest];                    // we can return the actual layer # itself for more data, but it is not required by the question
 
   } else {
-
-    const black = '0';                                              // these are given by the problem
-    const white = '1';
-    const transparent = '2';
 
     const img = Array(pixelsPerLayer).fill(null);
 
