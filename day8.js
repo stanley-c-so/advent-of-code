@@ -41,6 +41,7 @@ function solution_1 (part, imgStr, width, height) {
 
   // PART 1 VS PART 2
   if (part === 1) {
+
     let count0 = 0;
     let count1 = 0;
     let count2 = 0;
@@ -66,37 +67,40 @@ function solution_1 (part, imgStr, width, height) {
 
   } else {
 
-    const img = Array(pixelsPerLayer).fill(null);
-    const maxLayerLength = (imgStr.length / pixelsPerLayer - 1).toString().length;    // e.g. if there are 100 layers, then the max layer is 100 - 1 = 99 (count from 0), so maxLayerLength is '99'.length = 2
+    // HELPER FUNCTION: WILL PRODUCE IMAGE AND SHOW THE INPUT COLOR AS THE FOREGROUND, AND ALL ELSE AS INVISIBLE BACKGROUND
+    function makeAndShowImg (colorToShow) {
+      const img = Array(pixelsPerLayer).fill(null);
+      const maxLayerLength = (imgStr.length / pixelsPerLayer - 1).toString().length;    // e.g. if there are 100 layers, then the max layer is 100 - 1 = 99 (count from 0), so maxLayerLength is '99'.length = 2
 
-    for (let i = 0; i < imgStr.length; i++) {
-      if (imgStr[i] !== transparent && img[i % pixelsPerLayer] === null) {            // if the current pixel is the topmost non-transparent pixel, we need to save it
-        const layer = Math.floor(i / pixelsPerLayer);                                 // we can make one color type show anything. for debugging purposes, i made it show the top layer #, so calculate it
-        const layerStr = layer.toString().length < maxLayerLength
-          ? '0'.repeat(maxLayerLength - layer.toString().length) + layer.toString()   // add on extra 0s on the left in case the length of this layer is too short, so the final image will square nicely
-          : layer.toString();
-        img[i % pixelsPerLayer] = imgStr[i] === white                                 // we can change the value to switch between whether black or white should be displayed
-          ? layerStr
-          : ' '.repeat(maxLayerLength);
+      for (let i = 0; i < imgStr.length; i++) {
+        if (imgStr[i] !== transparent && img[i % pixelsPerLayer] === null) {            // if the current pixel is the topmost non-transparent pixel, we need to save it
+          const layer = Math.floor(i / pixelsPerLayer);                                 // we can make one color type show anything. for debugging purposes, i made it show the top layer #, so calculate it
+          const layerStr = layer.toString().length < maxLayerLength
+            ? '0'.repeat(maxLayerLength - layer.toString().length) + layer.toString()   // add on extra 0s on the left in case the length of this layer is too short, so the final image will square nicely
+            : layer.toString();
+          img[i % pixelsPerLayer] = imgStr[i] === colorToShow                           // we can change the value to switch between whether black or white should be displayed
+            ? layerStr
+            : ' '.repeat(maxLayerLength);
+        }
+      }
+
+      if (img.includes(null)) throw 'ERROR: the image includes a null value';           // check if we got null anywhere in the image. if the data is valid and the code is error-free, this should not happen!
+
+      for (let row = 0; row < height; row++) {
+        let currentRow = '';
+        for (let col = 0; col < width; col++) {
+          currentRow += img[row * width + col] + ' ';
+        }
+        console.log(currentRow);
       }
     }
 
-    if (img.includes(null)) {                                                         // check if we got null anywhere in the image
-      throw 'ERROR: the image includes a null value';
-    }
-
-    console.log('\n' + 'Image from Part 2:' + '\n');
-
-    for (let row = 0; row < height; row++) {
-      let currentRow = '';
-      for (let col = 0; col < width; col++) {
-        currentRow += img[row * width + col] + ' ';
-      }
-      console.log(currentRow);
-    }
+    console.log('\n' + 'Image from Part 2 (black as foreground):' + '\n');
+    makeAndShowImg(black);
+    console.log('\n' + 'Image from Part 2 (white as foreground):' + '\n');
+    makeAndShowImg(white);
 
     console.log('');
-
   }
 }
 
@@ -130,5 +134,5 @@ input = {
   width: 25,
   height: 6,
 };
-expected = undefined;                                             // there is no expected output! we just want to print out the image and decode it! the message is UGCUH
+expected = undefined;                                             // there is no expected output! we just want to print out the image and decode it! the message is UGCUH (white is foreground)
 test(func, input, expected, testNum, lowestTest, highestTest);
