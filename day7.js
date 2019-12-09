@@ -6,9 +6,9 @@
 
 // There are five amplifiers connected in series; each one receives an input signal and produces an output signal. They are connected such that the first amplifier's output leads to the second amplifier's input, the second amplifier's output leads to the third amplifier's input, and so on. The first amplifier's input value is 0, and the last amplifier's output leads to your ship's thrusters.
 
-// O-------O  O-------O  O-------O  O-------O  O-------O
+//     O-------O  O-------O  O-------O  O-------O  O-------O
 // 0 ->| Amp A |->| Amp B |->| Amp C |->| Amp D |->| Amp E |-> (to thrusters)
-// O-------O  O-------O  O-------O  O-------O  O-------O
+//     O-------O  O-------O  O-------O  O-------O  O-------O
 
 // The Elves have sent you some Amplifier Controller Software (your puzzle input), a program that should run on your existing Intcode computer. Each amplifier will need to run a copy of the program.
 
