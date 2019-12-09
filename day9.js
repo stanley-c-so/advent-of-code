@@ -63,6 +63,16 @@ function solution_1 (part, codeStr, input) {
 
   // HELPER FUNCTION: RUNS THROUGH INPUT INTCODE AND RETURNS ENTIRE OUTPUT
   function runIntcode (code, input) {
+
+    function calculateOperand (n, mode) {                                     // use this helper function to calculate operand based on operand # and mode #
+      if (mode === 1) return +clone[i + n];
+      const offset = mode === 0 ? 0 : relativeBase;
+      const searchIdx = +clone[i + n] + offset;
+      if (n === 3) return searchIdx;                                          // operand3 always refers to the write location, so we only need to return that index
+      if (clone[searchIdx] === undefined) clone[searchIdx] = numParser(0);    // if the search index is out of bounds of current clone state, first set that value to 0
+      return +clone[searchIdx];
+    }
+
     const clone = [...code];
     const output = [];
 
@@ -73,22 +83,12 @@ function solution_1 (part, codeStr, input) {
       const mode1 = +clone[i].substr(-3, 1);
       const mode2 = +clone[i].substr(-4, 1);
       const mode3 = +clone[i].substr(-5, 1);
-
-      function calculateOperand (n, mode) {                                     // use this helper function to calculate operand based on operand # and mode #
-        if (mode === 1) return +clone[i + n];
-        const offset = mode === 0 ? 0 : relativeBase;
-        const searchIdx = +clone[i + n] + offset;
-        if (n === 3) return searchIdx;                                          // operand3 always refers to the write location, so we only need to return that index
-        if (clone[searchIdx] === undefined) clone[searchIdx] = numParser(0);    // if the search index is out of bounds of current clone state, first set that value to 0
-        return +clone[searchIdx];
-      }
-
       const operand1 = calculateOperand(1, mode1);
       const operand2 = calculateOperand(2, mode2);
-      const operand3 = calculateOperand(3, mode3);
+      const operand3 = calculateOperand(3, mode3);                              // NOTE: unlike operands 1-2 which could be either an index or absolute value, 3 is ALWAYS an index
 
       if (opcode === '99') {
-        if (input === 1 && output.length !== 1) throw 'ERROR!';                 // here, if input === 1 (test mode), there should only be 1 output. this error should never happen
+        if (input === 1 && output.length !== 1) throw 'ERROR!';                 // in this problem specifically, there should only be 1 output. this error should never happen
         return output;
       } else if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
