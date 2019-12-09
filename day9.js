@@ -46,10 +46,7 @@
 
 // Run the BOOST program in sensor boost mode. What are the coordinates of the distress signal?
 
-// SWITCHING BETWEEN SOLUTIONS:
-const boost = solution_1;
-
-function solution_1 (part, codeStr, input) {
+function boost (part, codeStr, input) {
 
   // UTILITY FUNCTION: takes a str (or num) and standardizes its format so that the number portion is n digits (default 5) and it keeps its negative sign if applicable
   const numParser = (str, n = 5) => {

@@ -72,10 +72,7 @@
 // U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = 410 steps
 // What is the fewest combined steps the wires must take to reach an intersection?
 
-// SWITCHING BETWEEN SOLUTIONS:
-const nearestIntersection = solution_1;
-
-function solution_1 (part, wireInput) {
+function nearestIntersection (part, wireInput) {
 
   const [wire1, wire2] = wireInput.split('\n').map(wire => wire.split(','));
 

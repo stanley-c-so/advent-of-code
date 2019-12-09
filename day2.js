@@ -72,10 +72,7 @@
 
 // Find the input noun and verb that cause the program to produce the output 19690720. What is 100 * noun + verb? (For example, if noun=12 and verb=2, the answer would be 1202.)
 
-// SWITCHING BETWEEN SOLUTIONS:
-const intcode = solution_1;
-
-function solution_1 (part, codeStr, noun, verb, targetOutput) {
+function intcode (part, codeStr, noun, verb, targetOutput) {
 
   // HELPER FUNCTION: RUNS THROUGH INPUT INTCODE AND RETURNS OUTPUT AT ADDRESS 0
   function runIntcode (code, noun, verb) {

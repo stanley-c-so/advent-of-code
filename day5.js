@@ -85,10 +85,7 @@
 
 // What is the diagnostic code for system ID 5?
 
-// SWITCHING BETWEEN SOLUTIONS:
-const diagnostic = solution_1;
-
-function solution_1 (part, codeStr, input) {
+function diagnostic (part, codeStr, input) {
 
   // UTILITY FUNCTION: takes a str (or num) and standardizes its format so that the number portion is 4 digits and it keeps its negative sign if applicable
   const numParser = str => {

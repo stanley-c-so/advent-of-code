@@ -104,10 +104,7 @@
 
 // What is the minimum number of orbital transfers required to move from the object YOU are orbiting to the object SAN is orbiting? (Between the objects they are orbiting - not between YOU and SAN.)
 
-// SWITCHING BETWEEN SOLUTIONS:
-const countOrbits = solution_1;
-
-function solution_1 (part, mapStr) {
+function countOrbits (part, mapStr) {
 
   const map = mapStr.split('\n');
 

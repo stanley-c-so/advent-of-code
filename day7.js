@@ -77,10 +77,7 @@
 // 53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10
 // Try every combination of the new phase settings on the amplifier feedback loop. What is the highest signal that can be sent to the thrusters?
 
-// SWITCHING BETWEEN SOLUTIONS:
-const findMaxOutput = solution_1;
-
-function solution_1 (part, codeStr) {
+function findMaxOutput (part, codeStr) {
 
   // UTILITY FUNCTION: takes a str (or num) and standardizes its format so that the number portion is 4 digits and it keeps its negative sign if applicable
   const numParser = str => {
