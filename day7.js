@@ -161,9 +161,10 @@ function solution_1 (part, codeStr) {
         clone[operand3] = operand1 === operand2 ? numParser(1) : numParser(0);
         i += 4;
       } else {
-        throw 'ERROR!';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
+        throw 'ERROR! unrecognized opcode';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }
     }
+    throw 'ERROR! i is out of bounds';        // if the while loop terminates prematurely (apart from opcode 99 or 04). this error should never happen
   }
 
   // PART 1 HELPER FUNCTION: TAKES A SEQUENCE OF n PHASES, SIMULATES THE n AMPS, AND RETURNS THE OUTPUT
