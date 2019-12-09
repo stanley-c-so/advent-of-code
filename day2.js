@@ -75,10 +75,10 @@
 // SWITCHING BETWEEN SOLUTIONS:
 const intcode = solution_1;
 
-function solution_1 (part, codeStr, noun, verb, output) {
-  const code = codeStr.split(',').map(element => Number(element));
+function solution_1 (part, codeStr, noun, verb, targetOutput) {
 
-  function helper (code, noun, verb) {
+  // HELPER FUNCTION: RUNS THROUGH INPUT INTCODE AND RETURNS OUTPUT AT ADDRESS 0
+  function runIntcode (code, noun, verb) {
     const clone = [...code];
     if (noun !== null) clone[1] = noun;
     if (verb !== null) clone[2] = verb;
@@ -97,13 +97,16 @@ function solution_1 (part, codeStr, noun, verb, output) {
     return clone[0];
   }
 
+  // INGEST INPUT DATA (THE PROGRAM)
+  const code = codeStr.split(',').map(element => Number(element));
+
   // PART 1 VS PART 2
   if (part === 1) {
-    return helper(code, noun, verb);
+    return runIntcode(code, noun, verb);
   } else {
     for (let i = 0; i < 100; i++) {
       for (let j = 0; j < 100; j++) {
-        if (helper(code, i, j) === output) return 100 * i + j;
+        if (runIntcode(code, i, j) === targetOutput) return 100 * i + j;
       }
     }
 
