@@ -98,7 +98,7 @@ function solution_1 (part, codeStr, noun, verb, targetOutput) {
   }
 
   // INGEST INPUT DATA (THE PROGRAM)
-  const code = codeStr.split(',').map(element => Number(element));
+  const code = codeStr.split(',').map(element => +element);
 
   // PART 1 VS PART 2
   if (part === 1) {
