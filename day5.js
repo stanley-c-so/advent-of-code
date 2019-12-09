@@ -104,19 +104,20 @@ function solution_1 (part, codeStr, input) {
   const code = codeStr.split(',').map(str => numParser(str));
 
   // HELPER FUNCTION ALLOWS CUSTOM INPUT CODE
-  function helper (input) {
+  function runIntcode (input) {
     const clone = [...code];
     const output = [];
 
     let i = 0;
-    while (i < clone.length) {                                                            // we use a while loop because the increment varies depending on a lot of things
+    while (i < clone.length) {                                                              // we use a while loop because the increment varies depending on a lot of things
       const opcode = clone[i].slice(-2);
-      const operand1 = +clone[i].substr(-3, 1) ? +clone[i + 1] : +clone[+clone[i + 1]];   // make sure to handle for both position and immediate modes
-      const operand2 = +clone[i].substr(-4, 1) ? +clone[i + 2] : +clone[+clone[i + 2]];   // make sure to handle for both position and immediate modes
-      const operand3 = +clone[i + 3];                                                     // for every case in which there is an operand3, immediate mode is never used
+      const operand1 = +clone[i].substr(-3, 1) ? +clone[i + 1] : +clone[+clone[i + 1]];     // make sure to handle for both position and immediate modes
+      const operand2 = +clone[i].substr(-4, 1) ? +clone[i + 2] : +clone[+clone[i + 2]];     // make sure to handle for both position and immediate modes
+      const operand3 = +clone[i + 3];                                                       // for every case in which there is an operand3, immediate mode is never used
 
       if (opcode === '99') {
-        break;
+        if (!(output.slice(0, output.length - 1).every(num => num === 0))) throw 'ERROR!';  // this makes sure every number except the last is 0. this error should never happen
+        return output[output.length - 1];
       } else if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
         i += 4;
@@ -143,11 +144,9 @@ function solution_1 (part, codeStr, input) {
         throw 'ERROR!';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }
     }
-    if (!(output.slice(0, output.length - 1).every(num => num === 0))) throw 'ERROR!';    // this makes sure every number except the last is 0. this error should never happen
-    return output[output.length - 1];
   }
 
-  return helper(input);
+  return runIntcode(input);
 }
 
 // TEST CASES
