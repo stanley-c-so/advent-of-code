@@ -148,7 +148,7 @@ input = {
   width: 25,
   height: 6,
 };
-expected = [1560, 5];
+expected = [1560, 5];                                             // the first element is confirmed correct because it is the answer
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 2

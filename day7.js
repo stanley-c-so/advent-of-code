@@ -267,7 +267,7 @@ input = {
   part: 1,
   codeStr: actualInput,
 };
-expected = [255590, [4, 1, 2, 3, 0]];
+expected = [255590, [4, 1, 2, 3, 0]];                             // the first element is confirmed correct because it is the answer
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 5
@@ -291,5 +291,5 @@ input = {
   part: 2,
   codeStr: actualInput,
 };
-expected = [58285150, [8, 5, 6, 9, 7]];
+expected = [58285150, [8, 5, 6, 9, 7]];                           // the first element is confirmed correct because it is the answer
 test(func, input, expected, testNum, lowestTest, highestTest);
