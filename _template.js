@@ -8,10 +8,7 @@
 
 //
 
-// SWITCHING BETWEEN SOLUTIONS:
-const NAME_OF_ALGO_HERE = solution_1;
-
-function solution_1 (part, INPUT_HERE) {
+function NAME_OF_ALGO_HERE (part, INPUT_HERE) {
 
   // PART 1 VS PART 2
   // if (part === 1) {
