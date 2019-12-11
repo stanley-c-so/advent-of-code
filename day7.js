@@ -117,28 +117,20 @@ function findMaxOutput (part, codeStr) {
       const operand2 = +clone[i].substr(-4, 1) ? +clone[i + 2] : +clone[+clone[i + 2]];     // make sure to handle for both position and immediate modes
       const operand3 = +clone[i + 3];                                                       // for every case in which there is an operand3, immediate mode is never used
 
-      if (opcode === '99') {
-        return {
-          newState: clone,
-          finalOutput: part === 1 ? output[output.length - 1] : input,    // in part 1, we want the last thing written to output array by opcode '04'. in part 2, we want input (previous amp's output)
-          code99: true,
-          i,
-          phaseInputReceived,
-        };
-      } else if (opcode === '01') {
+      if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
         i += 4;
       } else if (opcode === '02') {
         clone[operand3] = numParser(operand1 * operand2);
         i += 4;
       } else if (opcode === '03') {
-        clone[+clone[i + 1]] = numParser( phaseInputReceived ? input : phase );   // the first time opcode '03' is reached, input is phase; after that, it is always input
-        phaseInputReceived = true;                                                // it is safe always to set phaseInputReceived to true
+        clone[+clone[i + 1]] = numParser( phaseInputReceived ? input : phase );             // the first time opcode '03' is reached, input is phase; after that, it is always input
+        phaseInputReceived = true;                                                          // it is safe always to set phaseInputReceived to true
         i += 2;
       } else if (opcode === '04') {
         output.push(operand1);
         i += 2;
-        if (part === 2) {                                   // in part 2, opcode '04' should return an object allowing the code to continue to the next amp
+        if (part === 2) {                                                                   // in part 2, opcode '04' should return an object allowing the code to continue to the next amp
           return {
             newState: clone,
             finalOutput: output[output.length - 1],
@@ -157,6 +149,14 @@ function findMaxOutput (part, codeStr) {
       } else if (opcode === '08') {
         clone[operand3] = operand1 === operand2 ? numParser(1) : numParser(0);
         i += 4;
+      } else if (opcode === '99') {
+        return {
+          newState: clone,
+          finalOutput: part === 1 ? output[output.length - 1] : input,    // in part 1, we want the last thing written to output array by opcode '04'. in part 2, we want input (previous amp's output)
+          code99: true,
+          i,
+          phaseInputReceived,
+        };
       } else {
         throw 'ERROR! unrecognized opcode';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }

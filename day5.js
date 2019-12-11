@@ -112,10 +112,7 @@ function diagnostic (part, codeStr, input) {
       const operand2 = +clone[i].substr(-4, 1) ? +clone[i + 2] : +clone[+clone[i + 2]];     // make sure to handle for both position and immediate modes
       const operand3 = +clone[i + 3];                                                       // for every case in which there is an operand3, immediate mode is never used
 
-      if (opcode === '99') {
-        if (!(output.slice(0, output.length - 1).every(num => num === 0))) throw 'ERROR!';  // this makes sure every number except the last is 0. this error should never happen
-        return output[output.length - 1];
-      } else if (opcode === '01') {
+      if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
         i += 4;
       } else if (opcode === '02') {
@@ -137,6 +134,9 @@ function diagnostic (part, codeStr, input) {
       } else if (opcode === '08') {
         clone[operand3] = operand1 === operand2 ? numParser(1) : numParser(0);
         i += 4;
+      } else if (opcode === '99') {
+        if (!(output.slice(0, output.length - 1).every(num => num === 0))) throw 'ERROR!';  // this makes sure every number except the last is 0. this error should never happen
+        return output[output.length - 1];
       } else {
         throw 'ERROR! unrecognized opcode';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }

@@ -84,10 +84,7 @@ function boost (part, codeStr, input) {
       const operand2 = calculateOperand(2, mode2);
       const operand3 = calculateOperand(3, mode3);                              // NOTE: unlike operands 1-2 which could be either an index or absolute value, 3 is ALWAYS an index
 
-      if (opcode === '99') {
-        if (input === 1 && output.length !== 1) throw 'ERROR!';                 // in this problem specifically, there should only be 1 output. this error should never happen
-        return output;
-      } else if (opcode === '01') {
+      if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
         i += 4;
       } else if (opcode === '02') {
@@ -115,6 +112,9 @@ function boost (part, codeStr, input) {
       } else if (opcode === '09') {
         relativeBase += operand1;
         i += 2;
+      } else if (opcode === '99') {
+        if (input === 1 && output.length !== 1) throw 'ERROR!';                 // in this problem specifically, there should only be 1 output. this error should never happen
+        return output;
       } else {
         throw 'ERROR! unrecognized opcode';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }
