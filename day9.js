@@ -61,12 +61,12 @@ function boost (part, codeStr, input) {
   // HELPER FUNCTION: RUNS THROUGH INPUT INTCODE AND RETURNS ENTIRE OUTPUT
   function runIntcode (code, input) {
 
-    function calculateOperand (n, mode) {                                     // use this helper function to calculate operand based on operand # and mode #
+    function calculateOperand (n, mode) {                                       // use this helper function to calculate operand based on operand # and mode #
       if (mode === 1) return +clone[i + n];
       const offset = mode === 0 ? 0 : relativeBase;
       const searchIdx = +clone[i + n] + offset;
-      if (n === 3) return searchIdx;                                          // operand3 always refers to the write location, so we only need to return that index
-      if (clone[searchIdx] === undefined) clone[searchIdx] = numParser(0);    // if the search index is out of bounds of current clone state, first set that value to 0
+      if (n === 3) return searchIdx;                                            // operand3 always refers to the write location, so we only need to return that index
+      if (clone[searchIdx] === undefined) clone[searchIdx] = numParser(0);      // if the search index is out of bounds of current clone state, first set that value to 0
       return +clone[searchIdx];
     }
 
