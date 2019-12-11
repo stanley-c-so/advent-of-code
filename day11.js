@@ -121,27 +121,7 @@ function robotPaint (part, codeStr) {
       const operand2 = calculateOperand(2, mode2);
       const operand3 = calculateOperand(3, mode3);                              // NOTE: unlike operands 1-2 which could be either an index or absolute value, 3 is ALWAYS an index
 
-      if (opcode === '99') {
-        if (part === 1) {
-          return Object.keys(panels).length;                                    // the number of painted panels will match the number of keys in the panels object
-        } else {
-          const h = highestY - lowestY + 1;
-          const w = highestX - lowestX + 1;
-          const img = Array.from({length: h}, () => Array.from({length: w}, () => 0));
-          for (const coord in panels) {
-            const [x, y] = coord.split(',').map(s => +s);
-            const row = highestY - y;                                           // since matrix rows are flipped relative to y axis, measure y relative to highestY
-            const col = x - lowestX;                                            // measure x relative to lowestX
-            img[row][col] = panels[coord];
-          }
-          console.log('\n' + 'Image from Part 2 (white as foreground):' + '\n');
-          img.forEach(row => console.log(row.map(n => n ? 'XX' : '  ').join(' ')));
-          console.log('\n' + 'Image from Part 2 (black as foreground):' + '\n');
-          img.forEach(row => console.log(row.map(n => n ? '  ' : 'XX').join(' ')));
-          console.log('');
-          return;
-        }
-      } else if (opcode === '01') {
+      if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
         i += 4;
       } else if (opcode === '02') {
@@ -182,11 +162,31 @@ function robotPaint (part, codeStr) {
       } else if (opcode === '09') {
         relativeBase += operand1;
         i += 2;
+      } else if (opcode === '99') {
+        if (part === 1) {
+          return Object.keys(panels).length;                                    // the number of painted panels will match the number of keys in the panels object
+        } else {
+          const h = highestY - lowestY + 1;
+          const w = highestX - lowestX + 1;
+          const img = Array.from({length: h}, () => Array.from({length: w}, () => 0));
+          for (const coord in panels) {
+            const [x, y] = coord.split(',').map(s => +s);
+            const row = highestY - y;                                           // since matrix rows are flipped relative to y axis, measure y relative to highestY
+            const col = x - lowestX;                                            // measure x relative to lowestX
+            img[row][col] = panels[coord];
+          }
+          console.log('\n' + 'Image from Part 2 (white as foreground):' + '\n');
+          img.forEach(row => console.log(row.map(n => n ? 'XX' : '  ').join(' ')));
+          console.log('\n' + 'Image from Part 2 (black as foreground):' + '\n');
+          img.forEach(row => console.log(row.map(n => n ? '  ' : 'XX').join(' ')));
+          console.log('');
+          return;
+        }
       } else {
         throw 'ERROR! unrecognized opcode';   // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }
     }
-    throw 'ERROR! i is out of bounds';        // if the while loop terminates prematurely (apart from opcode 99 or 04). this error should never happen
+    throw 'ERROR! i is out of bounds';        // if the while loop terminates prematurely (apart from opcode 99). this error should never happen
   }
 
   // INGEST INPUT DATA (THE PROGRAM)
