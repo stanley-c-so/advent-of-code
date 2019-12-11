@@ -158,5 +158,5 @@ input = {
   width: 25,
   height: 6,
 };
-expected = undefined;                                             // there is no expected output! we just want to print out the image and decode it! the message is UGCUH (white is foreground)
+expected = undefined;                                             // there is no expected return! we just want to print out the image and decode it! the message is UGCUH (white is foreground)
 test(func, input, expected, testNum, lowestTest, highestTest);
