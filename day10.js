@@ -173,7 +173,7 @@
 
 function bestAsteroidLocation (part, asteroidStr, n, startX, startY) {        // n, startX, and startY are for part 2
 
-  // UTILITY FUNCTION: GIVEN POSITIVE INTEGER INPUTS, FIND GREATEST COMMON DENOMINATOR
+  // UTILITY FUNCTION: GIVEN INTEGER INPUTS, FIND POSITIVE GREATEST COMMON DENOMINATOR
   function GCD (num, denom) {                                                 // uses Euclidean algorithm (https://en.wikipedia.org/wiki/Euclidean_algorithm)
     num = Math.abs(num);
     denom = Math.abs(denom);
