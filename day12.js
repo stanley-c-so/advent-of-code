@@ -327,8 +327,8 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
 
   } else {
 
-    const periodValues = Object.values(periods);                                      // now we only care about the period values for the three axes
-    return LCM(LCM(periodValues[0], periodValues[1]), periodValues[2]);               // get the LCM of all period values (run LCM on the first two values, then run again with the third)
+    const periodValues = Object.values(periods);                                          // now we only care about the period values for the three axes
+    return [periodValues, LCM(LCM(periodValues[0], periodValues[1]), periodValues[2])];   // get the LCM of all period values (run LCM on the first two values, then run again with the third)
 
   }
 }
@@ -419,7 +419,10 @@ input = {
     D: {x: 3, y: 5, z: -1},
   },
 };
-expected = 2772;
+expected = [
+  [18, 28, 44],                                                         // this is the value i calculated
+  2772,                                                                 // this value is provided by the prompt
+];
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 5
@@ -432,7 +435,10 @@ input = {
     D: {x: 9, y: -8, z: -3},
   },
 };
-expected = 4686774924;
+expected = [
+  [2028, 5898, 4702],                                                   // this is the value i calculated
+  4686774924,                                                           // this value is provided by the prompt
+];
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 6
@@ -440,5 +446,8 @@ input = {
   part: 2,
   initialPositions: actualInput,
 };
-expected = 326365108375488;                                             // my solution takes a bit over 2 seconds to calculate! be patient!
+expected = [
+  [268296, 84032, 231614],                                              // this is the value i calculated
+  326365108375488,                                                      // my solution takes a bit over 2 seconds to calculate! be patient!
+];
 test(func, input, expected, testNum, lowestTest, highestTest);
