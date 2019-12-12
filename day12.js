@@ -323,7 +323,7 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
       totalEnergy += energies[moon].total;
     }
 
-    return totalEnergy;
+    return [totalEnergy, energies];
 
   } else {
 
@@ -362,7 +362,14 @@ input = {
   },
   steps: 10,
 };
-expected = 179;
+expected = [179,
+  {
+    A: {potential: 6, kinetic: 6, total: 36},
+    B: {potential: 9, kinetic: 5, total: 45},
+    C: {potential: 10, kinetic: 8, total: 80},
+    D: {potential: 6, kinetic: 3, total: 18},
+  }
+];
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 2
@@ -376,7 +383,14 @@ input = {
   },
   steps: 100,
 };
-expected = 1940;
+expected = [1940,
+  {
+    A: {potential: 29, kinetic: 10, total: 290},
+    B: {potential: 32, kinetic: 19, total: 608},
+    C: {potential: 41, kinetic: 14, total: 574},
+    D: {potential: 52, kinetic: 9, total: 468},
+  }
+];
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 3
@@ -385,7 +399,14 @@ input = {
   initialPositions: actualInput,
   steps: 1000,
 };
-expected = 9493;
+expected = [9493,
+  {
+    A: {potential: 100, kinetic: 37, total: 3700},
+    B: {potential: 181, kinetic: 19, total: 3439},
+    C: {potential: 55, kinetic: 20, total: 1100},
+    D: {potential: 33, kinetic: 38, total: 1254},
+  }
+];
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 4
