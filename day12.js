@@ -296,6 +296,7 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
   for (let i = 1; i <= steps; i++) {                                                  // part 2 deals with step numbers, so counting from 1 .. steps is easier than 0 ... steps
     applyGravity();
     applyVelocity();
+
     if (part === 2) {
       for (const axis of axes) {
         currentState = stringifyState(axis);                                          // calculate the stringified state for each axis
@@ -328,7 +329,7 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
 
     const periodValues = Object.values(periods);                                      // now we only care about the period values for the three axes
     return LCM(LCM(periodValues[0], periodValues[1]), periodValues[2]);               // get the LCM of all period values (run LCM on the first two values, then run again with the third)
-    
+
   }
 }
 
@@ -353,7 +354,7 @@ const actualInput = {                                                   // origi
 // Test case 1
 input = {
   part: 1,
-  initialPositions: {
+  initialPositions: {                                                   // original input was formatted differently, but it was small enough for me to modify the format manually here
     A: {x: -1, y: 0, z: 2},
     B: {x: 2, y: -10, z: -7},
     C: {x: 4, y: -8, z: 8},
@@ -367,7 +368,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 2
 input = {
   part: 1,
-  initialPositions: {
+  initialPositions: {                                                   // original input was formatted differently, but it was small enough for me to modify the format manually here
     A: {x: -8, y: -10, z: 0},
     B: {x: 5, y: 5, z: 10},
     C: {x: 2, y: -7, z: 3},
@@ -390,7 +391,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 4
 input = {
   part: 2,
-  initialPositions: {
+  initialPositions: {                                                   // original input was formatted differently, but it was small enough for me to modify the format manually here
     A: {x: -1, y: 0, z: 2},
     B: {x: 2, y: -10, z: -7},
     C: {x: 4, y: -8, z: 8},
@@ -403,7 +404,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 5
 input = {
   part: 2,
-  initialPositions: {
+  initialPositions: {                                                   // original input was formatted differently, but it was small enough for me to modify the format manually here
     A: {x: -8, y: -10, z: 0},
     B: {x: 5, y: 5, z: 10},
     C: {x: 2, y: -7, z: 3},
@@ -418,5 +419,5 @@ input = {
   part: 2,
   initialPositions: actualInput,
 };
-expected = 326365108375488;
+expected = 326365108375488;                                             // my solution takes a bit over 2 seconds to calculate! be patient!
 test(func, input, expected, testNum, lowestTest, highestTest);
