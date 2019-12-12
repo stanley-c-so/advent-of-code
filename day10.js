@@ -175,6 +175,8 @@ function bestAsteroidLocation (part, asteroidStr, n, startX, startY) {        //
 
   // UTILITY FUNCTION: GIVEN POSITIVE INTEGER INPUTS, FIND GREATEST COMMON DENOMINATOR
   function GCD (num, denom) {                                                 // uses Euclidean algorithm (https://en.wikipedia.org/wiki/Euclidean_algorithm)
+    num = Math.abs(num);
+    denom = Math.abs(denom);
     return denom ? GCD(denom, num % denom) : num;
   }
 
@@ -182,7 +184,7 @@ function bestAsteroidLocation (part, asteroidStr, n, startX, startY) {        //
   function simplifySlope (rise, run) {
     if (!rise) return run > 0 ? '+0' : '-0';                                  // signs are needed to distinguish between looking left (negative) or looking right (positive)
     if (!run) return rise > 0 ? 'Infinity' : '-Infinity';                     // signs are needed to distinguish between looking up (negative) or looking down (positive) (higher row means down)
-    const gcd = GCD(Math.abs(rise), Math.abs(run));                           // credit to Phrogz (https://stackoverflow.com/questions/4652468/is-there-a-javascript-function-that-reduces-a-fraction)
+    const gcd = GCD(rise, run);                                               // credit to Phrogz (https://stackoverflow.com/questions/4652468/is-there-a-javascript-function-that-reduces-a-fraction)
     return `${rise/gcd},${run/gcd}`;                                          // we distinguish between -rise/run and rise/-run since those would imply two directions of visibility along the same slope
   }
 
