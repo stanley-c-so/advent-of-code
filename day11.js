@@ -98,6 +98,7 @@ function robotPaint (part, codeStr) {
 
     const clone = [...code];
 
+    // SPECIAL INITIALIZATIONS FOR THIS PROBLEM
     const panels = part === 1 ? {} : {'0,0': 1};                                // this will track the movement of the robot. part 1 starts the robot on a black panel, while part 2 starts it on white
     const output = [];                                                          // in this problem, output will temporarily store values until it has 2, and then it will process and empty
     const xVectors = [0, 1, 0, -1];                                             // represents 1 unit of movement while robot is facing UP, RIGHT, DOWN, or LEFT
