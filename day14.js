@@ -106,20 +106,11 @@
 
 function stoichiometry (part, reactionsStr) {
 
-  const reactions = {};                                                                 // chemicals will have a key, and the value will be another object of its qty and an object of reagents and quantities
-  const reactionsArr = reactionsStr.split('\n');
-  for (const reaction of reactionsArr) {
-    const [reagents, qtyProduct] = reaction.split(' => ');
-    const [qtyP, product] = qtyProduct.split(' ');
-    for (const qtyReagent of reagents.split(', ')) {
-      const [qtyR, reagent] = qtyReagent.split(' ');
-      if (!(product in reactions)) reactions[product] = {qty: +qtyP, reagents: {}};
-      reactions[product].reagents[reagent] = +qtyR;
-    }
-  }
-
+  // HELPER FUNCTION THAT DETERMINES HOW MUCH ORE YOU NEED TO PRODUCE qtyP of product, GIVEN EXCESS RESERVES OF excess
   function calculateORE (product, qtyP, excess) {
 
+    // WHEN YOU NEED A CERTAIN AMOUNT OF A MATERIAL, THIS SIDE-EFFECT FUNCTION DECREASES THAT AMOUNT BY TAKING AS MUCH OF THAT MATERIAL AS YOU CAN FROM YOUR EXCESS RESERVES.
+    // NOTE THAT THIS FUNCTION COULD BE WRITTEN APART FROM calculateORE BUT I THINK IT MAKES MORE SENSE INSIDE HERE
     function takeFromExcess (material, qtyM, excess) {                                  // grabs material from excess stockpile and returns the amount of that material that you still need afterward
       if (!(material in excess)) return qtyM;                                           // if the material you need does not even exist in the excess stockpile, simply return the amount of material you need
       if (qtyM < excess[material]) {                                                    // IF you can take entirely from excess, do so and return 0
@@ -131,32 +122,50 @@ function stoichiometry (part, reactionsStr) {
       return remainder;
     }
 
+    // STEP 1: REDUCE qtyP BY TAKING FROM EXCESS RESERVES
     qtyP = takeFromExcess(product, qtyP, excess);                                       // first, try to grab any of the product you need directly from excess
     if (!qtyP) return 0;                                                                // there's a chance that everything you needed was in excess. if so, return 0
 
-    if (product === 'ORE') return qtyP;                                                 // next, see if your desired product is ORE itself, in which case, just mine and return that much ORE
+    // STEP 2a: IF product IS ORE, MINE IT DIRECTLY
+    if (product === 'ORE') return qtyP;
 
-    const reagents = reactions[product].reagents;                                       // at this point, you will have to build your product out of other reagents. create reference to reagents
-    let requiredOre = 0;                                                                // go reagent by reagent, adding up amount of required ore for each reagent
+    // STEP 2b: OTHERWISE, GENERATE product BY COMBINING REAGENTS ONE BY ONE AND TRACK RUNNING TOTAL OF REQUIRED ORE
+    const reagents = reactions[product].reagents;                                       // create reference to reagents
+    let requiredOre = 0;                                                                // running total of required ORE
     for (const reagent in reagents) {
-      const qtyR = takeFromExcess(                                                                                              // first, try to take from excess
+      const qtyR = takeFromExcess(                                                      // first, try to take from excess
         reagent,
         Math.ceil(qtyP / reactions[product].qty) * reagents[reagent],
         excess
       );
-      requiredOre += calculateORE(reagent, qtyR, excess);                                                                       // then, recurse and add the ORE required for that reagent to your running total
-      if (reagent !== 'ORE') {                                                                                                  // unless the reagent is ORE, you may have to produce excess reagent
-        excess[reagent] = (excess[reagent] || 0) + Math.ceil(qtyR / reactions[reagent].qty) * reactions[reagent].qty - qtyR;    // calculate the amount of excess
-        if (!excess[reagent]) delete excess[reagent];                                                                           // if excess is 0, delete the key
+      requiredOre += calculateORE(reagent, qtyR, excess);                               // then, recurse and add the ORE required for that reagent to your running total
+      if (reagent !== 'ORE') {                                                          // unless the reagent is ORE, you may have to produce excess reagent
+        excess[reagent] = (excess[reagent] || 0)                                        // calculate the amount of excess
+          + Math.ceil(qtyR / reactions[reagent].qty) * reactions[reagent].qty
+          - qtyR;
+        if (!excess[reagent]) delete excess[reagent];                                   // if excess is 0, delete the key
       }
     }
     return requiredOre;
   }
 
+  // MAIN FUNCTION: PARSE THE REACTIONS DATA AND COMPILE A REACTIONS HASH TABLE
+  const reactions = {};                                                                 // keys are chemicals, and values are another object of (1) qty and (2) nested object of reagents and quantities
+  const reactionsArr = reactionsStr.split('\n');
+  for (const reaction of reactionsArr) {
+    const [reagents, qtyProduct] = reaction.split(' => ');
+    const [qtyP, product] = qtyProduct.split(' ');
+    for (const qtyReagent of reagents.split(', ')) {
+      const [qtyR, reagent] = qtyReagent.split(' ');
+      if (!(product in reactions)) reactions[product] = {qty: +qtyP, reagents: {}};
+      reactions[product].reagents[reagent] = +qtyR;
+    }
+  }
+
   // PART 1 VS PART 2
   if (part === 1) {
 
-    return calculateORE('FUEL', 1, {});
+    return calculateORE('FUEL', 1, {});                                                       // simply find out how much ORE you need to make 1 FUEL starting with no reserves
     
   } else {
 
