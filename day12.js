@@ -285,10 +285,10 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
   for (const moon of moons) velocities[moon] = {x: 0, y: 0, z: 0};                    // the problem provides that the default velocities are 0 in each axis
 
   // PART 2 INITIALIZATIONS: THE KEY IS THAT STATES BETWEEN AXES NEVER AFFECT ONE ANOTHER. THUS, THE STATE OF EVERY AXIS IS KEPT SEPARATE, UNTIL INDIVIDUAL AXIS PERIODS ARE FOUND. THEN, CALCULATE LCM.
-  const axisStates = {};                                                              // each value is a hash table of stringified states corresponding to an array of indices when those states appeared
+  const initialStates = {};                                                           // each key is an axis, and each value is that axis's initial stringified state
   const periods = {};                                                                 // these begin as undefined and we will stop part 2 once all of these are defined
   for (const axis of axes) {
-    axisStates[axis] = {[stringifyState(axis)]: 0};                                   // initial states appear at i = 0 (note that the for loop iterates i from 1 .. steps)
+    initialStates[axis] = stringifyState(axis);                                       // initial states appear at i = 0 (note that the for loop iterates i from 1 .. steps)
     periods[axis] = undefined;
   }
 
@@ -300,10 +300,9 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
     if (part === 2) {
       for (const axis of axes) {
         currentState = stringifyState(axis);                                          // calculate the stringified state for each axis
-        if (!periods[axis] && currentState in axisStates[axis]) {                     // if the period of this axis has not yet been found, but the current state has appeared before...
-          periods[axis] = i - axisStates[axis][currentState];                         // ...then now we know the period is the current step # minus the step # when the current state last appeared
+        if (!periods[axis] && currentState === initialStates[axis]) {                 // if the period of this axis has not yet been found, but the current state matches the initial state...
+          periods[axis] = i;                                                          // ... then now we know the period is the current step #, i
         }
-        axisStates[axis][currentState] = i;                                           // add current state to the axis's hash table with the current step # (if period has been found, the data won't matter)
       }
       if (!(Object.values(periods).includes(undefined))) break;                       // IMPORTANT: once all periods have been found, break!!! otherwise, infinite loop
     }
@@ -313,7 +312,7 @@ function jupiterMoons (part, initialPositions, steps = Infinity) {              
   if (part === 1) {
 
     const energies = {};
-    for (const moon of moons) energies[moon] = {potential: 0, kinetic: 0, total: 0};  // set up initial energies to 0
+    for (const moon of moons) energies[moon] = {potential: 0, kinetic: 0, total: 0};      // set up initial energies to 0
     let totalEnergy = 0;
 
     for (const moon of moons) {
