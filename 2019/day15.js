@@ -77,7 +77,53 @@
 
 // PART 2:
 
-//
+// You quickly repair the oxygen system; oxygen gradually fills the area.
+
+// Oxygen starts in the location containing the repaired oxygen system. It takes one minute for oxygen to spread to all open locations that are adjacent to a location that already contains oxygen. Diagonal locations are not adjacent.
+
+// In the example above, suppose you've used the droid to explore the area fully and have the following map (where locations that currently contain oxygen are marked O):
+
+//  ##   
+// #..## 
+// #.#..#
+// #.O.# 
+//  ###  
+
+// Initially, the only location which contains oxygen is the location of the repaired oxygen system. However, after one minute, the oxygen spreads to all open (.) locations that are adjacent to a location containing oxygen:
+
+//  ##   
+// #..## 
+// #.#..#
+// #OOO# 
+//  ###  
+
+// After a total of two minutes, the map looks like this:
+
+//  ##   
+// #..## 
+// #O#O.#
+// #OOO# 
+//  ###  
+
+// After a total of three minutes:
+
+//  ##   
+// #O.## 
+// #O#OO#
+// #OOO# 
+//  ###  
+
+// And finally, the whole region is full of oxygen after a total of four minutes:
+
+//  ##   
+// #OO## 
+// #O#OO#
+// #OOO# 
+//  ###  
+
+// So, in this example, all locations contain oxygen after 4 minutes.
+
+// Use the repair droid to get a complete map of the area. How many minutes will it take to fill with oxygen?
 
 function findTarget (part, codeStr) {
 
@@ -91,8 +137,26 @@ function findTarget (part, codeStr) {
     return rtn;
   }
 
+  // THIS FUNCTION IS COMPLETELY OPTIONAL
+  function drawBoard (tiles, highestX, lowestX, highestY, lowestY) {
+    const h = highestY - lowestY + 1;
+    const w = highestX - lowestX + 1;
+    const img = Array.from({length: h}, () => Array.from({length: w}, () => 0));
+    for (const coord in tiles) {
+      const [x, y] = coord.split(',').map(s => +s);
+      const row = highestY - y;                                                     // since matrix rows are flipped relative to y axis, measure y relative to highestY
+      const col = x - lowestX;                                                      // measure x relative to lowestX
+      img[row][col] = tiles[coord];
+    }
+    console.log('');
+    img.forEach(row => console.log(
+      row.map(pixel => pixel ? pixel : ' ').join(' '))
+    );
+    console.log('');
+  }
+
   // HELPER FUNCTION: RUNS THROUGH INPUT INTCODE
-  function runIntcode (code, directionIdx = 0) {
+  function runIntcode (code, hugLeft = 1, dirIdx = 0) {
 
     function calculateOperand (n, mode) {                                           // use this helper function to calculate operand based on operand # and mode #
       if (mode === 1) return +clone[i + n];
@@ -103,45 +167,26 @@ function findTarget (part, codeStr) {
       return +clone[searchIdx];
     }
 
-    // THIS FUNCTION IS COMPLETELY OPTIONAL
-    function drawBoard (tiles, highestX, lowestX, highestY, lowestY, currentX, currentY) {
-      const h = highestY - lowestY + 1;
-      const w = highestX - lowestX + 1;
-      const img = Array.from({length: h}, () => Array.from({length: w}, () => 0));
-      for (const coord in tiles) {
-        const [x, y] = coord.split(',').map(s => +s);
-        const row = highestY - y;                                                   // since matrix rows are flipped relative to y axis, measure y relative to highestY
-        const col = x - lowestX;                                                    // measure x relative to lowestX
-        img[row][col] = tiles[coord];
-      }
-      img[highestY - currentY][currentX - lowestX] = 'D';                           // overwrite droid's current position with 'D'
-      console.log('');
-      img.forEach(row => console.log(row.map(pixel => pixel ? pixel : ' ').join(' ')));
-      console.log('');
-    }
-
     const clone = [...code];
-    const output = [];
+    // const output = [];                                                           // output is not used in this problem
 
     // SPECIAL INITIALIZATIONS FOR THIS PROBLEM
-    const direction = [1, 4, 2, 3];                                                 // north, east, south, west
-    let mainDirection = true;                                                       // if true, your most recent attempt to move in your main direction was successful
     let hitFirstWall = false;                                                       // droid should run straight until it hits its first wall, after which it will hug the wall
-    const xVector = [0, 1, 0, -1];
-    const yVector = [1, 0, -1, 0];
-    let x = 0;                                                                      // default coordinates will by 0, 0
-    let y = 0;
-    const positions = new Set(['0,0,0,1']);                                         // x, y, direction, mainDirection (boolean)
-
-    // THIS BLOCK OF CODE IS COMPLETELY OPTIONAL
-    const tiles = {'0,0': 's'};                                                     // start position uniquely has 's' as its pixel
+    const direction = [1, 4, 2, 3];                                                 // N, E, S, W (the specific output numbers are given by the problem. sequence must be clockwise or ccw)
+    let mainDirection = true;                                                       // if true, your next input will be in the same direction as dirIdx
+    const hugLeftSign = hugLeft * 2 -1;                                             // hugLeft is 0 ir 1, but we want that to translate to -1 or 1, so we do some math
+    const xVector = [0, 1, 0, -1];                                                  // N, E, S, W
+    const yVector = [1, 0, -1, 0];                                                  // N, E, S, W
+    let [x, y] = [0, 0];                                                            // default coordinates will by 0, 0
+    const tiles = {'0,0': 'S'};                                                     // start position (0, 0) uniquely has 's' as its pixel
     let lowestX = Infinity;
     let highestX = -Infinity;
     let lowestY = Infinity;
     let highestY = -Infinity;
-    const dir = {0: 'NORTH', 1: 'EAST', 2: 'SOUTH', 3: 'WEST'};
+    let goalX;
+    let goalY;
 
-    let count = 0;
+    const positions = new Set([`0,0,${dirIdx},1`]);                                 // use a set to store all combinations of where the droid is, what direction it's facing, and value of mainDirection
 
     let i = 0;
     let relativeBase = 0;
@@ -154,9 +199,6 @@ function findTarget (part, codeStr) {
       const operand2 = calculateOperand(2, mode2);
       const operand3 = calculateOperand(3, mode3);                                  // NOTE: unlike operands 1-2 which could be either an index or absolute value, 3 is ALWAYS an index
 
-      count++;
-      if (count === 10000) throw `REACHED ${count} ITERATIONS`
-
       if (opcode === '01') {
         clone[operand3] = numParser(operand1 + operand2);
         i += 4;
@@ -167,62 +209,55 @@ function findTarget (part, codeStr) {
         const offset = mode1 === 0 ? 0 : relativeBase;
         const searchIdx = +clone[i + 1] + offset;
         if (clone[searchIdx] === undefined) clone[searchIdx] = numParser(0);        // if the search index is out of bounds of current clone state, first set that value to 0
-        clone[searchIdx] = numParser(
-          direction[(directionIdx + !mainDirection) % 4]                            // if currently going in main direction, go by directionIdx; else, choose 1 index higher
-        );
-        console.log(`count ${count}: next output will be ${dir[(directionIdx + !mainDirection) % 4]}. mainDirection is ${mainDirection}`)
+        clone[searchIdx] = numParser(direction[
+          ((dirIdx + !mainDirection * hugLeftSign) % 4 + 4) % 4                     // !mainDirection: if currently going in main direction, go by dirIdx; else, choose 1 index higher.
+                                                                                    // hugLeftSign: depending on whether you are hugging left or right, you actually want to increment/decrement index
+                                                                                    // (... % 4 + 4) % 4: if dirIdx dips below 0 into negatives, we still want % 4 to fall between 0..3
+        ]);
         i += 2;
       } else if (opcode === '04') {
+        const finalDirIdx = ((dirIdx + !mainDirection * hugLeftSign) % 4 + 4) % 4   // (see comments above)
         if (operand1 === 0) {                                                       // hit a wall. you must turn
-          
-          // OPTIONAL
-          tiles[
-            `${x + xVector[(directionIdx + !mainDirection) % 4]}`
-            + ','
-            + `${y + yVector[(directionIdx + !mainDirection) % 4]}`
-          ] = '#';
-          console.log(`count ${count}: wall found to the ${dir[(directionIdx + !mainDirection) % 4]} at ${x + xVector[(directionIdx + !mainDirection) % 4]}, ${y + yVector[(directionIdx + !mainDirection) % 4]}`)
-
-          hitFirstWall = true;
-          if (mainDirection) {                                                        // you were going in your main direction, but now you cannot continue
-            mainDirection = false;                                                      // set mainDirection to false - on your next input you will attempt the next direction (a turn)
-          } else {                                                                    // you cannot go in your main or the next direction
-            directionIdx++;                                                             // increase directionIdx to cycle to the next mainDirection
-          }
+          hitFirstWall = true;                                                      // we can set this to true as soon as we get our first opcode 04
+          if (!mainDirection) dirIdx += hugLeftSign;                                // if you cannot go in your main or the next direction, increase dirIdx to cycle to the next mainDirection
+          mainDirection = false;                                                    // after any unsuccessful movement, mainDirection becomes false
+          tiles[`${x + xVector[finalDirIdx]},${y + yVector[finalDirIdx]}`] = wall;  // update tiles
         } else if (operand1 === 1) {                                                // you successfully moved where you wanted
-
-          const youMovedInThisDir = dir[(directionIdx + !mainDirection) % 4];
-          
-          x += xVector[(directionIdx + !mainDirection) % 4];                        // update x position (if mainDirection, we want directionIdx + 0; else, directionIdx + 1)
-          y += yVector[(directionIdx + !mainDirection) % 4];                        // update y position (if mainDirection, we want directionIdx + 0; else, directionIdx + 1)
-          if (mainDirection && hitFirstWall) directionIdx--;                        // if you successfully moved in mainDirection, decrease directionIdx to cycle to the previous mainDirection
+          x += xVector[finalDirIdx];                                                // update x position
+          y += yVector[finalDirIdx];                                                // update y position
+          if (mainDirection && hitFirstWall) dirIdx -= hugLeftSign;                 // (after hitFirstWall) if you successfully moved in mainDirection, decrease dirIdx to cycle to the previous mainDirection
           mainDirection = true;                                                     // after any successful movement, resume trying to go in mainDirection
-
-          // OPTIONAL
-          if (!(`${x},${y}` in tiles)) tiles[`${x},${y}`] = '.';
-          lowestX = Math.min(lowestX, x - 1);                                       // give a 1 space buffer around the edge of the drawable area
-          highestX = Math.max(highestX, x + 1);
-          lowestY = Math.min(lowestY, y - 1);
-          highestY = Math.max(highestY, y + 1);
-
-          console.log(`count ${count}: position after moving ${youMovedInThisDir}: ${x}, ${y}`)
-
+          if (!(`${x},${y}` in tiles)) tiles[`${x},${y}`] = space;                  // update tiles (do not overwrite the starting indicator)
         } else if (operand1 === 2) {
-          console.log(`FOUND THE OXYGEN SYSTEM AT ${x}, ${y}`);
-          return;
+          x += xVector[((dirIdx + !mainDirection * hugLeftSign) % 4 + 4) % 4];      // update x position (if mainDirection, we want dirIdx + 0; else, dirIdx + 1)
+          y += yVector[((dirIdx + !mainDirection * hugLeftSign) % 4 + 4) % 4];      // update y position (if mainDirection, we want dirIdx + 0; else, dirIdx + 1)
+          tiles[`${x},${y}`] = goal;                                                // update tiles
+          goalX = x;
+          goalY = y;
         } else {
           throw `INVALID OUTPUT: ${operand1} AT i = ${i}`;
         }
 
-        const state = `${x},${y},${directionIdx % 4},${+mainDirection}`;
-        if (positions.has(state)) throw `repeated state ${state} at i = ${i}`
-        positions.add(state);
+        const state = `${x},${y},${(dirIdx % 4 + 4) % 4},${+mainDirection}`;        // `state` is the combination of where the droid is, what direction it's facing, and value of mainDirection
+        if (positions.has(state)) {                                                 // maze navigation should end when the droid reaches a prior state
+          return {
+            tiles,
+            highestX,
+            lowestX,
+            highestY,
+            lowestY,
+            goalX,
+            goalY,
+          };
+        }
+        positions.add(state);                                                       // add current state to set
+
+        lowestX = Math.min(lowestX, x - 1);                                         // give a 1 space buffer around the edge of the drawable area
+        highestX = Math.max(highestX, x + 1);
+        lowestY = Math.min(lowestY, y - 1);
+        highestY = Math.max(highestY, y + 1);
 
         i += 2;
-
-        // OPTIONAL
-        drawBoard(tiles, highestX, lowestX, highestY, lowestY, x, y);
-
       } else if (opcode === '05') {
         i = operand1 ? operand2 : i + 3;
       } else if (opcode === '06') {``
@@ -237,31 +272,68 @@ function findTarget (part, codeStr) {
         relativeBase += operand1;
         i += 2;
       } else if (opcode === '99') {
-        console.log(`REACHED OPCODE 99`);
-        return;
+        throw `REACHED OPCODE 99`;
       } else {
         throw 'ERROR! unrecognized opcode';                                         // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }
     }
-    throw 'ERROR! i is out of bounds';                                              // if the while loop terminates prematurely (apart from opcode 99 or 04). this error should never happen
+    throw 'ERROR! i is out of bounds';                                              // if the while loop terminates prematurely (apart from opcode 04). this error should never happen
   }
 
   // INGEST INPUT DATA (THE PROGRAM)
   const code = codeStr.split(',').map(str => numParser(str));
 
-  return runIntcode(code);
+  const wall = '#';                                                                 // these symbols represent how image will be displayed
+  const space = '.';
+  const goal = 'G';
+  const oxygen = 'O';
 
-  // PART 1 VS PART 2
-  // if (part === 1) {
+  const output = runIntcode(code, 0);                                               // run the program once, hugging the right wall
+  const { highestX, lowestX, highestY, lowestY, goalX, goalY } = output;            // get highest and lowest x/y data, as well as coordinates of oxygen tank
+  const tilesRight = output.tiles;                                                  // also get reference to tile data from hugging the right wall
+  const tilesLeft = runIntcode(code, 1).tiles;                                      // run the program a second time, hugging the left wall
+  const combinedTiles = Object.assign(Object.assign({}, tilesRight), tilesLeft);    // combine tile data
+  const numOfSpaces = Object.values(combinedTiles).reduce(                          // track the non-wall spaces so we know when the entire maze is filled with oxygen in part 2
+    (count, val) => count + (val !== wall), 0
+  );
 
+  const showImage = 1;                                                              // set this to 0 or 1 depending on if you want to see the image
 
-    
-  // } else {
+  // OPTIONAL: DRAW BOARD
+  if (part === 1 && showImage) {
+    drawBoard(combinedTiles, highestX, lowestX, highestY, lowestY);
+  }
 
-  
-
-  // }
-
+  // USE BFS TO FIND THE ANSWER
+  const queue = part === 1 ? [['0,0', 0]] : [[`${goalX},${goalY}`, 0]];             // in part 1, start at (0,0). in part 2, start at location of oxygen tank
+  const visited = new Set();
+  let maxMoves = 0;                                                                 // for part 2
+  while (queue.length) {
+    const [currentPos, moves] = queue.shift();
+    maxMoves = Math.max(maxMoves, moves);                                           // update maxMoves for part 2
+    if (part === 1 && combinedTiles[currentPos] === goal) return moves;             // part 1: if you reach the goal, return current number of moves
+    if (part === 2) combinedTiles[currentPos] = oxygen;                             // fill the space with oxygen for part 2
+    if (visited.has(currentPos)) continue;                                          // prevent backtracking
+    visited.add(currentPos);
+    if (part === 2 && visited.size === numOfSpaces) {                               // part 2: once you have visited all spaces, return maxMoves (the farthest distance from goal)
+      if (showImage) {
+        drawBoard(combinedTiles, highestX, lowestX, highestY, lowestY);
+      }
+      return maxMoves;
+    }
+    const [x, y] = currentPos.split(',').map(coord => +coord);
+    const neighbors = [                                                             // traverse 4 neighbors:
+      `${x},${y + 1}`,                                                              // up
+      `${x},${y - 1}`,                                                              // down
+      `${x + 1},${y}`,                                                              // right
+      `${x - 1},${y}`,                                                              // left
+    ]
+    for (const neighbor of neighbors) {
+      if (combinedTiles[neighbor] !== wall && !(visited.has(neighbor))) {           // only push neighbor to queue if neighbor is not wall and has not been visited
+        queue.push([neighbor, moves + 1]);
+      }
+    }
+  }
 }
 
 // TEST CASES
@@ -282,5 +354,13 @@ input = {
   part: 1,
   codeStr: actualInput,
 };
-expected = null;
+expected = 304;
+test(func, input, expected, testNum, lowestTest, highestTest);
+
+// Test case 2
+input = {
+  part: 2,
+  codeStr: actualInput,
+};
+expected = 310;
 test(func, input, expected, testNum, lowestTest, highestTest);
