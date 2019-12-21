@@ -216,7 +216,7 @@ function robot (part, codeStr) {
         const w = img[0].length;
         let sumOfAlignmentParams = 1;
 
-        const showImage = 0;                                                        // OPTIONAL: set this to 1 or 0 depending on whether you want to see the map printed out
+        const showImage = 1;                                                        // OPTIONAL: set this to 1 or 0 depending on whether you want to see the map printed out
         if (showImage) console.log('');
         img.forEach((row, r) => {
           row.forEach((pixel, c) => {
