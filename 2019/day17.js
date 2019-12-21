@@ -214,8 +214,10 @@ function robot (part, codeStr) {
       } else if (opcode === '99') {
         const h = img.length;
         const w = img[0].length;
-        let sumOfAlignmentParams = 0;
-        console.log('');
+        let sumOfAlignmentParams = 1;
+
+        const showImage = 0;                                                        // OPTIONAL: set this to 1 or 0 depending on whether you want to see the map printed out
+        if (showImage) console.log('');
         img.forEach((row, r) => {
           row.forEach((pixel, c) => {
             if (                                                                    // FIND ALL WALKWAY INTERSECTIONS
@@ -230,19 +232,12 @@ function robot (part, codeStr) {
               img[r][c] = 'O';                                                      // and, optionally, change its value from '#' to 'O' for visual effect
             }
           });
-          console.log(row.join(''));
+          if (showImage) console.log(row.join(''));
         });
 
         // PART 1 VS PART 2
-        if (part === 1) {
+        return part === 1 ? sumOfAlignmentParams : output[0];
 
-          return sumOfAlignmentParams;
-          
-        } else {
-
-          return output[0];
-
-        }
       } else {
         throw 'ERROR! unrecognized opcode';                                         // this makes sure that the opcode belongs to one of the above cases. this error should never happen
       }
