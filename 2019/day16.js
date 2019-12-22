@@ -96,6 +96,8 @@ function FFT (part, codeStr, phases, outputLength) {
   // the only difference is you omit the number at input[i - 1] (since there is one more 0 multiplier compared to before). since the first 7 digits of my initial input is close to 6 million, that means
   // that for each phase, i only need to do (6.5 million - 6 million) ~500,000 operations on the first iteration of i, and then ~500,000 operations on remaining iterations of i (i do not need to iterate
   // through j).
+  
+  // i got my idea for this solution from u/lega4 (https://www.reddit.com/r/adventofcode/comments/eblosu/day_16_mathvisual_explanation_and_thoughts/)
 
   let input = codeStr.repeat(part === 1 ? 1 : 10000);
   const offset = part === 1 ? 0 : +input.slice(0, 7);                               // part 1: no offset. part 2: offset is based on first 7 digits of initial input signal
