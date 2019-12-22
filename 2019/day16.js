@@ -87,37 +87,43 @@
 
 // After repeating your input signal 10000 times and running 100 phases of FFT, what is the eight-digit message embedded in the final output list?
 
-function FFT (part, codeStr, phases, basePattern, outputLength) {
+function FFT (part, codeStr, phases, outputLength) {
+
+  // NOTE: the part 2 solution only works because the offset (the first 7 digits of the initial input) is sufficiently large that it goes way past half the length of the input, AND the problem states
+  // that you only need to find the first 8 digits starting from that offset. all of this means that when you look at the matrix (like in the above diagrams), you can start analyzing the output of each
+  // phase starting at i === offset, because all the multipliers before that point will be 0. on the first iteration of i, you do need to sum the remaining numbers from the input (but this is only about
+  // < 1 million numbers, instead of 6.5 million) and all multipliers will be 1. on subsequent iterations of i, you do not need to sum the remaining input numbers - the multipliers are still 1, except that
+  // the only difference is you omit the number at input[i - 1] (since there is one more 0 multiplier compared to before). since the first 7 digits of my initial input is close to 6 million, that means
+  // that for each phase, i only need to do (6.5 million - 6 million) ~500,000 operations on the first iteration of i, and then ~500,000 operations on remaining iterations of i (i do not need to iterate
+  // through j).
 
   let input = codeStr.repeat(part === 1 ? 1 : 10000);
-  const offset = part === 1 ? 0 : +input.slice(0, 7);
+  const offset = part === 1 ? 0 : +input.slice(0, 7);                               // part 1: no offset. part 2: offset is based on first 7 digits of initial input signal
 
-  for (let phase = 0; phase < phases; phase++) {
-    let output = '';
-    for (let i = 0; i < input.length; i++) {
+  const pattern = [0, 1, 0, -1];                                                    // my part 2 solution is only possible specifically because the pattern is [0, 1, 0, -1], so i hard coded it
+
+  for (let phase = 0; phase < phases; phase++) {                                    // run through 100 phases
+    let output = offset ? 'x'.repeat(offset) : '';                                  // part 2: because the offset is sufficiently high, we don't care about the first `offset` digits of each output
+    let part2Total;                                                                 // part 2: the total only needs to be calculated on the first iteration of i; after that, just subtract input[i - 1]
+    for (let i = offset; i < input.length; i++) {                                   // i cycles through the output (which will be the same length as the input). start at the offset (0 in part 1)
       let total = 0;
-      for (let j = 0; j < input.length; j++) {
-        const num = input[j];
-        total += num * basePattern[Math.floor((j + 1) / (i + 1)) % basePattern.length];
+      if (part === 1 || i === offset) {                                             // in part 1 we always calculate the totals for each line, but in part 2 we only do it on the first iteration
+        for (let j = offset; j < input.length; j++) {                               // j cycles through the input. start at the offset (0 in part 1)
+          const num = +input[j];
+          total += part === 1
+            ? num * pattern[Math.floor((j + 1) / (i + 1)) % pattern.length]         // part 1: you need to check each multiplier
+            : num;                                                                  // part 2: since the initial offset is way past the half way point, the first j multipliers will be 0s, and the rest 1s
+        }
+        part2Total = total;                                                         // part 2, i === offset: just set part2Total to the calculated total. from now on, we will use part2Total
+      } else {
+        part2Total -= +input[i - 1];                                                // part 2, i > offset: decrement part2Total by input[i - 1] so you don't have to add up everything again
       }
-      output += Math.abs(total % 10);
+      output += Math.abs((part === 1 ? total : part2Total) % 10);                   // output digit is only the ones value of the total result. in part 1, use total; in part 2, use part2Total
     }
-    input = output;
+    input = output;                                                                 // current output becomes the next input
   }
 
   return input.slice(offset, offset + outputLength);
-
-  // PART 1 VS PART 2
-  // if (part === 1) {
-
-
-    
-  // } else {
-
-  
-
-  // }
-
 }
 
 // TEST CASES
@@ -128,8 +134,8 @@ let input, expected;
 const func = FFT;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
-const lowestTest = 8 || 0;
-const highestTest = 8 || Infinity;
+const lowestTest = 9 || 0;
+const highestTest = 0 || Infinity;
 
 const actualInput = `59738571488265718089358904960114455280973585922664604231570733151978336391124265667937788506879073944958411270241510791284757734034790319100185375919394328222644897570527214451044757312242600574353568346245764353769293536616467729923693209336874623429206418395498129094105619169880166958902855461622600841062466017030859476352821921910265996487329020467621714808665711053916709619048510429655689461607438170767108694118419011350540476627272614676919542728299869247813713586665464823624393342098676116916475052995741277706794475619032833146441996338192744444491539626122725710939892200153464936225009531836069741189390642278774113797883240104687033645`;
 
@@ -138,7 +144,6 @@ input = {
   part: 1,
   codeStr: `12345678`,
   phases: 1,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '48226158';
@@ -149,7 +154,6 @@ input = {
   part: 1,
   codeStr: `12345678`,
   phases: 2,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '34040438';
@@ -160,7 +164,6 @@ input = {
   part: 1,
   codeStr: `12345678`,
   phases: 3,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '03415518';
@@ -171,7 +174,6 @@ input = {
   part: 1,
   codeStr: `12345678`,
   phases: 4,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '01029498';
@@ -182,7 +184,6 @@ input = {
   part: 1,
   codeStr: `80871224585914546619083218645595`,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '24176176';
@@ -193,7 +194,6 @@ input = {
   part: 1,
   codeStr: `19617804207202209144916044189917`,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '73745418';
@@ -204,7 +204,6 @@ input = {
   part: 1,
   codeStr: `69317163492948606335995924319873`,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '52432133';
@@ -215,7 +214,6 @@ input = {
   part: 1,
   codeStr: actualInput,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '73127523';
@@ -226,7 +224,6 @@ input = {
   part: 2,
   codeStr: `03036732577212944063491565474664`,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '84462026';
@@ -237,7 +234,6 @@ input = {
   part: 2,
   codeStr: `02935109699940807407585447034323`,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '78725270';
@@ -248,7 +244,6 @@ input = {
   part: 2,
   codeStr: `03081770884921959731165446850517`,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
 expected = '53553731';
@@ -259,8 +254,7 @@ input = {
   part: 2,
   codeStr: actualInput,
   phases: 100,
-  basePattern: [0, 1, 0, -1],
   outputLength: 8,
 };
-expected = 'fill me in';
+expected = '80284420';                                                              // takes a few seconds to generate - be patient!
 test(func, input, expected, testNum, lowestTest, highestTest);
