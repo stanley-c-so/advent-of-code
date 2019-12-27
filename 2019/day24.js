@@ -339,7 +339,6 @@ function gameOfLife (part, initialState, time = Infinity) {                     
 
       // TRANSFER DATA FROM nextState TO CURRENT state
       for (const level in nextState) {                                                            // copy data from nextState to current matrix
-        // if (!(level in state)) state[level] = newGrid();
         for (let row = 0; row < h; row++) {
           for (let col = 0; col < w; col++) {
             if (                                                                                  // PART 2 ONLY: skip middle square
