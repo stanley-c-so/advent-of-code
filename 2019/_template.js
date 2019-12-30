@@ -55,7 +55,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 3
 input = {
   part: 1,
-  ARG_1: 'INPUT_HERE',
+  ARG_1: `INPUT_HERE`,
 };
 expected = `EXPECTED_HERE`;
 test(func, input, expected, testNum, lowestTest, highestTest);
