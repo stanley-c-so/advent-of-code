@@ -1,56 +1,70 @@
-// --- Day 1: The Tyranny of the Rocket Equation ---
+// --- Day 1: Report Repair ---
 
-// PART 1:
+// After saving Christmas five years in a row, you've decided to take a vacation at a nice resort on a tropical island. Surely, Christmas will go on without you.
 
-// Santa has become stranded at the edge of the Solar System while delivering presents to other planets! To accurately calculate his position in space, safely align his warp drive, and return to Earth in time to save Christmas, he needs you to bring him measurements from fifty stars.
+// The tropical island has its own currency and is entirely cash-only. The gold coins used there have a little picture of a starfish; the locals just call them stars. None of the currency exchanges seem to have heard of them, but somehow, you'll need to find fifty of these coins by the time you arrive so you can pay the deposit on your room.
+
+// To save your vacation, you need to get all fifty stars by December 25th.
 
 // Collect stars by solving puzzles. Two puzzles will be made available on each day in the Advent calendar; the second puzzle is unlocked when you complete the first. Each puzzle grants one star. Good luck!
 
-// The Elves quickly load you into a spacecraft and prepare to launch.
+// Before you leave, the Elves in accounting just need you to fix your expense report (your puzzle input); apparently, something isn't quite adding up.
 
-// At the first Go / No Go poll, every Elf is Go until the Fuel Counter-Upper. They haven't determined the amount of fuel required yet.
+// Specifically, they need you to find the two entries that sum to 2020 and then multiply those two numbers together.
 
-// Fuel required to launch a given module is based on its mass. Specifically, to find the fuel required for a module, take its mass, divide by three, round down, and subtract 2.
+// For example, suppose your expense report contained the following:
 
-// For example:
+// 1721
+// 979
+// 366
+// 299
+// 675
+// 1456
 
-// For a mass of 12, divide by 3 and round down to get 4, then subtract 2 to get 2.
-// For a mass of 14, dividing by 3 and rounding down still yields 4, so the fuel required is also 2.
-// For a mass of 1969, the fuel required is 654.
-// For a mass of 100756, the fuel required is 33583.
-// The Fuel Counter-Upper needs to know the total fuel requirement. To find it, individually calculate the fuel needed for the mass of each module (your puzzle input), then add together all the fuel values.
+// In this list, the two entries that sum to 2020 are 1721 and 299. Multiplying them together produces 1721 * 299 = 514579, so the correct answer is 514579.
 
-// What is the sum of the fuel requirements for all of the modules on your spacecraft?
+// Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
 
-// PART 2:
+// --- Part Two ---
 
-// During the second Go / No Go poll, the Elf in charge of the Rocket Equation Double-Checker stops the launch sequence. Apparently, you forgot to include additional fuel for the fuel you just added.
+// The Elves in accounting are thankful for your help; one of them even offers you a starfish coin they had left over from a past vacation. They offer you a second one if you can find three numbers in your expense report that meet the same criteria.
 
-// Fuel itself requires fuel just like a module - take its mass, divide by three, round down, and subtract 2. However, that fuel also requires fuel, and that fuel requires fuel, and so on. Any mass that would require negative fuel should instead be treated as if it requires zero fuel; the remaining mass, if any, is instead handled by wishing really hard, which has no mass and is outside the scope of this calculation.
+// Using the above example again, the three entries that sum to 2020 are 979, 366, and 675. Multiplying them together produces the answer, 241861950.
 
-// So, for each module mass, calculate its fuel and add it to the total. Then, treat the fuel amount you just calculated as the input mass and repeat the process, continuing until a fuel requirement is zero or negative. For example:
+// In your expense report, what is the product of the three entries that sum to 2020?
 
-// A module of mass 14 requires 2 fuel. This fuel requires no further fuel (2 divided by 3 and rounded down is 0, which would call for a negative fuel), so the total fuel required is still just 2.
-// At first, a module of mass 1969 requires 654 fuel. Then, this fuel requires 216 more fuel (654 / 3 - 2). 216 then requires 70 more fuel, which requires 21 fuel, which requires 5 fuel, which requires no further fuel. So, the total fuel required for a module of mass 1969 is 654 + 216 + 70 + 21 + 5 = 966.
-// The fuel required by a module of mass 100756 and its fuel is: 33583 + 11192 + 3728 + 1240 + 411 + 135 + 43 + 12 + 2 = 50346.
-// What is the sum of the fuel requirements for all of the modules on your spacecraft when also taking into account the mass of the added fuel? (Calculate the fuel requirements for each module separately, then add them all up at the end.)
+function sumTo2020 (part, inputStr) {
+  const inputArr = inputStr.split('\n').map(element => +element);
 
-function totalFuel (part, modulesStr) {
-  const modules = modulesStr.split('\n').map(element => +element);
-  
-  // PART 1 VS PART 2
   if (part === 1) {
-    return modules.reduce((total, curModule) => total + Math.max(0, Math.floor(curModule / 3) - 2), 0);
+
+    const set = new Set(inputArr);
+    for (const num of inputArr) {
+      const complement = 2020 - num;
+      if (set.has(complement)) return num * complement;
+    }
+    throw "INVALID: NO SOLUTION";
+
   } else {
-    let total = 0;
-    for (const curModule of modules) {
-      let fuel = curModule;
-      while (fuel > 0) {
-        fuel = Math.max(0, Math.floor(fuel / 3) - 2);
-        total += fuel;
+
+    inputArr.sort((a, b) => a - b);
+    for (let i = 0; i < inputArr.length - 2; ++i) {
+      const target = 2020 - inputArr[i];
+      let left = i + 1;
+      let right = inputArr.length - 1;
+      while (left < right) {
+        const sum = inputArr[left] + inputArr[right];
+        if (sum < target) {
+          ++left;
+        } else if (sum > target) {
+          --right;
+        } else {
+          return inputArr[i] * inputArr[left] * inputArr[right];
+        }
       }
     }
-    return total;
+    throw "INVALID: NO SOLUTION";
+
   }
 }
 
@@ -59,181 +73,251 @@ function totalFuel (part, modulesStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = totalFuel;
+const func = sumTo2020;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
-const actualInput = `123835
-66973
-63652
-99256
-56009
-58012
-130669
-109933
-52958
-131656
-144786
-50437
-134194
-80230
-50326
-118204
-102780
-135520
-142248
-80341
-51071
-71346
-134081
-142321
-136230
-55934
-79697
-90116
-107825
-133052
-130259
-99566
-83066
-90923
-58475
-134697
-91830
-105838
-109003
-125258
-108679
-87310
-79813
-109814
-65616
-69275
-118405
-105178
-93140
-79535
-138051
-55728
-71875
-121207
-52011
-81209
-129059
-135782
-62791
-72135
-77765
-109498
-73862
-134825
-148898
-81633
-53277
-109858
-91672
-115105
-132871
-138334
-135049
-73083
-79234
-129281
-86062
-88448
-99612
-52138
-149290
-120562
-118975
-92896
-51162
-122410
-75479
-137800
-142149
-123518
-67806
-89937
-85963
-104764
-56710
-51314
-67275
-61135
-77580
-74726`;
+const actualInput = `1567
+1223
+1758
+1842
+1933
+1898
+1409
+1058
+1533
+1417
+1032
+1634
+1477
+1394
+1888
+1972
+1237
+1390
+1677
+1546
+1302
+1070
+1369
+1455
+1065
+1924
+1593
+1131
+1064
+1346
+1914
+1129
+1830
+1450
+1278
+1740
+1809
+1176
+1734
+1102
+1807
+1982
+1603
+1736
+2008
+1980
+1905
+1633
+1732
+1350
+1865
+1988
+1805
+1998
+1152
+1046
+1870
+1557
+1789
+1766
+1945
+1359
+1002
+1126
+1719
+1497
+1296
+1560
+1936
+1929
+1464
+2005
+1281
+618
+1257
+1107
+1632
+1688
+1964
+1803
+1360
+1384
+1889
+1411
+1328
+1452
+1868
+1515
+1586
+1631
+1618
+1087
+1710
+1094
+1774
+1295
+1700
+1636
+1230
+1421
+1910
+1522
+1366
+1144
+1757
+1493
+1316
+1103
+687
+1371
+1720
+1155
+1559
+1900
+989
+1367
+1999
+1066
+1773
+1787
+1402
+1047
+1806
+1956
+1219
+1555
+1307
+1419
+1706
+1884
+1109
+1181
+2010
+1298
+1730
+1078
+1848
+1398
+1687
+2007
+1550
+1664
+1225
+1079
+1698
+350
+1222
+1377
+1977
+1510
+1571
+1630
+1029
+1379
+1942
+1949
+1249
+1829
+1297
+1530
+1607
+1324
+1069
+1476
+928
+1039
+1855
+1644
+1454
+1310
+1172
+547
+1034
+1878
+1479
+1457
+1319
+1810
+1759
+1439
+1851
+545
+1470
+2003
+1908
+1564
+1491
+1174
+1301
+1689
+1276
+1781
+1392
+1499
+1962
+1653
+1823
+1381
+1827
+1974`;
 
 // Test case 1
 input = {
   part: 1,
-  modulesStr: `12`,
+  inputStr: `1721
+  979
+  366
+  299
+  675
+  1456`,
 };
-expected = 2;
+expected = 1721 * 299;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 2
 input = {
   part: 1,
-  modulesStr: `14`,
+  inputStr: actualInput,
 };
-expected = 2;
+expected = 866436;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 3
 input = {
-  part: 1,
-  modulesStr: `1969`,
+  part: 2,
+  inputStr: `1721
+  979
+  366
+  299
+  675
+  1456`,
 };
-expected = 654;
+expected = 979 * 366 * 675;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 4
 input = {
-  part: 1,
-  modulesStr: `100756`,
-};
-expected = 33583;
-test(func, input, expected, testNum, lowestTest, highestTest);
-
-// Test case 5
-input = {
-  part: 1,
-  modulesStr: actualInput,
-};
-expected = 3226822;
-test(func, input, expected, testNum, lowestTest, highestTest);
-
-// Test case 6
-input = {
   part: 2,
-  modulesStr: `14`,
+  inputStr: actualInput,
 };
-expected = 2;
-test(func, input, expected, testNum, lowestTest, highestTest);
-
-// Test case 7
-input = {
-  part: 2,
-  modulesStr: `1969`,
-};
-expected = 966;
-test(func, input, expected, testNum, lowestTest, highestTest);
-
-// Test case 8
-input = {
-  part: 2,
-  modulesStr: `100756`,
-};
-expected = 50346;
-test(func, input, expected, testNum, lowestTest, highestTest);
-
-// Test case 9
-input = {
-  part: 2,
-  modulesStr: actualInput,
-};
-expected = 4837367;
+expected = 276650720;
 test(func, input, expected, testNum, lowestTest, highestTest);
