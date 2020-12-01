@@ -1,4 +1,4 @@
-const equals = require('./_equality-checker'); 
+const equals = require('./_equality-checker');
 
 function test (func, input, expected, testNum, lowestTest = 0, highestTest = Infinity) {
   if (testNum[0] >= lowestTest && testNum[0] <= highestTest) {

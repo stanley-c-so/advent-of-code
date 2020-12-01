@@ -1,4 +1,4 @@
-// --- Day XX: DESCRIPTION --- 
+// --- Day XX: DESCRIPTION ---
 
 // PART 1:
 
