@@ -1,4 +1,4 @@
-function equals (actual, expected) {
+function equals (actual, expected) { 
 
   // IF actual OR expected IS EITHER undefined OR null THEN DIRECTLY COMPARE (AS THOSE DON'T HAVE CONSTRUCTORS)
   if (
