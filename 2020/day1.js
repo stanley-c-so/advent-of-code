@@ -36,7 +36,7 @@
 function sumTo2020 (part, inputStr) {
   const inputArr = inputStr.split('\n').map(element => +element);
 
-  if (part === 1) {
+  if (part === 1) {                                                 // PART 1: two-sum
 
     const set = new Set(inputArr);
     for (const num of inputArr) {
@@ -45,7 +45,7 @@ function sumTo2020 (part, inputStr) {
     }
     throw "INVALID: NO SOLUTION";
 
-  } else {
+  } else {                                                          // PART 2: three-sum
 
     inputArr.sort((a, b) => a - b);
     for (let i = 0; i < inputArr.length - 2; ++i) {
