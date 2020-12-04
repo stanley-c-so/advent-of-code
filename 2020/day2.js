@@ -73,6 +73,10 @@ const modFunc = (...args) => func(...args) % 1000000007;                // used 
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
+const sampleInput = `1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc`;
+
 const actualInput = `4-5 l: rllllj
 4-10 s: ssskssphrlpscsxrfsr
 14-18 p: ppppppppppppppppppp
@@ -1077,9 +1081,7 @@ const actualInput = `4-5 l: rllllj
 // Test case 1
 input = {
   part: 1,
-  inputStr: `1-3 a: abcde
-1-3 b: cdefg
-2-9 c: ccccccccc`,
+  inputStr: sampleInput,
 };
 expected = 2;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -1095,9 +1097,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 3
 input = {
   part: 2,
-  inputStr: `1-3 a: abcde
-1-3 b: cdefg
-2-9 c: ccccccccc`,
+  inputStr: sampleInput,
 };
 expected = 1;
 test(func, input, expected, testNum, lowestTest, highestTest);

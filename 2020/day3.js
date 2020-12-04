@@ -102,6 +102,18 @@ const modFunc = (...args) => func(...args) % 1000000007;                // used 
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
+const sampleInput = `..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#`;
+
 const actualInput = `.#..........#......#..#.....#..
 ....#.............#.#....#..#..
 .....##...###....#..#.......#..
@@ -429,17 +441,7 @@ const actualInput = `.#..........#......#..#.....#..
 // Test case 1
 input = {
   part: 1,
-  inputStr: `..##.......
-#...#...#..
-.#....#..#.
-..#.#...#.#
-.#...##..#.
-..#.##.....
-.#.#.#....#
-.#........#
-#.##...#...
-#...##....#
-.#..#...#.#`,
+  inputStr: sampleInput,
 };
 expected = 7;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -455,17 +457,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 3
 input = {
   part: 2,
-  inputStr: `..##.......
-#...#...#..
-.#....#..#.
-..#.#...#.#
-.#...##..#.
-..#.##.....
-.#.#.#....#
-.#........#
-#.##...#...
-#...##....#
-.#..#...#.#`,
+  inputStr: sampleInput,
 };
 expected = 336;
 test(func, input, expected, testNum, lowestTest, highestTest);

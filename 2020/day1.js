@@ -79,6 +79,13 @@ const modFunc = (...args) => func(...args) % 1000000007;                // used 
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
+const sampleInput = `1721
+979
+366
+299
+675
+1456`;
+
 const actualInput = `1567
 1223
 1758
@@ -283,12 +290,7 @@ const actualInput = `1567
 // Test case 1
 input = {
   part: 1,
-  inputStr: `1721
-  979
-  366
-  299
-  675
-  1456`,
+  inputStr: sampleInput,
 };
 expected = 1721 * 299;
 test(func, input, expected, testNum, lowestTest, highestTest);
@@ -304,12 +306,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 // Test case 3
 input = {
   part: 2,
-  inputStr: `1721
-  979
-  366
-  299
-  675
-  1456`,
+  inputStr: sampleInput,
 };
 expected = 979 * 366 * 675;
 test(func, input, expected, testNum, lowestTest, highestTest);
