@@ -113,54 +113,65 @@
 // Count the number of valid passports - those that have all required fields and valid values. Continue to treat cid as optional. In your batch file, how many passports are valid?
 
 function countValidPassports (part, inputStr) {
-  const inputArr = inputStr.split('\n\n');
+  const inputArr = inputStr.split('\n\n');                                      // split the passports by the occurrence of two newlines in a row
 
-  const delimiter = '|';
+  // ===== VALIDATION FUNCTIONS =====
+  function validateByr(byr) {
+    return byr.length === 4 && 1920 <= +byr && +byr <= 2002;
+  }
+  function validateIyr(iyr) {
+    return iyr.length === 4 && 2010 <= +iyr && +iyr <= 2020;
+  }
+  function validateEyr(eyr) {
+    return eyr.length === 4 && 2020 <= +eyr && +eyr <= 2030;
+  }
+  function validateHgt(hgt) {
+    if (hgt.length < 3) return false;                                           // if the length is less than 3 then it cannot be *cm or *in
+    const num = +hgt.slice(0, hgt.length - 2);                                  // it may be the case that this slice is not only made of digits. coerce and check later with !isNaN(num)
+    const unit = hgt.slice(hgt.length - 2);                                     // it may be the case that this slice is not 'cm' or 'in'. will verify in return statement
+    return !isNaN(num) && (
+      unit === 'cm' && 150 <= num && num <= 193 ||
+      unit === 'in' && 59 <= num && num <= 76
+    );
+  }
+  function validateHcl(hcl) {
+    return hcl.length === 7 && hcl[0] === '#' && hcl.slice(1).split('').every(c => 
+      '0' <= c && c <= '9' || 'a' <= c && c <= 'f'                              // verify that each character at index 1-6 is alphanumeric (if letter, 'a' through 'f' only)
+    );
+  }
+  function validateEcl(ecl) {
+    return ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'].includes(ecl);
+  }
+  function validatePid(pid) {
+    return pid.length === 9 && !isNaN(+pid);
+  }
+
   let validPassports = 0;
   for (const passport of inputArr) {
-    const components = passport.split(' ').join(delimiter).split('\n').join(delimiter).split(delimiter).map(str => str.split(':'));
+
+    // PARSE THE PASSPORT
+    const uniqueDelimiter = '|';                                                // important: this character cannot show up anywhere in the input!
+    const components = passport
+      .split(' ')
+      .join(uniqueDelimiter)                                                    // convert all spaces into the unique delimiter
+      .split('\n')
+      .join(uniqueDelimiter)                                                    // convert all newlines into the unique delimiter
+      .split(uniqueDelimiter)                                                   // now split on the unique delimiter to separate all components
+      .map(str => str.split(':'));                                              // convert each component into a "tuple" by splitting on the colon
     const fields = {};
-    for (const component of components) fields[component[0]] = component[1];
-    function validateByr(byr) {
-      return byr.length === 4 && 1920 <= +byr && +byr <= 2002;
-    }
-    function validateIyr(iyr) {
-      return iyr.length === 4 && 2010 <= +iyr && +iyr <= 2020;
-    }
-    function validateEyr(eyr) {
-      return eyr.length === 4 && 2020 <= +eyr && +eyr <= 2030;
-    }
-    function validateHgt(hgt) {
-      if (hgt.length < 3) return false;
-      const num = +hgt.slice(0, hgt.length - 2);
-      const unit = hgt.slice(hgt.length - 2);
-      return !isNaN(num) && (
-        unit === 'cm' && 150 <= num && num <= 193 ||
-        unit === 'in' && 59 <= num && num <= 76
-      );
-    }
-    function validateHcl(hcl) {
-      return hcl.length === 7 && hcl[0] === '#' && hcl.slice(1).split('').every(c => 
-        '0' <= c && c <= '9' || 'a' <= c && c <= 'f'
-      );
-    }
-    function validateEcl(ecl) {
-      return ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'].includes(ecl);
-    }
-    function validatePid(pid) {
-      return pid.length === 9 && pid.split('').every(c => '0' <= c && c <= '9');
-    }
+    for (const component of components) fields[component[0]] = component[1];    // save each entry into fields object
+
+    // VALIDATE THE PASSPORT
     if (
-      'byr' in fields && 
-      'iyr' in fields && 
-      'eyr' in fields && 
-      'hgt' in fields && 
-      'hcl' in fields && 
-      'ecl' in fields && 
-      'pid' in fields
-    ) {
-      if (
-        part === 1 ||
+      'byr' in fields &&                                                        // enforce non-optional fields
+      'iyr' in fields &&
+      'eyr' in fields &&
+      'hgt' in fields &&
+      'hcl' in fields &&
+      'ecl' in fields &&
+      'pid' in fields &&
+      (
+        part === 1 ||                                                           // PART 1: NO FURTHER CHECKS; PART 2: PERFORM FURTHER VALIDATIONS
         validateByr(fields.byr) &&
         validateIyr(fields.iyr) &&
         validateEyr(fields.eyr) &&
@@ -168,10 +179,8 @@ function countValidPassports (part, inputStr) {
         validateHcl(fields.hcl) &&
         validateEcl(fields.ecl) &&
         validatePid(fields.pid)
-      ) {
-        ++validPassports;
-      }
-    }
+      )
+    ) ++validPassports;
   }
 
   return validPassports;
