@@ -1,25 +1,9 @@
-// --- Day XX: DESCRIPTION ---
+// COPY + PASTE PUZZLE DESCRIPTION HERE (PART 1)
 
-// PART 1:
+// COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
 
-//
-
-// PART 2:
-
-//
-
-function NAME_OF_ALGO_HERE (part, INPUT_HERE) {
-
-  // PART 1 VS PART 2
-  // if (part === 1) {
-
-
-    
-  // } else {
-
-  
-
-  // }
+function NAME_OF_ALGO_HERE (part, inputStr) {
+  const inputArr = inputStr.split('\n');
 
 }
 
@@ -28,34 +12,44 @@ function NAME_OF_ALGO_HERE (part, INPUT_HERE) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = 'FUNCTION_NAME_HERE';
+const func = NAME_OF_ALGO_HERE;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
-const actualInput = `ACTUAL_INPUT_HERE`;
+const sampleInput = ``;
+
+const actualInput = ``;
 
 // Test case 1
 input = {
   part: 1,
-  ARG_1: `INPUT_HERE`,
+  inputStr: sampleInput,
 };
-expected = 'EXPECTED_HERE';
+expected = null;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 2
 input = {
   part: 1,
-  ARG_1: `INPUT_HERE`,
+  inputStr: actualInput,
 };
-expected = 'EXPECTED_HERE';
+expected = null;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
 // Test case 3
 input = {
-  part: 1,
-  ARG_1: `INPUT_HERE`,
+  part: 2,
+  inputStr: sampleInput,
 };
-expected = `EXPECTED_HERE`;
+expected = null;
+test(func, input, expected, testNum, lowestTest, highestTest);
+
+// Test case 4
+input = {
+  part: 2,
+  inputStr: actualInput,
+};
+expected = null;
 test(func, input, expected, testNum, lowestTest, highestTest);
