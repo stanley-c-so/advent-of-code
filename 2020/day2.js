@@ -45,14 +45,14 @@ function countValidPasswords (part, inputStr) {
     const [num1, num2] = nums.split('-').map(num => +num);
     let freq = 0;
 
-    if (part === 1) {                                                                       // PART 1: frequency of the letter must be in range of [num1, num2]
+    if (part === 1) {                                                                       // PART 1: FREQUENCY OF THE LETTER MUST BE IN THE RANGE OF [num1, num2]
 
       for (const char of password) {
         if (char === letter) ++freq;
       }
       if (num1 <= freq && freq <= num2) ++valid;
 
-    } else {                                                                                // PART 2: password at index num1 (1-index) XOR num2 must be the letter
+    } else {                                                                                // PART 2: PASSWORD AT INDEX num1 (1-index) XOR num2 MUST BE THE LETTER
 
       if ((password[num1 - 1] === letter) !== (password[num2 - 1] === letter)) ++valid;
 

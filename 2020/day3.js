@@ -75,8 +75,8 @@ function countTrees (part, inputStr) {
   const h = inputArr.length;
   const w = inputArr[0].length;
   const slopesToCheck = part === 1
-    ? [ [3, 1] ]                                      // PART 1: check only slope [3, 1]
-    : [ [1, 1], [3, 1], [5, 1], [7, 1], [1, 2] ];     // PART 2: check all of these slopes
+    ? [ [3, 1] ]                                      // PART 1: CHECK ONLY SLOPE [3, 1]
+    : [ [1, 1], [3, 1], [5, 1], [7, 1], [1, 2] ];     // PART 2: CHECK ALL OF THESE SLOPES
 
   let product = 1;
   for (const [dx, dy] of slopesToCheck) {
