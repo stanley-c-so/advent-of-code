@@ -54,7 +54,7 @@ function seatId (part, inputStr) {
     let min = 0;
     let max = 127;
     for (let i = 0; i < 7; ++i) {
-      const mid = (min + max) / 2 - 0.5;
+      const mid = Math.floor((min + max) / 2);
       if (pass[i] === 'F') max = mid;               // if the letter is F, adjust max to first half
       else min = mid + 1;                           // if the letter is B, adjust min to second half
     }
@@ -62,7 +62,7 @@ function seatId (part, inputStr) {
     min = 0;
     max = 7;
     for (let i = 7; i < 10; ++i) {
-      const mid = (min + max) / 2 - 0.5;
+      const mid = Math.floor((min + max) / 2);
       if (pass[i] === 'L') max = mid;               // if the letter is L, adjust max to first half
       else min = mid + 1;                           // if the letter is R, adjust min to second half
     }
@@ -85,7 +85,7 @@ function seatId (part, inputStr) {
       ) return i;                                   // ...then we found our seat!
     }
     throw 'INVALID: NO SOLUTION';
-    
+
   }
 }
 
