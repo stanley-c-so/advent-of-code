@@ -38,18 +38,18 @@ input = {
 expected = null;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
-// Test case 3
-input = {
-  part: 2,
-  inputStr: sampleInput,
-};
-expected = null;
-test(func, input, expected, testNum, lowestTest, highestTest);
+// // Test case 3
+// input = {
+//   part: 2,
+//   inputStr: sampleInput,
+// };
+// expected = null;
+// test(func, input, expected, testNum, lowestTest, highestTest);
 
-// Test case 4
-input = {
-  part: 2,
-  inputStr: actualInput,
-};
-expected = null;
-test(func, input, expected, testNum, lowestTest, highestTest);
+// // Test case 4
+// input = {
+//   part: 2,
+//   inputStr: actualInput,
+// };
+// expected = null;
+// test(func, input, expected, testNum, lowestTest, highestTest);
