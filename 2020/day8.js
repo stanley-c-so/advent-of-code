@@ -87,10 +87,10 @@ function processInstructions (part, inputStr) {
   // HELPER FUNCTION TAKES IN SET OF INSTRUCTIONS AND RETURNS VALUE OF accumulator WHEN INSTRUCTIONS TERMINATE OR WHEN INFINITE LOOP IS DETECTED
   function simulate(inputArr) {
     let accumulator = 0;
-    let i = 0;                                                      // represents position within set of instructions
+    let i = 0;                                                            // represents position within set of instructions
     const visited = new Set();
-    while (i < inputArr.length) {                                   // use a while loop instead of a for loop because position may jump around
-      if (visited.has(i)) return { exited: false, accumulator };    // infinite loop detected
+    while (i < inputArr.length) {                                         // use a while loop instead of a for loop because position may jump around
+      if (visited.has(i)) return { exited: false, accumulator };          // infinite loop detected
       visited.add(i);
       const [instruction, arg] = inputArr[i].split(' ');
       if (instruction === 'jmp') {
@@ -100,26 +100,25 @@ function processInstructions (part, inputStr) {
         if (instruction === 'acc') accumulator += +arg;
       } 
     }
-    return { exited: true, accumulator };                           // instructions terminated without infinite loop
+    return { exited: true, accumulator };                                 // instructions terminated without infinite loop
   }
 
-  if (part === 1) {                                                 // PART 1: RUN THE SIMULATION ONCE AND RETURN THE accumulator ONCE INFINITE LOOP IS DETECTED
+  if (part === 1) {                                                       // PART 1: RUN THE SIMULATION ONCE AND RETURN THE accumulator ONCE INFINITE LOOP IS DETECTED
     
     return simulate(inputArr).accumulator;
 
-  } else {                                                          // PART 2: RUN THE SIMULATION FOR EVERY POSSIBLE SWITCHING OF A 'nop' TO 'jmp' OR VICE VERSA
+  } else {                                                                // PART 2: RUN THE SIMULATION FOR EVERY POSSIBLE SWITCHING OF A 'nop' TO 'jmp' OR VICE VERSA
 
-    for (let i = 0; i < inputArr.length; ++i) {                     // iterate through all of the instructions...
+    for (let i = 0; i < inputArr.length; ++i) {                           // iterate through all of the instructions...
       const [instruction, arg] = inputArr[i].split(' ');
-      if (instruction === 'acc') continue;                          // skip if the current instruction is 'acc', otherwise...
-      const changed = instruction === 'nop' ? 'jmp' : 'nop';
-      inputArr[i] = changed + ' ' + arg;                            // ...temporarily convert this instruction to its opposite...
-      const result = simulate(inputArr);                            // ...and run the simulation with the modified set of instructions...
-      if (result.exited) return result.accumulator;                 // ...and if the program exited successfully, return the accumulator
-      inputArr[i] = instruction + ' ' + arg;                        // ...else, restore instruction to its original state and continue
+      if (instruction === 'acc') continue;                                // skip if the current instruction is 'acc', otherwise...
+      inputArr[i] = (instruction === 'nop' ? 'jmp' : 'nop') + ' ' + arg;  // ...temporarily convert this instruction to its opposite...
+      const result = simulate(inputArr);                                  // ...and run the simulation with the modified set of instructions...
+      if (result.exited) return result.accumulator;                       // ...and if the program exited successfully, return the accumulator
+      inputArr[i] = instruction + ' ' + arg;                              // ...else, restore instruction to its original state and continue
     }
 
-    throw "INVALID: NO SOLUTION";                                   // we are given that there must be a solution
+    throw "INVALID: NO SOLUTION";                                         // we are given that there must be a solution
 
   }
 }
