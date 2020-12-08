@@ -84,7 +84,8 @@ function seatId (part, inputStr) {
         seats.has(i + 1)                            // ...and the subsequent seatId is not...
       ) return i;                                   // ...then we found our seat!
     }
-    throw 'INVALID: NO SOLUTION';
+    
+    throw 'INVALID: NO SOLUTION';                   // we are given that there must be a solution
 
   }
 }

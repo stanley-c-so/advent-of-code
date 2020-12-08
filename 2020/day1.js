@@ -63,7 +63,8 @@ function sumTo2020 (part, inputStr) {
         }
       }
     }
-    throw "INVALID: NO SOLUTION";
+    
+    throw "INVALID: NO SOLUTION";                                   // we are given that there must be a solution
 
   }
 }
