@@ -112,12 +112,11 @@ function processInstructions (part, inputStr) {
     for (let i = 0; i < inputArr.length; ++i) {                     // iterate through all of the instructions...
       const [instruction, arg] = inputArr[i].split(' ');
       if (instruction === 'acc') continue;                          // skip if the current instruction is 'acc', otherwise...
-      const original = instruction;
       const changed = instruction === 'nop' ? 'jmp' : 'nop';
       inputArr[i] = changed + ' ' + arg;                            // ...temporarily convert this instruction to its opposite...
       const result = simulate(inputArr);                            // ...and run the simulation with the modified set of instructions...
       if (result.exited) return result.accumulator;                 // ...and if the program exited successfully, return the accumulator
-      inputArr[i] = original + ' ' + arg;                           // ...else, restore instruction to its original state and continue
+      inputArr[i] = instruction + ' ' + arg;                        // ...else, restore instruction to its original state and continue
     }
 
     throw "INVALID: NO SOLUTION";                                   // we are given that there must be a solution
