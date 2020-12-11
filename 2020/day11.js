@@ -279,7 +279,7 @@ function countSeats (part, inputStr) {
   let occupied = 0;
   for (let row = 0; row < h; ++row) {
     for (let col = 0; col < w; ++col) {
-      if (inputArr[row][col] === '#') ++occupied;
+      if (inputArr[row][col] === "#") ++occupied;
     }
   }
   return occupied;
