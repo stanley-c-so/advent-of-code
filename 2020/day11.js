@@ -213,42 +213,42 @@ function countSeats (part, inputStr) {
 
   // UTILITY FUNCTION FOR COUNTING THE NUMBER OF OCCUPIED NEIGHBORS, GIVEN THE ROW AND COL OF A SEAT
   function countOccupiedNeighbors(row, col) {
-    const delta = [                                       // THIS COMES IN THE FORM OF: [dy, dx]
-      [-1, -1],                                           // up left
-      [-1, 0],                                            // up
-      [-1, 1],                                            // up right
-      [0, -1],                                            // left
-      [0, 1],                                             // right
-      [1, -1],                                            // down left
-      [1, 0],                                             // down
-      [1, 1],                                             // down right
+    const delta = [                                         // THIS COMES IN THE FORM OF: [dy, dx]
+      [-1, -1],                                             // up left
+      [-1, 0],                                              // up
+      [-1, 1],                                              // up right
+      [0, -1],                                              // left
+      [0, 1],                                               // right
+      [1, -1],                                              // down left
+      [1, 0],                                               // down
+      [1, 1],                                               // down right
     ];
     let neighbors = 0;
-    for (const [dy, dx] of delta) {                       // iterate through all 8 directions...
+    for (const [dy, dx] of delta) {                         // iterate through all 8 directions...
 
-      if (part === 1) {                                   // PART 1: CHECK ONE UNIT IN EACH DIRECTION FOR A NEIGHBOR
+      if (part === 1) {                                     // PART 1: CHECK ONE UNIT IN EACH DIRECTION FOR A NEIGHBOR
 
         if (
-          0 <= row + dy && row + dy < h &&                // if the square one unit away is in bounds vertically...
-          0 <= col + dx && col + dx < w &&                // ...and horizontally...
-          inputArr[row + dy][col + dx] === "#"            // ...and that square contains an occupied seat...
-        ) ++neighbors;                                    // ...then increment neighbors
+          0 <= row + dy && row + dy < h &&                  // if the square one unit away is in bounds vertically...
+          0 <= col + dx && col + dx < w &&                  // ...and horizontally...
+          inputArr[row + dy][col + dx] === "#"              // ...and that square contains an occupied seat...
+        ) ++neighbors;                                      // ...then increment neighbors
 
-      } else {                                            // PART 2: KEEP GOING IN EACH DIRECTION UNTIL OUT OF BOUNDS OR A SEAT IS REACHED
+      } else {                                              // PART 2: KEEP GOING IN EACH DIRECTION UNTIL OUT OF BOUNDS OR A SEAT IS REACHED
 
-        let y = row;                                      // track current position (starting at point of origin)
+        let y = row;                                        // track current position (starting at point of origin)
         let x = col;
-        let go = false;                                   // track whether we have moved from point of origin
+        let moved = false;                                  // track whether we have moved from point of origin
         while (
-          0 <= y + dy && y + dy < h &&                    // if the square one unit away is in bounds vertically...
-          0 <= x + dx && x + dx < w &&                    // ...and horizontally...
-          (!go || inputArr[y][x] === ".")                 // ...and we either haven't moved yet, or we haven't hit a seat yet...
+          0 <= y + dy && y + dy < h &&                      // if the square one unit away is in bounds vertically...
+          0 <= x + dx && x + dx < w &&                      // ...and horizontally...
+          (!moved || inputArr[y][x] === ".")                // ...and we either haven't moved yet, or we haven't hit a seat yet...
         ) {
-          go = true;                                      // ...then indicate that we have started to move...
-          y += dy;                                        // ...and move
+          moved = true;                                     // ...then indicate that we have started to move...
+          y += dy;                                          // ...and move
           x += dx;
         }
-        if (inputArr[y][x] === "#" && go) ++neighbors;    // once we hit a seat or reach an edge, increment neighbors if we are at an occupied seat
+        if (moved && inputArr[y][x] === "#") ++neighbors;   // once we hit a seat or reach an edge, increment neighbors if we are at an occupied seat
 
       }
     }
