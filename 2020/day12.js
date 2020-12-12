@@ -70,7 +70,8 @@ function manhattanDistance (part, inputStr) {
   let y = 0;                                // origin y
   let wx = 10;                              // waypoint x (part 2 only - starts 10 units east of origin)
   let wy = 1;                               // waypoint y (part 2 only - starts 1 unit north of origin)
-  let dir = 0;
+
+  let dir = 0;                              // dir acts as an index for the delta array below
   const delta = [                           // takes the form of [dx, dy]
     [1, 0],                                 // East
     [0, -1],                                // South
@@ -89,11 +90,11 @@ function manhattanDistance (part, inputStr) {
       if (code === "S") y -= num;
       if (code === "W") x -= num;
       if (code === "L") {                   // L: rotate the ship counterclockwise
-        dir -= (num / 90) % 4;              // we assume num is always a multiple of 90 deg
+        dir -= (num / 90) % 4;              // we assume num is always a multiple of 90 deg. the % 4 handles unreasonably large inputs
         if (dir < 0) dir += 4;              // handle out of bounds
       }
       if (code === "R") {                   // R: rotate the ship clockwise
-        dir += (num / 90) % 4;              // we assume num is always a multiple of 90 deg
+        dir += (num / 90) % 4;              // we assume num is always a multiple of 90 deg. the % 4 handles unreasonably large inputs
         if (dir > 3) dir -= 4;              // handle out of bounds
       }
       if (code === "F") {                   // F: translate based on deltas specified by current direction multiplied by num
