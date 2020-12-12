@@ -89,13 +89,11 @@ function manhattanDistance (part, inputStr) {
       if (code === "S") y -= num;
       if (code === "W") x -= num;
       if (code === "L") {                   // L: rotate the ship counterclockwise
-        const turns = (num / 90) % 4;       // we assume num is always a multiple of 90 deg
-        dir -= turns;
+        dir -= (num / 90) % 4;              // we assume num is always a multiple of 90 deg
         if (dir < 0) dir += 4;              // handle out of bounds
       }
       if (code === "R") {                   // R: rotate the ship clockwise
-        const turns = (num / 90) % 4;       // we assume num is always a multiple of 90 deg
-        dir += turns;
+        dir += (num / 90) % 4;              // we assume num is always a multiple of 90 deg
         if (dir > 3) dir -= 4;              // handle out of bounds
       }
       if (code === "F") {                   // F: translate based on deltas specified by current direction multiplied by num
