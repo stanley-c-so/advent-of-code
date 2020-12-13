@@ -257,5 +257,5 @@ input = {
   part: 2,
   inputStr: actualInput,
 };
-expected = 783685719679632 ;
+expected = 783685719679632;
 test(func, input, expected, testNum, lowestTest, highestTest);
