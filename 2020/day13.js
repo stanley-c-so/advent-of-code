@@ -137,7 +137,7 @@ function analyzeBusSchedule (part, inputStr) {
     for (let i = 0; i < busTimes.length; ++i) {                                       // we couldn't filter data earlier because we need index values for offset
       if (!isNaN(busTimes[i])) offset[busTimes[i]] = i;                               // skip "x" data (which turned into NaN after casting each element to a number)
     }
-    const filteredBusTimes = busTimes.filter(e => !isNaN(e)).sort((a, b) => a - b);   // now we can filter out NaN from our data, and sort in increasing order
+    const filteredBusTimes = busTimes.filter(e => !isNaN(e));                         // now we can filter out NaN from our data
     let currentTime = filteredBusTimes[0] - offset[filteredBusTimes[0]];              // simulate time starting with the earliest time that satisfies the first offset
     let delta = filteredBusTimes[0];                                                  // delta is the amount we can increment by while satisfying all offsets so far
     for (let i = 1; i < filteredBusTimes.length; ++i) {
