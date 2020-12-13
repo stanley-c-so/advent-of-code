@@ -149,6 +149,7 @@ function analyzeBusSchedule (part, inputStr) {
       while ((currentTime + offset[busTime]) % busTime) currentTime += delta;         // keep increasing currentTime by delta until we satisfy busTime's offset again
       const B = currentTime;                                                          // B is the second time we satisfied all offsets so far
       delta = B - A;                                                                  // we can now increase delta to B - A to speed up our simulation
+      currentTime = A;                                                                // reset currentTime back down to the first time we satisfied all offsets
     }
     return currentTime;
 
