@@ -93,7 +93,8 @@
 function analyzeChip (part, inputStr) {
   const inputArr = inputStr.split('\n');
 
-  const mem = {};                                                             // IMPORTANT: USE AN OBJECT LITERAL, NOT AN ARRAY, SO ONLY MODIFIED MEMORY LOCATIONS ARE STORED
+  const mem = {};                                                             // IMPORTANT: USE AN OBJECT LITERAL, NOT AN ARRAY, SO ONLY MODIFIED MEMORY LOCATIONS ARE STORED.
+                                                                              // THE KEYS WILL BE LARGE, FEW, AND FAR BETWEEN. USING AN ARRAY SLOWS DOWN THE PROGRAM SEVERELY AND CAUSES ERRORS.
   let mask = "X".repeat(36);                                                  // unnecessary default value for mask (not needed where input data always begins with mask assignment)
   for (const line of inputArr) {
     const [LS, RS] = line.split(" = ");
