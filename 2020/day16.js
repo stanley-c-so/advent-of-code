@@ -88,7 +88,8 @@ function analyzeTickets (part, inputStr, targetFields) {
     const nearbyTicket = nearbyTickets[i];
     let ticketConfirmedInvalid = false;                               // (used in part 2 only)
     for (const num of nearbyTicket) {
-      if (knownInvalidNums.has(num)) {                                // see note on optimization above
+      if (part === 2 && ticketConfirmedInvalid) continue;             // optimization for part 2 only - we do not need to find all invalid nums; we only need to identify valid tickets
+      if (knownInvalidNums.has(num)) {                                // see note on knownInvalidNums optimization above
         ticketConfirmedInvalid = true;                                // (used in part 2 only) the entire ticket is confirmed invalid if it has an invalid num
         part1Total += num;                                            // (used in part 1 only)
       } else {
