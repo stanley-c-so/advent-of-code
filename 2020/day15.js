@@ -79,11 +79,11 @@ function memoryGame (part, inputStr) {
     recent = num;
 
     if (i && i % 1000000 === 0) {                                                             // NOT PART OF SOLUTION. used to track elapsed time.
-      console.log(`JUST REACHED ${i} AFTER ${(Date.now() - startTime) / 1000} seconds`);
+      console.log(`JUST REACHED ${i} AFTER ${(Date.now() - startTime) / 1000} seconds - ${(S = (i / stop * 100).toString()) && S.slice(0, S.indexOf(".") + 3)}% complete`);
     }
   }
 
-  console.log(`JUST REACHED ${stop} AFTER ${(Date.now() - startTime) / 1000} seconds`);       // NOT PART OF SOLUTION. used to track elapsed time.
+  console.log(`JUST REACHED ${stop} AFTER ${(Date.now() - startTime) / 1000} seconds - 100% complete`);       // NOT PART OF SOLUTION. used to track elapsed time.
   return recent;
 }
 
