@@ -441,7 +441,7 @@ function conwayCubes (part, inputStr) {
                     W <= (part === 1 ? 0 : w + 1);                                                      // PART 1: NO w DIMENSION; PART 2: HANDLE w DIMENSION
                     ++W
                   ) {
-                    if (X === x && Y === y && Z === z && W === w) continue;
+                    if (X === x && Y === y && Z === z && W === w) continue;                             // always skip the current position itself
                     if (active.has(`${X},${Y},${Z},${W}`)) ++activeNeighbors;
                   }
                 }
