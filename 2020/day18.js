@@ -71,7 +71,7 @@ function addAllExpressions (part, inputStr) {
 
       if (part === 1) {                                                             // PART 1: + AND * OPERATIONS HAVE EQUAL PRECEDENCE
 
-        let operand = null;                                                         // this stores the running total before the current operand
+        let runningTotal = null;                                                    // this stores the running total before the current operand
         let operator = null;                                                        // this stores the most recent operator before the current one
         let numStr = "";                                                            // this stores the current operand in string form (gets built up as input is read)
 
@@ -81,24 +81,22 @@ function addAllExpressions (part, inputStr) {
             numStr += char;                                                         // ...concatenate it to the current numStr
           } else {                                                                  // else, char is an operator, or i is out of bounds
             const currentOperand = +numStr;                                         // it's time to typecast numStr and do something with this number
-            if (operator === null) {                                                // (this block only runs when we reach the first operator - no previous operator)
-              operand = currentOperand;                                             // operand simply becomes currentOperand itself
-            } else {
-              switch (operator) {                                                   // otherwise, apply the most recent operation between the most recent operand and the current one:
-                case "+":
-                  operand += currentOperand;                                        // add currentOperand to the running total
-                  break;
-                case "*":
-                  operand *= currentOperand;                                        // multiply the running total by currentOperand
-                  break;
-              }
+            switch (operator) {                                                     // apply the most recent operation between the most recent operand and the current one:
+              case "+":
+                runningTotal += currentOperand;                                     // add currentOperand to the running total
+                break;
+              case "*":
+                runningTotal *= currentOperand;                                     // multiply the running total by currentOperand
+                break;
+              default:                                                              // if operator is null (we reached first operator, so there is no previous one)...
+                runningTotal = currentOperand;                                      // ...initialize running total to value of currentOperand
             }
             operator = char;                                                        // update operator to current char
             numStr = "";                                                            // reset numStr
           }
         }
 
-        return operand;                                                             // return running total after for loop exits
+        return runningTotal;                                                        // return running total after for loop exits
 
       } else {                                                                      // PART 2: + TAKES PRECEDENCE OVER *
 
