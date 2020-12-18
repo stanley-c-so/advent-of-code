@@ -71,32 +71,17 @@ function addAllExpressions (part, inputStr) {
 
       if (part === 1) {                                                             // PART 1: + AND * OPERATIONS HAVE EQUAL PRECEDENCE
 
-        let runningTotal = null;                                                    // this stores the running total before the current operand
-        let operator = null;                                                        // this stores the most recent operator before the current one
-        let numStr = "";                                                            // this stores the current operand in string form (gets built up as input is read)
+        const operations = simpleExpression                                         // create operations array which holds only the operations, in the order in which they appear
+          .split("")
+          .filter(char => ["+", "*"].includes(char));
 
-        for (let i = 0; i <= simpleExpression.length; ++i) {                        // iterate through the string, and also include final iteration when i is out of bounds
-          const char = i < simpleExpression.length ? simpleExpression[i] : null;
-          if (char && "0" <= char && char <= "9") {                                 // if i is in bounds and char is a digit...
-            numStr += char;                                                         // ...concatenate it to the current numStr
-          } else {                                                                  // else, char is an operator, or i is out of bounds
-            const currentOperand = +numStr;                                         // it's time to typecast numStr and do something with this number
-            switch (operator) {                                                     // apply the most recent operation between the most recent operand and the current one:
-              case "+":
-                runningTotal += currentOperand;                                     // add currentOperand to the running total
-                break;
-              case "*":
-                runningTotal *= currentOperand;                                     // multiply the running total by currentOperand
-                break;
-              default:                                                              // if operator is null (we reached first operator, so there is no previous one)...
-                runningTotal = currentOperand;                                      // ...initialize running total to value of currentOperand
-            }
-            operator = char;                                                        // update operator to current char
-            numStr = "";                                                            // reset numStr
-          }
-        }
-
-        return runningTotal;                                                        // return running total after for loop exits
+        return simpleExpression
+          .split("+").join("o").split("*").join("o").split("o")                     // split along all operations (one at a time) resulting in an array of only the operands...
+          .map(n => +n)                                                             // ...typecast the operands into number form...
+          .reduce((runningTotal, operand, i) =>
+            operations[i - 1] === "+" ? runningTotal + operand                      // ...and for each operand (after the first), apply the preceding operation to it with the running total
+            : runningTotal * operand
+          );
 
       } else {                                                                      // PART 2: + TAKES PRECEDENCE OVER *
 
