@@ -60,7 +60,7 @@
 
 // What do you get if you add up the results of evaluating the homework problems using these new rules?
 
-function evaluate (part, inputStr) {
+function addAllExpressions (part, inputStr) {
   const inputArr = inputStr.split('\n');
 
   // DEFINE calculate UTILITY FUNCTION WHICH EVALUATES A STRING EXPRESSION
@@ -142,7 +142,7 @@ function evaluate (part, inputStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = evaluate;
+const func = addAllExpressions;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
