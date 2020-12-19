@@ -210,8 +210,8 @@ function countValidMessages (part, inputStr) {
 
   // INVESTIGATORY CODE (based on actual input): UNDERSTANDING THE PART 1 LENGTHS OF VALID SEQUENCES FOR RULES 42 AND 31 (FROM WHICH WE CAN DERIVE THOSE OF VALID SEQUENCES FROM RULES 0, 8, 11)
   if (42 in translated && 31 in translated) {
-    console.log("LENTH OF A POSSIBLITY FROM 42:", translated[42][0].length);  // 8
-    console.log("LENTH OF A POSSIBLITY FROM 31:", translated[31][0].length);  // 8
+    console.log("LENGTH OF A POSSIBLITY FROM 42:", translated[42][0].length);  // 8
+    console.log("LENGTH OF A POSSIBLITY FROM 31:", translated[31][0].length);  // 8
   }
 
   // INVESTIGATORY CODE (based on actual input): EXAMINING THE LENGTHS OF MESSAGES FROM THE INPUT DATA (AND SEEING THAT THEY TEND TO BE MULTIPLES OF RULE 42 OR 31 SEQUENCES)
