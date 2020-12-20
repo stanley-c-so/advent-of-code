@@ -272,6 +272,10 @@ function analyzeImage (part, inputStr) {
   const len = 10;                                                                 // both the sample data and the actual data feature 10 x 10 images
 
   // DATA STRUCTURES AND UTILITY FUNCTIONS
+  function reverse(str) {                                                         // we will have to do this many times in this problem
+    return str.split("").reverse().join("");
+  }
+
   const tileData = {};                                                            // each key is a tile ID, and its value is an array of strings representing the image on that tile
   for (const tile of inputArr) {
     const [label, data] = tile.split(":\n");
@@ -290,7 +294,7 @@ function analyzeImage (part, inputStr) {
     return data.map(row => row[len - 1]).join("");
   }
   function getBottom(data) {                                                      // ditto, for bottom edge
-    return data[len - 1].split("").reverse().join("");
+    return reverse(data[len - 1]);
   }
   function getLeft(data) {                                                        // ditto, for left edge
     return data.map(row => row[0]).reverse().join("");
@@ -299,16 +303,16 @@ function analyzeImage (part, inputStr) {
     const data = tileData[id];
     const top = getTop(data);
     addToDict(top, id + "A");                                                     // ...making sure to represent current tile ID with an extra "A" to denote its original flip orientation...
-    addToDict(top.split("").reverse().join(""), id + "B");                        // ...then do the same with each edge reversed (simulating a flip), with an extra "B" after the ID
+    addToDict(reverse(top), id + "B");                                            // ...then do the same with each edge reversed (simulating a flip), with an extra "B" after the ID
     const right = getRight(data);
     addToDict(right, id + "A");
-    addToDict(right.split("").reverse().join(""), id + "B");
+    addToDict(reverse(right), id + "B");
     const bottom = getBottom(data);
     addToDict(bottom, id + "A");
-    addToDict(bottom.split("").reverse().join(""), id + "B");
+    addToDict(reverse(bottom), id + "B");
     const left = getLeft(data);
     addToDict(left, id + "A");
-    addToDict(left.split("").reverse().join(""), id + "B");
+    addToDict(reverse(left), id + "B");
   }
 
   // KEEP EDGES FOR ONLY ONE FLIP ORIENTATION (A/B) WHILE DISCARDING EDGES FROM THE OPPOSITE ORIENTATION - DFS "GRAPH" TRAVERSAL
@@ -352,7 +356,7 @@ function analyzeImage (part, inputStr) {
 
     // UTILITY FUNCTIONS FOR MANIPULATING AN IMAGE REPRESENTED BY AN ARRAY OF STRINGS
     function flipImage(image) {
-      return image.map(row => row.split("").reverse().join(""));
+      return image.map(row => reverse(row));
     }
     function rotateImage(image) {
       const newImage = [];
@@ -369,84 +373,85 @@ function analyzeImage (part, inputStr) {
     // STITCH TOGETHER THE IMAGE, BEGINNING WITH DEDUCING THE RELATIVE ARRANGEMENT OF TILES BY ID
     const firstCorner = Object.keys(edges).filter(id => edges[id] === 2)[0];      // arbitrarily begin with the ID of any corner tile - this will go in the top left of our tile arrangement
     const firstCornerId = firstCorner.slice(0, firstCorner.length - 1);
-
     for (let i = 0; i < 8; ++i) {                                                 // the first tile must be oriented such that its right and bottom edges are both shared. try all 8 orientations
+      const rightEdge = getRight(tileData[firstCornerId]);
+      const bottomEdge = getBottom(tileData[firstCornerId]);
       if (
         (
-          borders[getRight(tileData[firstCornerId])]?.length === 2 ||                                 // search the borders object for the right edge...
-          borders[getRight(tileData[firstCornerId]).split("").reverse().join("")]?.length === 2       // ...(or the reverse of its right edge) and ensure that it is a shared edge
+          borders[
+            rightEdge in borders ? rightEdge                                      // search the borders object for the right edge...
+            : reverse(rightEdge)                                                  // ...(or the reverse of its right edge)...
+          ].length === 2                                                          // ...and ensure that it is a shared edge
         ) &&
         (
-          borders[getBottom(tileData[firstCornerId])]?.length === 2 ||                                // do the same for its bottom edge
-          borders[getBottom(tileData[firstCornerId]).split("").reverse().join("")]?.length === 2
+          borders[
+            bottomEdge in borders ? bottomEdge                                    // do the same for the bottom edge
+            : reverse(bottomEdge)
+          ].length === 2
         )
-      ) break;                                                                                        // when the above conditions have been met, break
-      if (i === 7) throw "INVALID: NO SOLUTION";                                                      // sanity check: if no solution is found after all 8 orientations, our data is bad
-      if (i === 3) tileData[firstCornerId] = flipImage(tileData[firstCornerId]);                      // if we haven't found a solution after 4th rotation, flip the image
-      tileData[firstCornerId] = rotateImage(tileData[firstCornerId]);                                 // if we haven't found a solution, rotate
+      ) break;                                                                    // when the above conditions have been met, break
+      if (i === 7) throw "INVALID: NO SOLUTION";                                  // sanity check: if no solution is found after all 8 orientations, our data is bad
+      if (i === 3) tileData[firstCornerId] = flipImage(tileData[firstCornerId]);  // if we haven't found a solution after 4th rotation, flip the image
+      tileData[firstCornerId] = rotateImage(tileData[firstCornerId]);             // if we haven't found a solution, rotate
     }
 
-    const imageById = [[firstCornerId]];                                                              // this structure is our arrangement of tiles by ID
-    let currentRow = 0;                                                                               // track coords, as we do not know in advance what the dimensions of the image will be
-    let currentCol = 1;                                                                               // initialize currentCol at 1 because the top left tile has already been placed
-    let tilesPlaced = 1;
-
-    while (tilesPlaced < numTiles) {                                                                  // we cannot use a for loop since we do not know the dimensions of the image
-      const previousImageId = imageById[currentRow][imageById[currentRow].length - 1];
+    const imageById = [[firstCornerId]];                                          // this structure is our arrangement of tiles by ID
+    let currentRow = 0;                                                           // track the current row, as we do not know in advance what the dimensions of the image will be
+    let tilesPlaced = 1;                                                          // instead, we will keep count of how many tiles we have placed in our arrangement...
+    while (tilesPlaced < numTiles) {                                              // ...since we cannot use a for loop, as we do not know the dimensions of the image
+      const previousId = imageById[currentRow][imageById[currentRow].length - 1];
       let nextId;
-      const rightEdge = getRight(tileData[previousImageId]);                                          // examine the right edge of the previous tile...
+      const rightEdge = getRight(tileData[previousId]);                           // examine the right edge of the previous tile...
       if (
         borders[
-          rightEdge in borders ? rightEdge                                                            // ...and see if it is a shared edge, to determine if the next tile goes to its right
-          : rightEdge.split("").reverse().join("")                                                    // (make sure to check the reverse of the previous right edge as well)
-        ].length === 2
+          rightEdge in borders ? rightEdge                                        // ...and see if it is a shared edge, to determine if the next tile goes to its right
+          : reverse(rightEdge)                                                    // (make sure to check the reverse of the previous right edge as well)
+        ].length === 2                                                            // CASE i: THE NEXT TILE GOES TO THE RIGHT OF THE PREVIOUS ONE
       ) {
         nextId = borders[
             rightEdge in borders ? rightEdge
-            : rightEdge.split("").reverse().join("")
-          ].filter(id => id.slice(0, id.length - 1) !== previousImageId)[0];
-        nextId = nextId.slice(0, nextId.length - 1);                                                  // if so, then the next tile is the one that shares the right edge of the previous tile
-        for (let i = 0; i < 8; ++i) {                                                                 // check all 8 orientations for the one where the left edge matches the previous right edge
+            : reverse(rightEdge)
+          ].filter(id => id.slice(0, id.length - 1) !== previousId)[0];
+        nextId = nextId.slice(0, nextId.length - 1);                              // if so, then the next tile is the one that shares the right edge of the previous tile
+        for (let i = 0; i < 8; ++i) {                                             // check all 8 orientations for the one where the left edge matches the previous right edge
           if (
-            getLeft(tileData[nextId]) === getRight(tileData[previousImageId]).split("").reverse().join("")
+            getLeft(tileData[nextId]) === reverse(getRight(tileData[previousId]))
           ) break;
-          if (i === 7) throw "INVALID: NO SOLUTION";                                                  // sanity check: if no solution is found after all 8 orientations, our data is bad
-          if (i === 3) tileData[nextId] = flipImage(tileData[nextId]);                                // if we haven't found a solution after 4th rotation, flip the image
-          tileData[nextId] = rotateImage(tileData[nextId]);                                           // if we haven't found a solution, rotate
+          if (i === 7) throw "INVALID: NO SOLUTION";                              // sanity check: if no solution is found after all 8 orientations, our data is bad
+          if (i === 3) tileData[nextId] = flipImage(tileData[nextId]);            // if we haven't found a solution after 4th rotation, flip the image
+          tileData[nextId] = rotateImage(tileData[nextId]);                       // if we haven't found a solution, rotate
         }
-        ++currentCol;                                                                                 // increment currentCol
-      } else {                                                                                        // if the right edge of the previous tile is unshared, the next tile goes on the next row
-        const imageAboveId = imageById[currentRow][0];                                                // the tile above the next tile is the first one on the previous row
+      } else {                                                                    // CASE ii: THE NEXT TILE GOES ON THE NEXT ROW
+        const imageAboveId = imageById[currentRow][0];                            // the tile above the next tile is the first one on the previous row
         imageById.push([]);
-        ++currentRow;                                                                                 // increment currentRow
-        const bottomEdge = getBottom(tileData[imageAboveId]);                                         // examine the bottom edge of the tile above...
+        ++currentRow;                                                             // increment currentRow
+        const bottomEdge = getBottom(tileData[imageAboveId]);                     // examine the bottom edge of the tile above...
         nextId = borders[
-          bottomEdge in borders ? bottomEdge                                                          // ...and search the borders object for this edge...
-          : bottomEdge.split("").reverse().join("")                                                   // ...(or its reverse)...
-        ].filter(id => id.slice(0, id.length - 1) !== imageAboveId)[0];                               // ...and find the other tile ID to determine which tile goes next
+          bottomEdge in borders ? bottomEdge                                      // ...and search the borders object for this edge...
+          : reverse(bottomEdge)                                                   // ...(or its reverse)...
+        ].filter(id => id.slice(0, id.length - 1) !== imageAboveId)[0];           // ...and find the other tile ID to determine which tile goes next
         nextId = nextId.slice(0, nextId.length - 1);
-        for (let i = 0; i < 8; ++i) {                                                                 // check all 8 orientations for the one where the top edge matches the one from above
+        for (let i = 0; i < 8; ++i) {                                             // check all 8 orientations for the one where the top edge matches the one from above
           if (
-            getTop(tileData[nextId]) === getBottom(tileData[imageAboveId]).split("").reverse().join("")
+            getTop(tileData[nextId]) === reverse(getBottom(tileData[imageAboveId]))
           ) break;
-          if (i === 7) throw "INVALID: NO SOLUTION";                                                  // sanity check: if no solution is found after all 8 orientations, our data is bad
-          if (i === 3) tileData[nextId] = flipImage(tileData[nextId]);                                // if we haven't found a solution after 4th rotation, flip the image
-          tileData[nextId] = rotateImage(tileData[nextId]);                                           // if we haven't found a solution, rotate
+          if (i === 7) throw "INVALID: NO SOLUTION";                              // sanity check: if no solution is found after all 8 orientations, our data is bad
+          if (i === 3) tileData[nextId] = flipImage(tileData[nextId]);            // if we haven't found a solution after 4th rotation, flip the image
+          tileData[nextId] = rotateImage(tileData[nextId]);                       // if we haven't found a solution, rotate
         }
-        currentCol = 1;                                                                               // set currentCol to 1 (now that we have placed the first tile of the current row)
       }
-      imageById[currentRow].push(nextId);                                                             // in either case, push the ID of the new tile into the current row of the arrangement...
-      ++tilesPlaced;                                                                                  // ...and increment tilesPlaced
+      imageById[currentRow].push(nextId);                                         // in either case (i or ii), push the ID of the new tile into the current row of the arrangement...
+      ++tilesPlaced;                                                              // ...and increment tilesPlaced
     }
 
     // NOW STITCH TOGETHER THE IMAGE ITSELF BASED ON THE ARRANGEMENT OF THE TILE IDS, AND REMEMBER TO STRIP AWAY THE EDGES
     let image = [];
-    for (let row = 0; row < imageById.length; ++row) {                                                // iterate through the rows of the tile arrangement
-      for (let i = 1; i < len - 1; ++i) {                                                             // iterate through the second to second last rows of the image within a tile
+    for (let row = 0; row < imageById.length; ++row) {                            // iterate through the rows of the tile arrangement
+      for (let i = 1; i < len - 1; ++i) {                                         // iterate through the SECOND to SECOND LAST rows of the image within a tile
         let rowText = "";
-        for (let col = 0; col < imageById[0].length; ++col) {                                         // iterate through the columns of the tile arrangement
+        for (let col = 0; col < imageById[0].length; ++col) {                     // iterate through the columns of the tile arrangement
           const segment = tileData[imageById[row][col]][i];
-          rowText += segment.slice(1, segment.length - 1);                                            // for each tile, grab the slice from the second to the second last characters
+          rowText += segment.slice(1, segment.length - 1);                        // for each tile, grab the slice from the SECOND to the SECOND LAST characters
         }
         image.push(rowText);
       }
@@ -458,45 +463,47 @@ function analyzeImage (part, inputStr) {
  #  #  #  #  #  #   `.split("\n");
     const monsterHeight = monster.length;
     const monsterWidth = monster[0].length;
-    const monsterCoords = [];                                                                         // once the image is oriented correctly, this holds [row, col] coords for the top left...
-                                                                                                      // ...of all instances of the monster
+    const monsterCoords = [];                                                     // once the image is oriented correctly, this holds [row, col] coords for the top left of all monsters
     function containsMonster(image) {
-      for (let row = 0; row < image.length - monsterHeight + 1; ++row) {                              // iterate through all possible top left corners where a monster could be found
+      for (let row = 0; row < image.length - monsterHeight + 1; ++row) {          // iterate through all possible top left corners where a monster could be found
         for (let col = 0; col < image[0].length - monsterWidth + 1; ++col) {
           let invalid = false;
-          for (let r = 0; r < monsterHeight; ++r) {                                                   // scan this location for the monster
+          for (let r = 0; r < monsterHeight; ++r) {                               // scan this location for the monster
             if (invalid) break;
             for (let c = 0; c < monsterWidth; ++c) {
-              if (monster[r][c] === "#" && image[row + r][col + c] !== "#") {                         // the scan can be immediately aborted if the image lacks a "#" where the monster should be
+              if (monster[r][c] === "#" && image[row + r][col + c] !== "#") {     // the scan can be immediately aborted if the image lacks a "#" where the monster should be
                 invalid = true;
                 break;
               }
             }
           }
-          if (!invalid) monsterCoords.push([row, col]);                                               // if the scan completes without aborting, save the current [row, col] coords
+          if (!invalid) monsterCoords.push([row, col]);                           // if the scan completes without aborting, save the current [row, col] coords
         }
       }
-      return monsterCoords.length;                                                                    // only one orientation has any monsters at all - check if monsterCoords is empty
+      return monsterCoords.length;                                                // only one orientation has any monsters at all - check if monsterCoords is empty
     }
     
-    for (let i = 0; i < 8; ++i) {                                                                     // check all 8 orientations for the one where monster coords are found
+    for (let i = 0; i < 8; ++i) {                                                 // check all 8 orientations for the one where monster coords are found
       if (containsMonster(image)) break;
-      if (i === 7) throw "INVALID: NO SOLUTION";                                                      // sanity check: if no solution is found after all 8 orientations, our data is bad
-      if (i === 3) image = flipImage(image);                                                          // if we haven't found a solution after 4th rotation, flip the image
-      image = rotateImage(image);                                                                     // if we haven't found a solution, rotate
+      if (i === 7) throw "INVALID: NO SOLUTION";                                  // sanity check: if no solution is found after all 8 orientations, our data is bad
+      if (i === 3) image = flipImage(image);                                      // if we haven't found a solution after 4th rotation, flip the image
+      image = rotateImage(image);                                                 // if we haven't found a solution, rotate
     }
 
-    image = image.map(str => str.split(""));                                                          // to modify the image, we must convert the string elements to arrays of characters
+    image = image.map(str => str.split(""));                                      // to modify the image, we must convert the string elements to arrays of characters
     for (const [row, col] of monsterCoords) {
       for (let r = 0; r < monsterHeight; ++r) {
         for (let c = 0; c < monsterWidth; ++c) {
-          if (monster[r][c] === "#") image[row + r][col + c] = "O";                                   // where we have identified a monster, change "#" to "O"
+          if (monster[r][c] === "#") image[row + r][col + c] = "O";               // where we have identified a monster, change "#" to "O"
         }
       }
     }
 
-    for (const row of image) console.log(row.join(""));                                               // OPTIONAL: SEE THE FINAL IMAGE
-    return image.reduce((total, row) => total + row.reduce((t, p) => t + (p === "#"), 0), 0);         // this allows us finally to count the unchanged "#" (rough water) patches
+    for (const row of image) console.log(row.join(""));                           // OPTIONAL: SEE THE FINAL IMAGE
+    return image.reduce((total, row) =>                                           // this allows us finally to count the unchanged "#" (rough water) patches. count up the "#" totals per row
+      total + row.reduce((t, p) => t + (p === "#"), 0),                           // (and count up the total "#" on each row)
+      0
+    );
 
   }
 }
