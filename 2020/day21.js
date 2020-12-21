@@ -75,11 +75,11 @@ function analyzeIngredients (part, inputStr) {
             foodArr[foodIdx]                                                      // ...the ingredients list of the current food (as the true ingredient must be in all foods with this allergen)
           ));
         }
-        if (possibleTranslations[allergen].size === 1) {                          // at this point, check if the possible translations for this
+        if (possibleTranslations[allergen].size === 1) {                          // at this point, check if the possible translations for this allergen has been narrowed down to 1
           madeDeduction = true;                                                   // trigger the madeDeduction flag
-          const ingredient = [...possibleTranslations[allergen]][0];              // this ingredient must be the translation for this allergen
+          const ingredient = [...possibleTranslations[allergen]][0];              // this final remaining ingredient must obviously be the true translation for this allergen
           unsolvedAllergens.delete(allergen);                                     // thus, delete it from the unsolvedAllergens set
-          for (let i = 0; i < foodArr.length; ++i) {                              // for all foods...
+          for (let i = 0; i < foodArr.length; ++i) {                              // then, for all foods...
             const indexOfIngredient = foodArr[i].indexOf(ingredient);             // ...if the food contains the ingredient now known to be the allergen...
             if (indexOfIngredient >= 0) foodArr[i].splice(indexOfIngredient, 1);  // ...cut it out of the ingredient list, to narrow down possibilities for other unsolved items
           }
