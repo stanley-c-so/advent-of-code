@@ -73,7 +73,7 @@ function analyzeIngredients (part, inputStr) {
           possibleTranslations[allergen] = new Set(getCommonElements(             // ...we will always eliminate from the set of possible translations...
             [...possibleTranslations[allergen]],                                  // ...any elements in there that are not common to...
             foodArr[foodIdx]                                                      // ...the ingredients list of the current food (as the true ingredient must be in all foods with this allergen)
-          ));
+          )); 
         }
         if (possibleTranslations[allergen].size === 1) {                          // at this point, check if the possible translations for this
           madeDeduction = true;                                                   // trigger the madeDeduction flag
