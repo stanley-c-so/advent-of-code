@@ -114,7 +114,7 @@ function bingo (part, inputStr) {
   const alreadyWon = Array(numBoards).fill(false);
 
   // UTILITY FUNCTION
-  function checkForWin(board, currRow, currCol) {
+  function checkForWin(board, currRow, currCol) {       // currRow and currCol represent the num that was just picked - we only need to check that row and col for a win
     let rowComplete = true;
     for (let row = 0; row < boardLength; ++row) {
       if (board[row][currCol] !== X) {
@@ -123,6 +123,7 @@ function bingo (part, inputStr) {
       }
     }
     if (rowComplete) return true;
+    
     let colComplete = true;
     for (let col = 0; col < boardLength; ++col) {
       if (board[currRow][col] !== X) {
