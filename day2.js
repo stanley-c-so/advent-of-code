@@ -60,41 +60,35 @@ Using this new interpretation of the commands, calculate the horizontal position
 
 */
 
-function NAME_OF_FUNC_HERE (part, inputStr) {
+function submarineInstructions (part, inputStr) {
   const inputArr = inputStr.split('\n').map(instruction => {
     const split = instruction.split(' ');
     return [split[0], +split[1]];
   });
 
-  if (part === 1) {
-
-    let horizontal = 0;
-    let depth = 0;
-    for (const [instruction, n] of inputArr) {
-      if (instruction === 'forward') horizontal += n;
-      else if (instruction === 'down') depth += n;
-      else if (instruction === 'up') depth -= n;
-      else throw 'INVALID INSTRUCTION';
-    }
-    return horizontal * depth;
-
-  } else {
-
-    let horizontal = 0;
-    let depth = 0;
-    let aim = 0;
-    for (const [instruction, n] of inputArr) {
-      if (instruction === 'forward') {
+  let horizontal = 0;
+  let depth = 0;
+  let aim = 0;
+  for (const [instruction, n] of inputArr) {
+    if (instruction === 'forward') {
+      if (part === 1) {
         horizontal += n;
-        depth += (aim * n);
+      } else {
+        horizontal += n;
+        depth += (aim * n)
       }
-      else if (instruction === 'down') aim += n;
-      else if (instruction === 'up') aim -= n;
-      else throw 'INVALID INSTRUCTION';
     }
-    return horizontal * depth;
-
+    else if (instruction === 'down') {
+      if (part === 1) depth += n;
+      else aim += n;
+    }
+    else if (instruction === 'up') {
+      if (part === 1) depth -= n;
+      aim -= n;
+    }
+    else throw 'INVALID INSTRUCTION';
   }
+  return horizontal * depth;
 
 }
 
@@ -103,7 +97,7 @@ function NAME_OF_FUNC_HERE (part, inputStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = NAME_OF_FUNC_HERE;
+const func = submarineInstructions;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
