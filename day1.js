@@ -81,32 +81,18 @@ Consider sums of a three-measurement sliding window. How many sums are larger th
 
 */
 
-function NAME_OF_FUNC_HERE (part, inputStr) {
+function slidingWindow (part, inputStr) {
   const inputArr = inputStr.split('\n').map(n => +n);
 
-  if (part === 1) {
-
-    let count = 0;
-    for (let i = 1; i < inputArr.length; ++i) {
-      const num = inputArr[i];
-      const prev = inputArr[i - 1];
-      if (num > prev) ++count;
-    }
-    return count;
-
-  } else {
-
-    const windowSize = 3;
-    let count = 0;
-    let currWindowTotal = inputArr.slice(0, windowSize).reduce((sum, curr) => sum + curr);
-    for (let i = windowSize; i < inputArr.length; ++i) {
-      const prev = currWindowTotal;
-      currWindowTotal += inputArr[i] - inputArr[i - windowSize];
-      if (currWindowTotal > prev) ++count;
-    }
-    return count;
-
+  const windowSize = part === 1 ? 1 : 3;
+  let count = 0;
+  let currWindowTotal = inputArr.slice(0, windowSize).reduce((sum, curr) => sum + curr);
+  for (let i = windowSize; i < inputArr.length; ++i) {
+    const prev = currWindowTotal;
+    currWindowTotal += inputArr[i] - inputArr[i - windowSize];
+    if (currWindowTotal > prev) ++count;
   }
+  return count;
 
 }
 
@@ -115,7 +101,7 @@ function NAME_OF_FUNC_HERE (part, inputStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = NAME_OF_FUNC_HERE;
+const func = slidingWindow;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
