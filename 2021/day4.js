@@ -77,16 +77,15 @@ function bingo (part, inputStr) {
     .split('\n\n')                                  // split on double line breaks to separate the blocks
     .map((block, i) => {
 
-    if (!i) return block.split(',').map(n => +n);   // first element is always a line of comma-separated draw numbers. split them and convert strings into numbers
-
-    return block                                    // remaining elements are bingo boards
-      .split('\n')                                  // split them into individual lines
-      .map(row => row
-        .split('  ')                                // one digit numbers have an extra space before them, so split on double spaces first...
-        .join(' ')                                  // ...replacing them with single splaces
-        .split(' ')                                 // then, split on single spaces to separate numbers
-        .filter(n => n)                             // if a line begins with a single digit number, there will be an extra empty element in the front after the split, so filter those out
-        .map(n => +n));                             // finally, convert strings into numbers
+      return !i ? block.split(',').map(n => +n)     // first element is always a line of comma-separated draw numbers... split them and convert strings into numbers
+        : block                                     // remaining elements are bingo boards..
+            .split('\n')                            // split them into individual lines
+            .map(row => row
+              .split('  ')                          // one digit numbers have an extra space before them, so split on double spaces first...
+              .join(' ')                            // ...replacing them with single splaces
+              .split(' ')                           // then, split on single spaces to separate numbers
+              .filter(n => n)                       // if a line begins with a single digit number, there will be an extra empty element in the front after the split, so filter those out
+              .map(n => +n));                       // finally, convert strings into numbers
   });
 
   // INIT
