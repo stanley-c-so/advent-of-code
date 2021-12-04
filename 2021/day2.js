@@ -68,7 +68,7 @@ function submarineInstructions (part, inputStr) {
 
   let horizontal = 0;
   let depth = 0;
-  let aim = 0;
+  let aim = 0;                                  // part 2
   for (const [instruction, n] of inputArr) {
     if (instruction === 'forward') {
       if (part === 1) {
@@ -84,7 +84,7 @@ function submarineInstructions (part, inputStr) {
     }
     else if (instruction === 'up') {
       if (part === 1) depth -= n;
-      aim -= n;
+      else aim -= n;
     }
     else throw 'INVALID INSTRUCTION';
   }
