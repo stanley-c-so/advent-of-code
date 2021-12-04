@@ -72,22 +72,23 @@ Use the binary numbers in your diagnostic report to calculate the oxygen generat
 function runDiagnostic (part, inputStr) {
   const inputArr = inputStr.split('\n');
 
+  // INIT
   const lineLength = inputArr[0].length;
-  const gammaArr = [];
-  for (let i = 0; i < lineLength; ++i) {
-    let countZero = 0;
-    let countOne = 0;
-    for (const line of inputArr) {
-      if (line[i] === '0') ++countZero;
-      else ++countOne;
-    }
-    gammaArr.push(countZero > countOne ? '0' : '1');
-  }
-  const gammaRate = parseInt(gammaArr.join(''), 2);
-  
+
   if (part === 1) {
 
-    const epsilonRate = 2**lineLength - 1 - gammaRate;  // epsilonRate is the complement of gammaRate such that their sum is equal to the binary num of all 1s
+    const gammaArr = [];
+    for (let i = 0; i < lineLength; ++i) {
+      let countZero = 0;
+      let countOne = 0;
+      for (const line of inputArr) {
+        if (line[i] === '0') ++countZero;
+        else ++countOne;
+      }
+      gammaArr.push(countZero > countOne ? '0' : '1');      // NO ESTABLISHED PROTOCOL IF countZero === countOne, BUT I DON'T THINK IT HAPPENS
+    }
+    const gammaRate = parseInt(gammaArr.join(''), 2);
+    const epsilonRate = 2**lineLength - 1 - gammaRate;      // epsilonRate is the complement of gammaRate such that their sum is equal to the binary num of all 1s
     return gammaRate * epsilonRate;
 
   } else {
@@ -118,11 +119,11 @@ function runDiagnostic (part, inputStr) {
         candidates = candidates.filter(line => applyRule(rule, line[i], countZero, countOne));
         ++i;
       }
-      return candidates[0];
+      return parseInt(candidates[0], 2);
     }
 
-    const oxygenRating = parseInt(getRating(OXYGEN), 2);
-    const carbonDioxideRating = parseInt(getRating(CO2), 2);
+    const oxygenRating = getRating(OXYGEN);
+    const carbonDioxideRating = getRating(CO2);
     return oxygenRating * carbonDioxideRating;
 
   }
