@@ -10,6 +10,7 @@ COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
 
 function NAME_OF_FUNC_HERE (part, inputStr) {
   const inputArr = inputStr.split('\n');
+  console.log(inputArr);
 
   if (part === 1) {
 
