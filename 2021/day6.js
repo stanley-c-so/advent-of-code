@@ -80,8 +80,8 @@ function simulateFish (part, inputStr) {
     const numOfFishRestarting = fishMemo[0];                      // IMPORTANT: keep track of the number of fish at timer 0 that are about to reproduce and reset to timer 6
     for (let i = 0; i < fishMemoLen; ++i) {
       fishMemo[i] = i < fishMemoLen - 1 ? fishMemo[i + 1] : 0;    // first, replace current count with the incoming count from the timer above (or, for timer 8, replace with 0)
-      
-      if (i === cycleTime - 1 || i === fishMemoLen - 1) {         // then, for timer 6 or 8, increment by the number of restarting fish (parents go to 6; offspring go to 8)
+
+      if (i === cycleTime - 1 || i === fishMemoLen - 1) {         // then, for timer 6 or 8, further increase by the number of restarting fish (parents go to 6; offspring go to 8)
         fishMemo[i] += numOfFishRestarting;
       }
     }
