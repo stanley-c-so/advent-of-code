@@ -79,16 +79,15 @@ function simulateFish (part, inputStr) {
   for (let day = 0; day < daysToSimulate; ++day) {
     const numOfFishRestarting = fishMemo[0];                      // first, keep track of the number of fish at timer 0 that are about to reproduce and reset to timer 6
     for (let i = 0; i < fishMemoLen; ++i) {
-      const numOfIncomingFish = fishMemo[i + 1];                  // next, keep track of the number of fish whose timers are decrementing from i+1 to i
       switch (i) {
         case fishMemoLen - 1:                                     // the new timer 8 count is the number of newly spawned fish (which matches the number of fish that are restarting)
           fishMemo[i] = numOfFishRestarting;
           break;
         case cycleTime - 1:                                       // the new timer 6 count is the sum of the old timer 7 count, plus the number of fish that are restarting
-          fishMemo[i] = numOfIncomingFish + numOfFishRestarting;
+          fishMemo[i] = fishMemo[i + 1] + numOfFishRestarting;
           break;
         default:                                                  // for all other timers 0-5 and 7, the new counts will match the previous counts for timers 1-6 and 8 (the next timer up)
-          fishMemo[i] = numOfIncomingFish
+          fishMemo[i] = fishMemo[i + 1]
       }
     }
   }
