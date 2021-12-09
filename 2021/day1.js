@@ -84,7 +84,7 @@ Consider sums of a three-measurement sliding window. How many sums are larger th
 function slidingWindow (part, inputStr) {
   const inputArr = inputStr.split('\n').map(n => +n);
 
-  const windowSize = part === 1 ? 1 : 3;
+  const windowSize = part === 1 ? 1 : 3;                                                    // PART 1: treat this as a sliding window problem, with window size 1. PART 2: window size 3.
   let count = 0;
   let currWindowTotal = inputArr.slice(0, windowSize).reduce((sum, curr) => sum + curr);
   for (let i = windowSize; i < inputArr.length; ++i) {

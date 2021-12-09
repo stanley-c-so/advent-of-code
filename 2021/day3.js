@@ -74,7 +74,7 @@ function runDiagnostic (part, inputStr) {
   // INIT
   const lineLength = inputArr[0].length;
 
-  if (part === 1) {
+  if (part === 1) {                                         // PART 1: find gammaRate and epsilonRate
 
     const gammaArr = [];
     for (let i = 0; i < lineLength; ++i) {
@@ -90,7 +90,7 @@ function runDiagnostic (part, inputStr) {
     const epsilonRate = 2**lineLength - 1 - gammaRate;      // epsilonRate is the complement of gammaRate such that their sum is equal to the binary num of all 1s
     return gammaRate * epsilonRate;
 
-  } else {
+  } else {                                                  // PART 2: find oxygenRating and carbonDioxideRating
 
     const OXYGEN = 'OXYGEN';
     const CO2 = 'CO2';

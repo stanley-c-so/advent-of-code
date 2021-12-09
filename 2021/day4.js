@@ -136,7 +136,7 @@ function bingo (part, inputStr) {
   // RUN SIMULATION
   for (const num of draw) {
     for (let i = 0; i < numBoards; ++i) {
-      if (alreadyWon[i]) continue;                      // part 2: skip a board that has already won
+      if (alreadyWon[i]) continue;                      // PART 2: skip a board that has already won
       const board = boards[i];
       const dict = boardDicts[i];
       if (num in dict) {                                // if the drawn num is found on this board...
@@ -145,8 +145,8 @@ function bingo (part, inputStr) {
         boardSums[i] -= num;                            // ...subtract the drawn num from the running total of unmarked nums for that board...
         if (checkForWin(board, row, col)) {             // ...and check for a win:
           if (
-            part === 1
-            || part === 2 && numBoardsRemaining === 1
+            part === 1                                  // PART 1: stop at the first winning board
+            || part === 2 && numBoardsRemaining === 1   // PART 2: stop at the last winning board
           ) return boardSums[i] * num;                  // (ASSUMING ONLY ONE BOARD WINS AT A TIME) upon finding a win for YOUR board, return relevant data
           alreadyWon[i] = true;                         // part 2: if your board not yet found, mark this board as finished...
           --numBoardsRemaining;                         // ...and decrement the number of boards remaining

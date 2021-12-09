@@ -75,7 +75,7 @@ function simulateFish (part, inputStr) {
   for (const fish of inputArr) ++fishMemo[fish];                  // memo has indices 0-8 (all possible timer values); store the current corresponding fish count within each index
   
   // RUN SIMULATION
-  const daysToSimulate = part === 1 ? 80 : 256;
+  const daysToSimulate = part === 1 ? 80 : 256;                   // PART 1: simulate 80 days. PART 2: simulate 256 days.
   for (let day = 0; day < daysToSimulate; ++day) {
     const numOfFishRestarting = fishMemo[0];                      // IMPORTANT: keep track of the number of fish at timer 0 that are about to reproduce and reset to timer 6
     for (let i = 0; i < fishMemoLen; ++i) {

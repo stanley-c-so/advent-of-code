@@ -173,14 +173,14 @@ function decode (part, inputStr) {
     const [LS, RS] = line.split(' | ');
     const outputArr = RS.split(' ');
     
-    if (part === 1) {
+    if (part === 1) {                                                             // PART 1: total up the number of output digits with unique lengths
 
       const uniqueLengths = [2, 4, 3, 7];                                         // these are the unique lengths (only '1' has a length of 2, '4' has a length of 4, etc.)
       for (const str of outputArr) {
         if (uniqueLengths.includes(str.length)) ++total;
       }
 
-    } else {
+    } else {                                                                      // PART 2: decode output digits and total up their numbers
 
       // INIT
       const strByDigit = Array(10).fill(null);                                    // if we know a certain string str represents a digit k, then strByDigit[k] === str

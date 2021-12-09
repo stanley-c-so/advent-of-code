@@ -77,8 +77,8 @@ function countIntersections (part, inputStr) {
       )
     );
   const lines = (part === 1)
-    ? inputArr.filter(line => line[0][0] === line[1][0] || line[0][1] === line[1][1])   // part 1: analyze ORTHOGONAL lines only
-    : inputArr;                                                                         // part 2: analyze ALL lines
+    ? inputArr.filter(line => line[0][0] === line[1][0] || line[0][1] === line[1][1])   // PART 1: analyze ORTHOGONAL lines only
+    : inputArr;                                                                         // PART 2: analyze ALL lines
 
   // CREATE MAP BASED ON LINES
   const maxX = lines.reduce((x, line) => Math.max(x, line[0][0], line[1][0]), 0);       // dimensions of map will be governed by max value of x...

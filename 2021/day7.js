@@ -68,8 +68,8 @@ function optimizeFuel (part, inputStr) {
   // HELPER FUNCTION: CALCULATE THE COST OF MOVING BETWEEN TWO POINTS (BASED ON PART 1, PART 2)
   function getCost(a, b) {
     const delta = Math.abs(a - b);
-    if (part === 1) return delta;                                   // part 1: each unit of distance costs 1 fuel
-    return (delta * (delta + 1)) / 2;                               // part 2: for each i, the ith unit of distance costs i fuel, so use gauss' summation formula (n)(n+1)/2
+    if (part === 1) return delta;                                   // PART 1: each unit of distance costs 1 fuel
+    return (delta * (delta + 1)) / 2;                               // PART 2: for each i, the ith unit of distance costs i fuel, so use gauss' summation formula (n)(n+1)/2
   }
 
   // RUN SIMULATION FOR ALL VALUES OF x FROM minX to maxX AND CALCULATE TOTAL FUEL COST TO GET TO THAT x. RETURN THE LOWEST COST

@@ -67,7 +67,7 @@ function submarineInstructions (part, inputStr) {
 
   let horizontal = 0;
   let depth = 0;
-  let aim = 0;                                  // part 2
+  let aim = 0;                                  // PART 2
   for (const [instruction, n] of inputArr) {
     if (instruction === 'forward') {
       if (part === 1) {
