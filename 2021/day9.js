@@ -123,6 +123,7 @@ function analyzeLowPointsAndBasins (part, inputStr) {
     }
     basinSizes.push(basinSize);
   }
+  if (basinSizes.length < 3) throw 'YOU SCREWED UP';                                      // (the problem asks for the 3 largest basin sizes)
   basinSizes.sort((a, b) => b - a);                                                       // sort in descending order so we can grab the first 3 (i.e. the 3 largest) elements
   return basinSizes[0] * basinSizes[1] * basinSizes[2];                                   // PART 2: return product of 3 largest basin sizes
 
