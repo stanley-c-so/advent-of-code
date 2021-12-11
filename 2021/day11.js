@@ -374,7 +374,7 @@ function gameOfLifeRedux (part, inputStr) {
       }
     }
 
-    // RESOLVE FLASHES
+    // STEP 2: resolve flashes
     while (stack.length) {
       const [row, col] = stack.pop();
       if (flashed[row][col]) continue;                                              // guard: if we have already processed the flash for this octopus, continue
@@ -390,7 +390,7 @@ function gameOfLifeRedux (part, inputStr) {
       }
     }
 
-    // RESET ENERGY LEVEL FOR ALL OCTOPI THAT FLASHED THIS STEP
+    // STEP 3: reset energy level for all octopi that flashed this step
     for (let row = 0; row < H; ++row) {
       for (let col = 0; col < W; ++col) {
         if (flashed[row][col]) map[row][col] = 0;
@@ -398,6 +398,7 @@ function gameOfLifeRedux (part, inputStr) {
     }
 
     if (flashedThisStep === H * W) return k;                                        // PART 2: return k (step number) if all octopi flashed (i.e. flashedThisStep equals total number of octopi)
+    if (k === 10**6) throw 'ANSWER SEEMS HIGH - YOU PROBABLY SCREWED UP';           // guard against infinite loop
   }
 
   return totalFlashes;                                                              // PART 1: after 100 steps, return total number of flashes
