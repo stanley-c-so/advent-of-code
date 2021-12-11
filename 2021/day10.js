@@ -102,7 +102,7 @@ Find the completion string for each incomplete line, score the completion string
 
 */
 
-function balancedBrackets (part, inputStr) {
+function balancedBracketsRedux (part, inputStr) {
   const inputArr = inputStr.split('\n');
 
   // INIT
@@ -154,7 +154,7 @@ function balancedBrackets (part, inputStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = balancedBrackets;
+const func = balancedBracketsRedux;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
