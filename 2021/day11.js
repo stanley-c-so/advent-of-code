@@ -397,8 +397,10 @@ function gameOfLifeRedux (part, inputStr) {
       }
     }
 
-    if (flashedThisStep === H * W) return k;                                        // PART 2: return k (step number) if all octopi flashed (i.e. flashedThisStep equals total number of octopi)
-    if (k === 10**6) throw 'ANSWER SEEMS HIGH - YOU PROBABLY SCREWED UP';           // guard against infinite loop
+    if (part === 2) {
+      if (flashedThisStep === H * W) return k;                                      // PART 2: return k (step number) if all octopi flashed (i.e. flashedThisStep equals total number of octopi)
+      if (k === 10**6) throw 'ANSWER SEEMS HIGH - YOU PROBABLY SCREWED UP';         // guard against infinite loop
+    }
   }
 
   return totalFlashes;                                                              // PART 1: after 100 steps, return total number of flashes
