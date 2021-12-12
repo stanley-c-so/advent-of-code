@@ -330,7 +330,7 @@ input = {
 expected = 5457;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
-// Test case 1
+// Test case 5
 input = {
   part: 2,
   inputStr: sampleInput1,
@@ -338,7 +338,7 @@ input = {
 expected = 36;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
-// Test case 2
+// Test case 6
 input = {
   part: 2,
   inputStr: sampleInput2,
@@ -346,7 +346,7 @@ input = {
 expected = 103;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
-// Test case 3
+// Test case 7
 input = {
   part: 2,
   inputStr: sampleInput3,
@@ -354,7 +354,7 @@ input = {
 expected = 3509;
 test(func, input, expected, testNum, lowestTest, highestTest);
 
-// Test case 4
+// Test case 8
 input = {
   part: 2,
   inputStr: actualInput,
