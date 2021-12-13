@@ -190,6 +190,7 @@ function foldingPaper (part, inputStr) {
     map = foldPaper(map, folds[k]);
   }
 
+  // GENERATE THE REQUIRED INFORMATION FROM THE FINAL MAP
   if (part === 1) {                                                                     // PART 1: count the number of visible dots in the final map
 
     let count = 0;
