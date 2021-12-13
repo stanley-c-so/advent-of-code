@@ -151,15 +151,15 @@ function foldingPaper (part, inputStr) {
     const oldH = map.length;
     const oldW = map[0].length;
     
-    // THE PUZZLE NEVER EXPLICITLY PROMISES THAT FOLD VALUES WILL ALWAYS BE HALF WAY ALONG THE PAPER, BUT THIS BLOCK ENDS UP CONFIRMING IT'S TRUE
+    // THE PUZZLE NEVER EXPLICITLY PROMISES THAT FOLD VALUES WILL ALWAYS BE HALF WAY ALONG THE PAPER, BUT THIS BLOCK ENDS UP CONFIRMING IT'S TRUE, AND THAT DIMENSIONS ARE ALWAYS ODD
     if (
-      foldingAlongY && val !== Math.floor(oldH / 2) || 
-      !foldingAlongY && val !== Math.floor(oldW / 2))
+      foldingAlongY && val !== oldH / 2 - 0.5 || 
+      !foldingAlongY && val !== oldW / 2 - 0.5)
     {
       throw 'ASSUMPTION THAT FOLD IS ALWAYS HALF WAY ALONG THE PAPER IS NOT TRUE';
     }
 
-    // INSTANTIATE THE NEW MAP (one dimension will be the same, and the other will be half and floored, as confirmed by the throw statement above)
+    // INSTANTIATE THE NEW MAP (one dimension will be the same, and the other will be halved and floored, as confirmed by the throw statement above)
     const newH = foldingAlongY ? val : oldH;                                            // if folding along Y, then new height (0-indexed) ends BEFORE val, so 1-indexed it IS val
     const newW = foldingAlongY ? oldW : val;                                            // else, new width (0-indexed) ends BEFORE val, so 1-indxed it IS val
     const newMap = Array.from({length: newH}, () => Array(newW).fill('.'));
