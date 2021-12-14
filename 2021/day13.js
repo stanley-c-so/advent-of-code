@@ -130,72 +130,63 @@ function foldingPaper (part, inputStr) {
     return [axis, +val];
   });
 
-  // INITIALIZE MAP
+  // SCAN DATA TO DETERMINE MAP DIMENSIONS
   let maxX = 0;
   let maxY = 0;
-  for (const dot of dots) {                                                             // first, get the max values of X and Y found in the data (which are 0-indexed)...
+  for (const dot of dots) {                                                             // get the max values of X and Y found in the data (which are 0-indexed)
     const [x, y] = dot;
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
   }
-  let map = Array.from({length: maxY + 1}, () => Array(maxX + 1).fill('.'));            // ...then, instantiate a map based on those dimensions (add 1 to each dimension)...
-  for (const dot of dots) {                                                             // ...finally, fill in all dots (#) based on the input data
+
+  // INITIALIZE MAP
+  const map = Array.from({length: maxY + 1}, () => Array(maxX + 1).fill('.'));          // instantiate a map based on those dimensions (add 1 to each dimension as they are 1-indexed)
+  for (const dot of dots) {                                                             // finally, fill in all dots (#) based on the input data
     const [col, row] = dot;
     map[row][col] = '#';
   }
+  let H = maxY + 1;                                                                     // "effective" H and W will be changed as we fold the map. rather than discarding data...
+  let W = maxX + 1;                                                                     // ...we will just ignore the "discarded" half since we always fold up or fold left
 
-  // HELPER FUNCTION: ACCEPTS A MAP AND A FOLD INSTRUCTION, AND RETURNS A NEW MAP
-  function foldPaper(map, foldInstr) {
-    const [axis, val] = foldInstr;
+  // SIMULATE FOLDS
+  for (let k = 0; k < (part === 1 ? 1 : folds.length); ++k) {                           // PART 1: simulate first fold only; PART 2: simulate ALL folds
+    const [axis, val] = folds[k];
     const foldingAlongY = axis === 'y';
-    const oldH = map.length;
-    const oldW = map[0].length;
-    
+
     // THE PUZZLE NEVER EXPLICITLY PROMISES THAT FOLD VALUES WILL ALWAYS BE HALF WAY ALONG THE PAPER, BUT THIS BLOCK ENDS UP CONFIRMING IT'S TRUE, AND THAT DIMENSIONS ARE ALWAYS ODD
     if (
-      foldingAlongY && val !== oldH / 2 - 0.5 || 
-      !foldingAlongY && val !== oldW / 2 - 0.5)
+      foldingAlongY && val !== H / 2 - 0.5 || 
+      !foldingAlongY && val !== W / 2 - 0.5)
     {
       throw 'ASSUMPTION THAT FOLD IS ALWAYS HALF WAY ALONG THE PAPER IS NOT TRUE';
     }
 
-    // INSTANTIATE THE NEW MAP (one dimension will be the same, and the other will be halved and floored, as confirmed by the throw statement above)
-    const newH = foldingAlongY ? val : oldH;                                            // if folding along Y, then new height (0-indexed) ends BEFORE val, so 1-indexed it IS val
-    const newW = foldingAlongY ? oldW : val;                                            // else, new width (0-indexed) ends BEFORE val, so 1-indxed it IS val
-    const newMap = Array.from({length: newH}, () => Array(newW).fill('.'));
-    
-    // COPY DATA FROM THE HALF THAT REMAINS OF THE OLD MAP TO THAT OF THE NEW MAP (if folding along y, this would be the top half; else, the right half)
-    for (let row = 0; row < newH; ++row) {                                              // regardless of whether folding along Y, stop before newH (0-indexed)...
-      for (let col = 0; col < newW; ++col) {                                            // ...and stop before newW (0-indexed)
-        newMap[row][col] = map[row][col];
-      }
-    }
+    // CALCULATE NEW EFFECTIVE H AND W VALUES
+    const newH = foldingAlongY ? val : H;
+    const newW = foldingAlongY ? W : val;
 
-    // REFLECT THE DOTS FROM THE DISCARDED OLD HALF TO THE CORRESPONDING POSITION IN THE NEW MAP
-    for (let row = foldingAlongY ? newH + 1 : 0; row < oldH; ++row) {                   // if folding along Y, then begin at the row AFTER newH (0-indexed)...
-      for (let col = foldingAlongY ? 0 : newW + 1; col < oldW; ++col) {                 // ...else, begin at the col AFTER newW (0-indexed)
+    // SCAN REGION TO BE DISCARDED, AND COPY OVER RELEVANT DATA TO THE HALF THAT WILL BE KEPT
+    for (let row = (foldingAlongY ? val + 1 : 0); row < H; ++row) {
+      for (let col = (foldingAlongY ? 0 : val + 1); col < W; ++col) {
         if (map[row][col] === '#') {
           const correspondingRow = foldingAlongY ? 2 * newH - row : row;                // (if folding along Y) corresponding row is newH - (row - newH), or 2 * newH - row
           const correspondingCol = foldingAlongY ? col : 2 * newW - col;                // (else) corresponding col is newW - (col - newW), or 2 * newW - col
-          newMap[correspondingRow][correspondingCol] = '#';
+          map[correspondingRow][correspondingCol] = '#';        
         }
       }
     }
 
-    return newMap;
-  }
-
-  // SIMULATE FOLDS
-  for (let k = 0; k < (part === 1 ? 1 : folds.length); ++k) {                           // PART 1: simulate first fold only; PART 2: simulate ALL folds
-    map = foldPaper(map, folds[k]);
+    // UPDATE THE EFFECTIVE H AND W VALUES
+    H = newH;
+    W = newW;
   }
 
   // GENERATE THE REQUIRED INFORMATION FROM THE FINAL MAP
   if (part === 1) {                                                                     // PART 1: count the number of visible dots in the final map
 
     let count = 0;
-    for (let row = 0; row < map.length; ++row) {
-      for (let col = 0; col < map[0].length; ++col) {
+    for (let row = 0; row < H; ++row) {
+      for (let col = 0; col < W; ++col) {
         if (map[row][col] === '#') ++count;
       }
     }
@@ -204,7 +195,9 @@ function foldingPaper (part, inputStr) {
   } else {                                                                              // PART 2: nothing to return - print out final map and interpret solution visually
 
     console.log('FINAL STATE OF PAPER:');
-    console.log(map.map(row => row.join('')));                                          // my terminal can't fit a line of the map onto one line of terminal unless i join the rows first!
+    for (let row = 0; row < H; ++row) {
+      console.log(map[row].slice(0, W).join(''));                                       // my terminal can't fit a line of the map onto one line of terminal unless i join the rows first!
+    }
 
   }
 }
