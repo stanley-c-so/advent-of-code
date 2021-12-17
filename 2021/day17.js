@@ -155,7 +155,7 @@ function trickShot (part, inputStr) {
     the reason why (3) is so important is because it frees us to think only about the y axis, since we can just shoot at the key x velocity that
     is guaranteed to fall within the target area's x range.
 
-    thus part 1 can be treated as a pure math problem: *in order to maximize maxHeight, you have to shoot at the highest theoretical initial y velocity
+    thus part 1 can be treated as a pure math problem: *in order to maximize maxHeight*, you have to shoot at the highest theoretical initial y velocity
     (we'll call it Y) that still lands on target. imagine you shoot the probe at Y. its value decrements until it reaches 0 as y === maxHeight, and the probe
     starts to fall. its fall will mirror the path of its rise (ignoring the x axis) until eventually the probe reaches y === 0 again (which will always happen).
     at this point, the y velocity will be -Y. then on the subsequent step, y velocity will be -(Y + 1) and the probe ends up at position -(Y + 1). since we are
