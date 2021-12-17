@@ -203,6 +203,7 @@ function trickShot (part, inputStr) {
     return { onTarget: false, maxHeight: null };                                                        // MISS - max height not relevant
   }
 
+  // PART 2 (AND OPTIONALLY PART 1) CAN BE SOLVED SIMPLY BY TRYING ALL SHOTS WITHIN THEORETICAL LIMITS
   function tryAllShotsWithinTheoreticalLimits() {
     let maxHeight = 0;                                                                                  // PART 1: track max height
     let numShots = 0;                                                                                   // PART 2: track number of shots
