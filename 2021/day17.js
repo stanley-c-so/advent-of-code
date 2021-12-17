@@ -155,14 +155,18 @@ function trickShot (part, inputStr) {
     the reason why (3) is so important is because it frees us to think only about the y axis, since we can just shoot at the key x velocity that
     is guaranteed to fall within the target area's x range.
 
-    thus part 1 is purely a math problem: *in order to maximize maxHeight, you have to shoot at the highest theoretical initial y velocity (we'll call
-    it Y) that still lands on target. imagine you shoot the probe at Y. its value decrements until it reaches 0 as y === maxHeight, and the probe
-    starts to fall. its fall will mirror the path of its rise (ignoring the x axis) until eventually the probe reaches y === 0 again. at this point,
-    the y velocity will be -Y. then on the subsequent step, y velocity will be -(Y + 1) and the probe ends up at position -(Y + 1). since we are
+    thus part 1 can be treated as a pure math problem: *in order to maximize maxHeight, you have to shoot at the highest theoretical initial y velocity
+    (we'll call it Y) that still lands on target. imagine you shoot the probe at Y. its value decrements until it reaches 0 as y === maxHeight, and the probe
+    starts to fall. its fall will mirror the path of its rise (ignoring the x axis) until eventually the probe reaches y === 0 again (which will always happen).
+    at this point, the y velocity will be -Y. then on the subsequent step, y velocity will be -(Y + 1) and the probe ends up at position -(Y + 1). since we are
     trying to maximize Y, it is possible that position -(Y + 1) would have dropped below the bottom edge of the target area, and thus we would not
     land on target. therefore, the lowest we could go (since we are trying to maximize Y) is if -(Y + 1) exactly matched the y value of the bottom
     edge of the target area. thus, for such a value of Y, maxHeight is simply 1 + 2 + 3 + ... + Y, or using euler's summation, Y * (Y + 1) / 2. simply
     substitute Y = abs(minTargetY) - 1.
+
+    notably, you don't have to use the complete analysis above to approach part 1. as long as you realize the theoretical max height, since you will try
+    every combination of candidate x and y values anyway in part 2, you could still derive the max height empirically anyway. if you approach it this way,
+    you don't even need to rely on assumption (3).
 
   */
 
@@ -187,17 +191,22 @@ function trickShot (part, inputStr) {
     function shootOnTarget(xVelocity, yVelocity) {
       let x = 0;
       let y = 0;
+      let maxHeight = 0;                                                                                  // OPTIONAL: track max height
       while (y >= minTargetY) {
-        if (minTargetX <= x && x <= maxTargetX && minTargetY <= y && y <= maxTargetY) return true;
+        if (minTargetX <= x && x <= maxTargetX && minTargetY <= y && y <= maxTargetY) {
+          return { onTarget: true, maxHeight };                                                           // OPTIONAL: instead of just returning onTarget bool, return max height
+        }
         x += xVelocity;
         y += yVelocity;
+        maxHeight = Math.max(maxHeight, y);                                                               // OPTIONAL: track max height
         if (xVelocity > 0) --xVelocity;
-        else if (xVelocity < 0) ++xVelocity;                                                              // don't truly need this because this will never happen
+        // else if (xVelocity < 0) ++xVelocity;                                                           // don't truly need this because this will never happen
         --yVelocity;
       }
-      return false;
+      return { onTarget: false, maxHeight: null };                                                        // OPTIONAL: instead of just returning onTarget bool, return max height
     }
 
+    let maxHeight = 0;                                                                                    // OPTIONAL: track max height
     let numValues = 0;
 
     const theoreticalMinX = 1;                                                                            // any lower, and you wouldn't get any rightward movement (assumption (1))
@@ -206,10 +215,15 @@ function trickShot (part, inputStr) {
 
     for (let xVelocity = theoreticalMinX; xVelocity <= theoreticalMaxX; ++xVelocity) {                    // simply try every combination of possible x velocity values...
       for (let yVelocity = theoreticalMinY; yVelocity <= theoreticalMaxY; ++yVelocity) {                  // ...with possible y velocity values...
-        if (shootOnTarget(xVelocity, yVelocity)) ++numValues;                                             // ...and count the successful shots
+        const simulate = shootOnTarget(xVelocity, yVelocity);
+        if (simulate.onTarget) {
+          ++numValues;                                                                                    // ...and count the successful shots
+          maxHeight = Math.max(maxHeight, simulate.maxHeight);                                            // OPTIONAL: track max height
+        }
       }
     }
 
+    console.log('MAX HEIGHT WAS:', maxHeight);                                                            // OPTIONAL: inspect max height to verify part 1
     return numValues;
 
   }
