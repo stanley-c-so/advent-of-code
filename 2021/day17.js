@@ -178,53 +178,59 @@ function trickShot (part, inputStr) {
   const yRangeStr = yData.slice(2);
   const [minTargetY, maxTargetY] = yRangeStr.split('..').map(n => +n);
 
-  // THEORETICAL MAX VALUE OF Y AT WHICH YOU CAN SHOOT AND STILL BE ON TARGET (ANY HIGHER, AND YOUR FIRST STEP WITH y < 0 WILL ALREADY BE TOO FAR DOWN)
-  const theoreticalMaxY = Math.abs(minTargetY) - 1;
+  // THEORETICAL MIN/MAX VALUES THAT MAY (OR MAY NOT) HIT TARGET - NO NEED TO TEST ANYTHING OUTSIDE THESE LIMITS
+  const theoreticalMinX = 1;                                                                            // any lower, and you wouldn't get any rightward movement (assumption (1))
+  const theoreticalMaxY = Math.abs(minTargetY) - 1;                                                     // any higher, and your first step with y < 0 will already be too far down
+  const theoreticalMaxX = maxTargetX;                                                                   // you could reach the right edge of the target area in one shot
+  const theoreticalMinY = minTargetY;                                                                   // you could reach the bottom edge of the target area in one shot
+  
+  // HELPER FUNCTION - SIMULATE THE SHOT
+  function shootOnTarget(xVelocity, yVelocity) {
+    let x = 0;
+    let y = 0;
+    let maxHeight = 0;                                                                                  // track max height
+    while (x <= maxTargetX && y >= minTargetY) {
+      if (minTargetX <= x && x <= maxTargetX && minTargetY <= y && y <= maxTargetY) {                   // HIT
+        return { onTarget: true, maxHeight };
+      }
+      x += xVelocity;
+      y += yVelocity;
+      maxHeight = Math.max(maxHeight, y);                                                               // track max height
+      if (xVelocity > 0) --xVelocity;
+      // else if (xVelocity < 0) ++xVelocity;                                                           // don't truly need this because this will never happen
+      --yVelocity;
+    }
+    return { onTarget: false, maxHeight: null };                                                        // MISS - max height not relevant
+  }
+
+  function tryAllShotsWithinTheoreticalLimits() {
+    let maxHeight = 0;                                                                                  // PART 1: track max height
+    let numShots = 0;                                                                                   // PART 2: track number of shots
+
+    for (let xVelocity = theoreticalMinX; xVelocity <= theoreticalMaxX; ++xVelocity) {                  // simply try every combination of possible x velocity values...
+      for (let yVelocity = theoreticalMinY; yVelocity <= theoreticalMaxY; ++yVelocity) {                // ...with possible y velocity values...
+        const simulate = shootOnTarget(xVelocity, yVelocity);
+        if (simulate.onTarget) {
+          maxHeight = Math.max(maxHeight, simulate.maxHeight);                                          // ...PART 1: update max height, if applicable
+          ++numShots;                                                                                   // ...PART 2: increment the count of successful shots
+        }
+      }
+    }
+
+    return { maxHeight, numShots };
+  }
 
   if (part === 1) {                                                                                       // PART 1: find max height (i.e. find height when shooting at theoretical max y)
 
+    // SIMULATION ANSWER
+    // return tryAllShotsWithinTheoreticalLimits().maxHeight;
+
+    // MATH ANSHWER
     return theoreticalMaxY * (theoreticalMaxY + 1) / 2;                                                   // use euler's summation (see three assumptions)
 
   } else {                                                                                                // PART 2: count number of distinct pairs of initial shot velocities that hit target
 
-    // HELPER FUNCTION - SIMULATE THE SHOT
-    function shootOnTarget(xVelocity, yVelocity) {
-      let x = 0;
-      let y = 0;
-      let maxHeight = 0;                                                                                  // OPTIONAL: track max height
-      while (y >= minTargetY) {
-        if (minTargetX <= x && x <= maxTargetX && minTargetY <= y && y <= maxTargetY) {
-          return { onTarget: true, maxHeight };                                                           // OPTIONAL: instead of just returning onTarget bool, return max height
-        }
-        x += xVelocity;
-        y += yVelocity;
-        maxHeight = Math.max(maxHeight, y);                                                               // OPTIONAL: track max height
-        if (xVelocity > 0) --xVelocity;
-        // else if (xVelocity < 0) ++xVelocity;                                                           // don't truly need this because this will never happen
-        --yVelocity;
-      }
-      return { onTarget: false, maxHeight: null };                                                        // OPTIONAL: instead of just returning onTarget bool, return max height
-    }
-
-    let maxHeight = 0;                                                                                    // OPTIONAL: track max height
-    let numValues = 0;
-
-    const theoreticalMinX = 1;                                                                            // any lower, and you wouldn't get any rightward movement (assumption (1))
-    const theoreticalMaxX = maxTargetX;                                                                   // you could reach the right edge of the target area in one shot
-    const theoreticalMinY = minTargetY;                                                                   // you could reach the bottom edge of the target area in one shot
-
-    for (let xVelocity = theoreticalMinX; xVelocity <= theoreticalMaxX; ++xVelocity) {                    // simply try every combination of possible x velocity values...
-      for (let yVelocity = theoreticalMinY; yVelocity <= theoreticalMaxY; ++yVelocity) {                  // ...with possible y velocity values...
-        const simulate = shootOnTarget(xVelocity, yVelocity);
-        if (simulate.onTarget) {
-          ++numValues;                                                                                    // ...and count the successful shots
-          maxHeight = Math.max(maxHeight, simulate.maxHeight);                                            // OPTIONAL: track max height
-        }
-      }
-    }
-
-    console.log('MAX HEIGHT WAS:', maxHeight);                                                            // OPTIONAL: inspect max height to verify part 1
-    return numValues;
+    return tryAllShotsWithinTheoreticalLimits().numShots;
 
   }
 
