@@ -159,13 +159,13 @@ function trickShot (part, inputStr) {
     (we'll call it Y) that still lands on target. imagine you shoot the probe at Y. its value decrements until it reaches 0 as y === maxHeight, and the probe
     starts to fall. its fall will mirror the path of its rise (ignoring the x axis) until eventually the probe reaches y === 0 again (which will always happen).
     at this point, the y velocity will be -Y. then on the subsequent step, y velocity will be -(Y + 1) and the probe ends up at position -(Y + 1). since we are
-    trying to maximize Y, it is possible that position -(Y + 1) would have dropped below the bottom edge of the target area, and thus we would not
-    land on target. therefore, the lowest we could go (since we are trying to maximize Y) is if -(Y + 1) exactly matched the y value of the bottom
+    trying to maximize Y, it is possible that position -(Y + 1) would have dropped below the bottom edge of the target area, and thus we would not land on target.
+    therefore, to avoid missing the target, the lowest we could go (since we are trying to maximize Y) is such that -(Y + 1) exactly matched the y value of the bottom
     edge of the target area. thus, for such a value of Y, maxHeight is simply 1 + 2 + 3 + ... + Y, or using euler's summation, Y * (Y + 1) / 2. simply
     substitute Y = abs(minTargetY) - 1.
 
-    notably, you don't have to use the complete analysis above to approach part 1. as long as you realize the theoretical max height, since you will try
-    every combination of candidate x and y values anyway in part 2, you could still derive the max height empirically anyway. if you approach it this way,
+    notably, you don't have to use the complete analysis above to approach part 1. as long as you realize the theoretical max initial y velocity, since you will
+    try every combination of candidate x and y values anyway in part 2, you could still derive the max height empirically anyway. if you approach it this way,
     you don't even need to rely on assumption (3).
 
   */
