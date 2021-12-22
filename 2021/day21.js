@@ -56,7 +56,7 @@ Using your given starting positions, determine every possible outcome. Find the 
 
 */
 
-function NAME_OF_FUNC_HERE (part, inputStr) {
+function diracDice (part, inputStr) {
 
   // UTILITY FUNCTION: HANDLE MODULO, BUT IF THE ANSWER SHOULD BE 0, MAKE IT THE MOD NUMBER INSTEAD
   const modWithoutZero = (n, mod) => (n % mod) || mod;                                              // e.g. board position can only be 1-10
@@ -170,7 +170,7 @@ function NAME_OF_FUNC_HERE (part, inputStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = NAME_OF_FUNC_HERE;
+const func = diracDice;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const lowestTest = 0 || 0;
