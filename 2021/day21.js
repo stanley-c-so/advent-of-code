@@ -59,28 +59,28 @@ Using your given starting positions, determine every possible outcome. Find the 
 function diracDice (part, inputStr) {
 
   // UTILITY FUNCTION: HANDLE MODULO, BUT IF THE ANSWER SHOULD BE 0, MAKE IT THE MOD NUMBER INSTEAD
-  const modWithoutZero = (n, mod) => (n % mod) || mod;                                              // e.g. board position can only be 1-10
+  const modWithoutZero = (n, mod) => (n % mod) || mod;                                                // e.g. board position can only be 1-10
 
   // PARSE DATA AND SET UP INITIAL GAME POSITION
-  const [p1Input, p2Input] = inputStr.split('\n');                                                  // the only info that makes up a game state is...
-  let p1Turn = true;                                                                                // - whose turnß
-  let p1Position = +(p1Input.split(': ')[1]);                                                       // - P1's position
-  let p2Position = +(p2Input.split(': ')[1]);                                                       // - P2's position
-  let p1Score = 0;                                                                                  // - P1's score
-  let p2Score = 0;                                                                                  // - P2's score
+  const [p1Input, p2Input] = inputStr.split('\n');                                                    // the only info that makes up a game state is...
+  let p1Turn = true;                                                                                  // - whose turnß
+  let p1Position = +(p1Input.split(': ')[1]);                                                         // - P1's position
+  let p2Position = +(p2Input.split(': ')[1]);                                                         // - P2's position
+  let p1Score = 0;                                                                                    // - P1's score
+  let p2Score = 0;                                                                                    // - P2's score
 
-  if (part === 1) {                                                                                 // PART 1: use deterministic die only
+  if (part === 1) {                                                                                   // PART 1: use deterministic die only
 
     // CREATE FUNCTION WITH CLOSURE
     function getDeterministicDie() {
-      let die = 1;                                                                                  // create a closure that tracks value of die...
-      return function() {                                                                           // ...and return a function that reads/writes this closure
+      let die = 1;                                                                                    // create a closure that tracks value of die...
+      return function() {                                                                             // ...and return a function that reads/writes this closure
         let output = die;
         die = modWithoutZero(die + 1, 10);
         return output;
       }
     }
-    const rollDeteriministicDie = getDeterministicDie();                                            // this is that function
+    const rollDeteriministicDie = getDeterministicDie();                                              // this is that function
 
     // INIT FOR NUMBER OF TIMES ROLLED, WHICH FACTORS INTO WHAT WE NEED TO RETURN
     let numTimesRolled = 0;
@@ -100,7 +100,7 @@ function diracDice (part, inputStr) {
       p2Position = p1Turn ? p2Position : modWithoutZero(p2Position + roll, 10);
       p1Score += p1Turn ? p1Position : 0;
       p2Score += p1Turn ? 0 : p2Position;
-      if (p1Score >= 1000) return numTimesRolled * p2Score;                                         // return the needed value if someone won
+      if (p1Score >= 1000) return numTimesRolled * p2Score;                                           // return the needed value if someone won
       if (p2Score >= 1000) return numTimesRolled * p1Score;
       p1Turn = !p1Turn;
 
@@ -133,29 +133,40 @@ function diracDice (part, inputStr) {
     //   9: 1
     // }
 
+    // MEMOIZATION MAKES THIS SOLUTION LIGHTNING FAST!!!
+    const memo = {};
+
     // RECURSIVE FUNCTION THAT USES THE REFERENCE OBJECT TO MULTIPLY THE RESULTS COMING BACK FROM THE NEXT MOVE
     function simulate(p1Turn, p1Position, p2Position, p1Score, p2Score) {
 
-      // base cases
-      if (p1Score >= 21) return [1, 0];                                                             // i.e. if P1 has won, there is 1 way for P1 to win, 0 for P2
-      if (p2Score >= 21) return [0, 1];                                                             // vice versa for P2
+      const serial = `${p1Turn},${p1Position},${p2Position},${p1Score},${p2Score}`;                   // for memoization
 
-      // recursive case
-      let numWaysP1Wins = 0;
-      let numWaysP2Wins = 0;
-      for (const key in diceOutcomesDict) {                                                         // for each roll possibility, simulate the next move...
-        const roll = +key;
-        const freq = diceOutcomesDict[key];
-        const newP1Turn = !p1Turn;
-        const newP1Position = p1Turn ? modWithoutZero(p1Position + roll, 10) : p1Position;
-        const newP2Position = p1Turn ? p2Position : modWithoutZero(p2Position + roll, 10);
-        const newP1Score = p1Score + (p1Turn ? newP1Position : 0);
-        const newP2Score = p2Score + (p1Turn ? 0 : newP2Position);
-        const recurse = simulate(newP1Turn, newP1Position, newP2Position, newP1Score, newP2Score);  
-        numWaysP1Wins += recurse[0] * freq;                                                         // ...and multiply those counts by the frequency distribution
-        numWaysP2Wins += recurse[1] * freq;
+      if (!(serial in memo)) {
+
+        // base cases
+        if (p1Score >= 21) return [1, 0];                                                             // i.e. if P1 has won, there is 1 way for P1 to win, 0 for P2
+        if (p2Score >= 21) return [0, 1];                                                             // vice versa for P2
+
+        // recursive case
+        let numWaysP1Wins = 0;
+        let numWaysP2Wins = 0;
+        for (const key in diceOutcomesDict) {                                                         // for each roll possibility, simulate the next move...
+          const roll = +key;
+          const freq = diceOutcomesDict[key];
+          const newP1Turn = !p1Turn;
+          const newP1Position = p1Turn ? modWithoutZero(p1Position + roll, 10) : p1Position;
+          const newP2Position = p1Turn ? p2Position : modWithoutZero(p2Position + roll, 10);
+          const newP1Score = p1Score + (p1Turn ? newP1Position : 0);
+          const newP2Score = p2Score + (p1Turn ? 0 : newP2Position);
+          const recurse = simulate(newP1Turn, newP1Position, newP2Position, newP1Score, newP2Score);  
+          numWaysP1Wins += recurse[0] * freq;                                                         // ...and multiply those counts by the frequency distribution
+          numWaysP2Wins += recurse[1] * freq;
+        }
+
+        memo[serial] = [numWaysP1Wins, numWaysP2Wins];
       }
-      return [numWaysP1Wins, numWaysP2Wins];
+
+      return memo[serial];
     }
 
     // KICK START RECURSION AND RETURN
