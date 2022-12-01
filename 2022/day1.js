@@ -83,12 +83,24 @@ const highestTest = 0 || Infinity;
 const fs = require('fs');
 const path = require('path');
 const DAY_NUM = __filename.split('.js')[0].split('day')[1];
-const SAMPLE_PATH = path.join(__dirname, `day${DAY_NUM}-sample.txt`);
 const INPUT_PATH = path.join(__dirname, `day${DAY_NUM}-input.txt`);
-const sampleInput = fs.readFileSync(SAMPLE_PATH, 'utf8');
 const actualInput = fs.readFileSync(INPUT_PATH, 'utf8');
+const parseSampleInput = s => s.split('').map(c => c === '\n' ? '\r\n' : c).join('');
 
-// console.log(sampleInput)
+const sampleInput = parseSampleInput(`1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000`);
 
 // Test case 1
 input = {
