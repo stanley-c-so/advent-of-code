@@ -11,7 +11,7 @@ function test (func, input, expected, testNum, skippedTests, lowestTest = 0, hig
         : `TEST ${testNum[0]} FAILED: EXPECTED ${expected} BUT GOT ${output}`
     );
   }
-  testNum[0]++;
+  ++testNum[0];
 };
 
 module.exports = test;
