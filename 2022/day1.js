@@ -55,17 +55,18 @@ function countCalories (part, inputStr) {
   const inputArr = inputStr
                     .split('\r\n\r\n')
                     .map(inv => inv.split('\r\n')
-                                  .map(n => +n)
-                                  .reduce((sum, num) => sum + num));
+                                  .map(n => +n));
+
+  const totalCaloriesCarriedByEachElf = inputArr.map(elf => elf.reduce((sum, num) => sum + num));
 
   if (part === 1) {
 
-    return Math.max(...inputArr);
+    return Math.max(...totalCaloriesCarriedByEachElf);
 
   } else {
 
-    inputArr.sort((a, b) => b - a);
-    return inputArr[0] + inputArr[1] + inputArr[2];
+    totalCaloriesCarriedByEachElf.sort((a, b) => b - a);
+    return totalCaloriesCarriedByEachElf[0] + totalCaloriesCarriedByEachElf[1] + totalCaloriesCarriedByEachElf[2];
 
   }
 }
