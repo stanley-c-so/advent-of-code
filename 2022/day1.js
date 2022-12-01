@@ -28,6 +28,7 @@ For example, suppose the Elves finish writing their items' Calories and end up w
 9000
 
 10000
+
 This list represents the Calories of the food carried by five Elves:
 
 The first Elf is carrying food with 1000, 2000, and 3000 Calories, a total of 6000 Calories.
@@ -77,6 +78,7 @@ let input, expected;
 const func = countCalories;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
+const skippedTests = new Set([  ]);
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
@@ -108,7 +110,7 @@ input = {
   inputStr: sampleInput,
 };
 expected = 24000;
-test(func, input, expected, testNum, lowestTest, highestTest);
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
 // Test case 2
 input = {
@@ -116,7 +118,7 @@ input = {
   inputStr: actualInput,
 };
 expected = 72511;
-test(func, input, expected, testNum, lowestTest, highestTest);
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
 // Test case 3
 input = {
@@ -124,7 +126,7 @@ input = {
   inputStr: sampleInput,
 };
 expected = 45000;
-test(func, input, expected, testNum, lowestTest, highestTest);
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
 // Test case 4
 input = {
@@ -132,4 +134,4 @@ input = {
   inputStr: actualInput,
 };
 expected = 212117;
-test(func, input, expected, testNum, lowestTest, highestTest);
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);

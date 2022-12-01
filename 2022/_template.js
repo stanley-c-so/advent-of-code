@@ -27,6 +27,7 @@ let input, expected;
 const func = NAME_OF_FUNC_HERE;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
+const skippedTests = new Set([  ]);
 const lowestTest = 0 || 0;
 const highestTest = 0 || Infinity;
 
@@ -45,7 +46,7 @@ input = {
   inputStr: sampleInput,
 };
 expected = null;
-test(func, input, expected, testNum, lowestTest, highestTest);
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
 // Test case 2
 input = {
@@ -53,7 +54,7 @@ input = {
   inputStr: actualInput,
 };
 expected = null;
-test(func, input, expected, testNum, lowestTest, highestTest);
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
 // // Test case 3
 // input = {
@@ -61,7 +62,7 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 //   inputStr: sampleInput,
 // };
 // expected = null;
-// test(func, input, expected, testNum, lowestTest, highestTest);
+// test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
 // // Test case 4
 // input = {
@@ -69,4 +70,4 @@ test(func, input, expected, testNum, lowestTest, highestTest);
 //   inputStr: actualInput,
 // };
 // expected = null;
-// test(func, input, expected, testNum, lowestTest, highestTest);
+// test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
