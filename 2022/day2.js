@@ -48,63 +48,130 @@ Following the Elf's instructions for the second column, what would your total sc
 function rockPaperScissors (part, inputStr) {
   const inputArr = inputStr.split('\r\n');
 
-  const REF = {
-    "rock": { points: 1, beats: "scissors", losesTo: "paper" },
-    "paper": { points: 2, beats: "rock", losesTo: "scissors" },
-    "scissors": { points: 3, beats: "paper", losesTo: "rock" },
-  };
-
-  const OPPONENT = {
-    "A": "rock",
-    "B": "paper",
-    "C": "scissors",
-  };
-
-  const RESULTS = {
-    "win": 6,
-    "tie": 3,
-    "lose": 0,
-  };
-  
   let score = 0;
   for (const line of inputArr) {
-    const opponentMove = OPPONENT[line[0]];
-    const you = line[2];
-
     if (part === 1) {
-
-      const PART1 = {
-        "X": "rock",
-        "Y": "paper",
-        "Z": "scissors",
-      };
-
-      const yourMove = PART1[you];
-      score += REF[yourMove].points;                                                      // add points from shape
-      if (opponentMove === yourMove) score += RESULTS.tie;                                // then add points from result
-      else if (opponentMove === REF[yourMove].beats) score += RESULTS.win;
-      else if (opponentMove === REF[yourMove].losesTo) score += RESULTS.lose;
-      else throw "ERROR!";
-
+      switch (line) {
+        case "A X":
+          score += 1 + 3;
+          break;
+        case "A Y":
+          score += 2 + 6;
+          break;
+        case "A Z":
+          score += 3 + 0;
+          break;
+        case "B X":
+          score += 1 + 0;
+          break;
+        case "B Y":
+          score += 2 + 3;
+          break;
+        case "B Z":
+          score += 3 + 6;
+          break;
+        case "C X":
+          score += 1 + 6;
+          break;
+        case "C Y":
+          score += 2 + 0;
+          break;
+        case "C Z":
+          score += 3 + 3;
+          break;
+      }
     } else {
-
-      const PART2 = {
-        "X": "lose",
-        "Y": "tie",
-        "Z": "win",
-      };
-
-      const yourResult = PART2[you];
-      score += RESULTS[yourResult];                                                       // add points from result
-      if (yourResult === "win") score += REF[REF[opponentMove].losesTo].points;           // then add points from shape
-      else if (yourResult === "lose") score += REF[REF[opponentMove].beats].points;
-      else if (yourResult === "tie") score += REF[opponentMove].points;
-      else throw "ERROR!";
-
+      switch (line) {
+        case "A X":
+          score += 3 + 0;
+          break;
+        case "A Y":
+          score += 1 + 3;
+          break;
+        case "A Z":
+          score += 2 + 6;
+          break;
+        case "B X":
+          score += 1 + 0;
+          break;
+        case "B Y":
+          score += 2 + 3;
+          break;
+        case "B Z":
+          score += 3 + 6;
+          break;
+        case "C X":
+          score += 2 + 0;
+          break;
+        case "C Y":
+          score += 3 + 3;
+          break;
+        case "C Z":
+          score += 1 + 6;
+          break;
+      }
     }
   }
-
   return score;
+
+  // const REF = {
+  //   "rock": { points: 1, beats: "scissors", losesTo: "paper" },
+  //   "paper": { points: 2, beats: "rock", losesTo: "scissors" },
+  //   "scissors": { points: 3, beats: "paper", losesTo: "rock" },
+  // };
+
+  // const OPPONENT = {
+  //   "A": "rock",
+  //   "B": "paper",
+  //   "C": "scissors",
+  // };
+
+  // const RESULTS = {
+  //   "win": 6,
+  //   "tie": 3,
+  //   "lose": 0,
+  // };
+  
+  // let score = 0;
+  // for (const line of inputArr) {
+  //   const opponentMove = OPPONENT[line[0]];
+  //   const you = line[2];
+
+  //   if (part === 1) {
+
+  //     const PART1 = {
+  //       "X": "rock",
+  //       "Y": "paper",
+  //       "Z": "scissors",
+  //     };
+
+  //     const yourMove = PART1[you];
+  //     score += REF[yourMove].points;                                                      // add points from shape
+  //     if (opponentMove === yourMove) score += RESULTS.tie;                                // then add points from result
+  //     else if (opponentMove === REF[yourMove].beats) score += RESULTS.win;
+  //     else if (opponentMove === REF[yourMove].losesTo) score += RESULTS.lose;
+  //     else throw "ERROR!";
+
+  //   } else {
+
+  //     const PART2 = {
+  //       "X": "lose",
+  //       "Y": "tie",
+  //       "Z": "win",
+  //     };
+
+  //     const yourResult = PART2[you];
+  //     score += RESULTS[yourResult];                                                       // add points from result
+  //     if (yourResult === "win") score += REF[REF[opponentMove].losesTo].points;           // then add points from shape
+  //     else if (yourResult === "lose") score += REF[REF[opponentMove].beats].points;
+  //     else if (yourResult === "tie") score += REF[opponentMove].points;
+  //     else throw "ERROR!";
+
+  //   }
+  // }
+
+  // return score;
+
 }
 
 // TEST CASES
