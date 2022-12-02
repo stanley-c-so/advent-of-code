@@ -45,7 +45,7 @@ Following the Elf's instructions for the second column, what would your total sc
 
 */
 
-function NAME_OF_FUNC_HERE (part, inputStr) {
+function rockPaperScissors (part, inputStr) {
   const inputArr = inputStr.split('\r\n');
 
   const REF = {
@@ -112,7 +112,7 @@ function NAME_OF_FUNC_HERE (part, inputStr) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = NAME_OF_FUNC_HERE;
+const func = rockPaperScissors;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
