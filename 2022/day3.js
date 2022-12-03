@@ -79,9 +79,9 @@ function findCommonElement (part, inputStr) {
     for (const line of inputArr) {
       let ERROR = true;
       const len = line.length;
-      const set = new Set(line.slice(len / 2));
+      const secondHalf = new Set(line.slice(len / 2));
       for (let i = 0; i < len / 2 ; ++i) {
-        if (set.has(line[i])) {
+        if (secondHalf.has(line[i])) {
           total += LETTERS.indexOf(line[i]) + 1;
           ERROR = false;
           break;
