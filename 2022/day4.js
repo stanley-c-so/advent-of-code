@@ -110,12 +110,14 @@ const INPUT_PATH = path.join(__dirname, `day${DAY_NUM}-input.txt`);
 const actualInput = fs.readFileSync(INPUT_PATH, 'utf8');
 const parseSampleInput = s => s.split('').map(c => c === '\n' ? '\r\n' : c).join('');
 
-const sampleInput = parseSampleInput(`2-4,6-8
+const sampleInput = parseSampleInput(
+`2-4,6-8
 2-3,4-5
 5-7,7-9
 2-8,3-7
 6-6,4-6
-2-6,4-8`);
+2-6,4-8`
+);
 
 // Test case 1
 input = {
