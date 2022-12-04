@@ -61,11 +61,11 @@ function countCalories (part, inputStr) {
 
   const totalCaloriesCarriedByEachElf = inputArr.map(elf => elf.reduce((sum, num) => sum + num));
 
-  if (part === 1) {
+  if (part === 1) {                                         // PART 1: GET THE HIGHEST CALORIE COUNT
 
     return Math.max(...totalCaloriesCarriedByEachElf);
 
-  } else {
+  } else {                                                  // PART 2: GET THE SUM OF THE 3 HIGHEST CALORIE COUNTS
 
     totalCaloriesCarriedByEachElf.sort((a, b) => b - a);
     return totalCaloriesCarriedByEachElf[0] + totalCaloriesCarriedByEachElf[1] + totalCaloriesCarriedByEachElf[2];
