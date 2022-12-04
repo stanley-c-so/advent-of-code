@@ -50,7 +50,7 @@ function rockPaperScissors (part, inputStr) {
 
   let score = 0;
   for (const line of inputArr) {
-    if (part === 1) {
+    if (part === 1) {               // PART 1: X/Y/Z REPRESENT ROCK/PAPER/SCISSORS
       switch (line) {
         case "A X":
           score += 1 + 3;
@@ -80,7 +80,7 @@ function rockPaperScissors (part, inputStr) {
           score += 3 + 3;
           break;
       }
-    } else {
+    } else {                        // PART 2: X/Y/Z REPRESENT LOSE/TIE/WIN FOR YOU
       switch (line) {
         case "A X":
           score += 3 + 0;
