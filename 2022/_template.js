@@ -7,9 +7,12 @@ COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
 
 */
 
-function NAME_OF_FUNC_HERE (part, inputStr) {
+function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // console.log(inputArr);
+  if (DEBUG) {
+    console.log(inputArr[0]);
+    // console.log(inputArr[1]);
+  }
 
   if (part === 1) {
 
@@ -46,6 +49,7 @@ const sampleInput = parseSampleInput(
 input = {
   part: 1,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = null;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
@@ -62,6 +66,7 @@ test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 input = {
   part: 2,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = null;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);

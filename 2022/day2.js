@@ -45,8 +45,12 @@ Following the Elf's instructions for the second column, what would your total sc
 
 */
 
-function rockPaperScissors (part, inputStr) {
+function rockPaperScissors (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
 
   let score = 0;
   for (const line of inputArr) {
@@ -203,6 +207,7 @@ C Z`
 input = {
   part: 1,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = 15;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
@@ -219,6 +224,7 @@ test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 input = {
   part: 2,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = 12;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);

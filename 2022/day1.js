@@ -53,11 +53,15 @@ Find the top three Elves carrying the most Calories. How many Calories are those
 
 */
 
-function countCalories (part, inputStr) {
+function countCalories (part, inputStr, DEBUG = false) {
   const inputArr = inputStr
                     .split('\r\n\r\n')
                     .map(inv => inv.split('\r\n')
                                   .map(n => +n));
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
 
   const totalCaloriesCarriedByEachElf = inputArr.map(elf => elf.reduce((sum, num) => sum + num));
 
@@ -113,6 +117,7 @@ const sampleInput = parseSampleInput(
 input = {
   part: 1,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = 24000;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
@@ -129,6 +134,7 @@ test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 input = {
   part: 2,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = 45000;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);

@@ -66,8 +66,12 @@ Find the item type that corresponds to the badges of each three-Elf group. What 
 
 */
 
-function findCommonElement (part, inputStr) {
+function findCommonElement (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
 
   const alphabet = 'abcdefghijklmnopqrstuvwxyz';
   const ALPHABET = alphabet.split('').map(c => c.toUpperCase()).join('');
@@ -145,6 +149,7 @@ CrZsJsPPZsGzwwsLwLmpwMDw`
 input = {
   part: 1,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = 157;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
@@ -161,6 +166,7 @@ test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 input = {
   part: 2,
   inputStr: sampleInput,
+  DEBUG: true,
 };
 expected = 70;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
