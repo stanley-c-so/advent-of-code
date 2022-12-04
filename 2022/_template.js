@@ -9,7 +9,7 @@ COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
 
 function NAME_OF_FUNC_HERE (part, inputStr) {
   const inputArr = inputStr.split('\r\n');
-  console.log(inputArr);
+  // console.log(inputArr);
 
   if (part === 1) {
 
@@ -56,18 +56,18 @@ input = {
 expected = null;
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
-// // Test case 3
-// input = {
-//   part: 2,
-//   inputStr: sampleInput,
-// };
-// expected = null;
-// test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
+// Test case 3
+input = {
+  part: 2,
+  inputStr: sampleInput,
+};
+expected = null;
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
-// // Test case 4
-// input = {
-//   part: 2,
-//   inputStr: actualInput,
-// };
-// expected = null;
-// test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
+// Test case 4
+input = {
+  part: 2,
+  inputStr: actualInput,
+};
+expected = null;
+test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
