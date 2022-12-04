@@ -73,7 +73,7 @@ function findCommonElement (part, inputStr) {
   const ALPHABET = alphabet.split('').map(c => c.toUpperCase()).join('');
   const LETTERS = alphabet + ALPHABET;
 
-  if (part === 1) {
+  if (part === 1) {                                             // PART 1: FIND DUPLICATE LETTER BETWEEN TWO HALVES OF EACH LINE
 
     let total = 0;
     for (const line of inputArr) {
@@ -91,7 +91,7 @@ function findCommonElement (part, inputStr) {
     }
     return total;
 
-  } else {
+  } else {                                                      // PART 2: FIND DUPLICATE LETTER AMONG EACH GROUP OF 3 LINES
 
     let total = 0;
     for (let k = 0; k < inputArr.length; k += 3) {
