@@ -104,8 +104,8 @@ const func = overlappingIntervals;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
-const lowestTest = 0 || 0;
-const highestTest = 0 || Infinity;
+const lowestTest = 0;
+const highestTest = 0;
 
 const fs = require('fs');
 const path = require('path');
