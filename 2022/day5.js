@@ -145,12 +145,14 @@ function pushAndPopStacks (part, inputStr, DEBUG = false) {
 
       if (part === 1) {                                               // PART 1: ELEMENTS GET POPPED AND PUSHED ONE AT A TIME
 
+        if (STACKS[colA].length < N) throw 'ERROR: STACK TOO SMALL';
         for (let i = 0; i < N; ++i) {
           STACKS[colB].push(STACKS[colA].pop());
         }
 
       } else {                                                        // PART 2: ELEMENTS GET POPPED AND PUSHED ALL AT ONCE
         
+        if (STACKS[colA].length < N) throw 'ERROR: STACK TOO SMALL';
         const TEMP_STACK = [];                                        // effectively, the group will be in reversed order relative to part 1
         for (let i = 0; i < N; ++i) {                                 // so, we can simply pop/push the elements in the same way into a temporary stack...
           TEMP_STACK.push(STACKS[colA].pop());
