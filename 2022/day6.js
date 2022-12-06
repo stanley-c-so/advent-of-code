@@ -60,7 +60,7 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
   const N = part === 1 ? 4                                                      // PART 1: NEED SUBSTRING OF LENGTH 4
                        : 14;                                                    // PART 2: NEED SUBSTRING OF LENGTH 14
 
-  // // SOLUTION 1: TAKE SLICES BASED ON INDEX POSITION, INSERT INTO A SET, AND MEASURE SET SIZE
+  // // ===== SOLUTION 1: TAKE SLICES BASED ON INDEX POSITION, INSERT INTO A SET, AND MEASURE SET SIZE
   // for (let i = 0; i < inputStr.length; ++i) {
   //   if (
   //     i >= N - 1
@@ -69,7 +69,7 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
   // }
   // throw `ERROR: DID NOT FIND SUBSTRING OF LENGTH ${N} WITH UNIQUE CHARACTERS`;
 
-  // SOLUTION 2 (BETTER TIME COMPLEXITY): USE A HASH TABLE AND TRACK UNIQUE CHARS
+  // ===== SOLUTION 2 (BETTER TIME COMPLEXITY): USE A HASH TABLE AND TRACK UNIQUE CHARS
   const freq = {};
   let numUniqueChars = 0;
 
