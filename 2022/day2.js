@@ -52,6 +52,68 @@ function rockPaperScissors (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
+  // // ===== SOLUTION 1: TRY TO WRITE CODE IN A SOMEWHAT MODULAR, READABLE WAY
+
+  // const REF = {
+  //   "rock": { points: 1, beats: "scissors", losesTo: "paper" },
+  //   "paper": { points: 2, beats: "rock", losesTo: "scissors" },
+  //   "scissors": { points: 3, beats: "paper", losesTo: "rock" },
+  // };
+
+  // const OPPONENT = {
+  //   "A": "rock",
+  //   "B": "paper",
+  //   "C": "scissors",
+  // };
+
+  // const RESULTS = {
+  //   "win": 6,
+  //   "tie": 3,
+  //   "lose": 0,
+  // };
+  
+  // let score = 0;
+  // for (const line of inputArr) {
+  //   const opponentMove = OPPONENT[line[0]];
+  //   const you = line[2];
+
+  //   if (part === 1) {
+
+  //     const PART1 = {
+  //       "X": "rock",
+  //       "Y": "paper",
+  //       "Z": "scissors",
+  //     };
+
+  //     const yourMove = PART1[you];
+  //     score += REF[yourMove].points;                                                      // add points from shape
+  //     if (opponentMove === yourMove) score += RESULTS.tie;                                // then add points from result
+  //     else if (opponentMove === REF[yourMove].beats) score += RESULTS.win;
+  //     else if (opponentMove === REF[yourMove].losesTo) score += RESULTS.lose;
+  //     else throw "ERROR!";
+
+  //   } else {
+
+  //     const PART2 = {
+  //       "X": "lose",
+  //       "Y": "tie",
+  //       "Z": "win",
+  //     };
+
+  //     const yourResult = PART2[you];
+  //     score += RESULTS[yourResult];                                                       // add points from result
+  //     if (yourResult === "win") score += REF[REF[opponentMove].losesTo].points;           // then add points from shape
+  //     else if (yourResult === "lose") score += REF[REF[opponentMove].beats].points;
+  //     else if (yourResult === "tie") score += REF[opponentMove].points;
+  //     else throw "ERROR!";
+
+  //   }
+  // }
+
+  // return score;
+
+  // ===== SOLUTION 2: HARD CODE EVERYTHING
+
   let score = 0;
   for (const line of inputArr) {
     if (part === 1) {               // PART 1: X/Y/Z REPRESENT ROCK/PAPER/SCISSORS
@@ -117,64 +179,6 @@ function rockPaperScissors (part, inputStr, DEBUG = false) {
     }
   }
   return score;
-
-  // const REF = {
-  //   "rock": { points: 1, beats: "scissors", losesTo: "paper" },
-  //   "paper": { points: 2, beats: "rock", losesTo: "scissors" },
-  //   "scissors": { points: 3, beats: "paper", losesTo: "rock" },
-  // };
-
-  // const OPPONENT = {
-  //   "A": "rock",
-  //   "B": "paper",
-  //   "C": "scissors",
-  // };
-
-  // const RESULTS = {
-  //   "win": 6,
-  //   "tie": 3,
-  //   "lose": 0,
-  // };
-  
-  // let score = 0;
-  // for (const line of inputArr) {
-  //   const opponentMove = OPPONENT[line[0]];
-  //   const you = line[2];
-
-  //   if (part === 1) {
-
-  //     const PART1 = {
-  //       "X": "rock",
-  //       "Y": "paper",
-  //       "Z": "scissors",
-  //     };
-
-  //     const yourMove = PART1[you];
-  //     score += REF[yourMove].points;                                                      // add points from shape
-  //     if (opponentMove === yourMove) score += RESULTS.tie;                                // then add points from result
-  //     else if (opponentMove === REF[yourMove].beats) score += RESULTS.win;
-  //     else if (opponentMove === REF[yourMove].losesTo) score += RESULTS.lose;
-  //     else throw "ERROR!";
-
-  //   } else {
-
-  //     const PART2 = {
-  //       "X": "lose",
-  //       "Y": "tie",
-  //       "Z": "win",
-  //     };
-
-  //     const yourResult = PART2[you];
-  //     score += RESULTS[yourResult];                                                       // add points from result
-  //     if (yourResult === "win") score += REF[REF[opponentMove].losesTo].points;           // then add points from shape
-  //     else if (yourResult === "lose") score += REF[REF[opponentMove].beats].points;
-  //     else if (yourResult === "tie") score += REF[opponentMove].points;
-  //     else throw "ERROR!";
-
-  //   }
-  // }
-
-  // return score;
 
 }
 
