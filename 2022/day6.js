@@ -61,11 +61,8 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
                        : 14;                                                    // PART 2: NEED SUBSTRING OF LENGTH 14
 
   // // ===== SOLUTION 1: TAKE SLICES BASED ON INDEX POSITION, INSERT INTO A SET, AND MEASURE SET SIZE
-  // for (let i = 0; i < inputStr.length; ++i) {
-  //   if (
-  //     i >= N - 1
-  //     && new Set(inputStr.slice(i - (N - 1), i + 1)).size === N
-  //   ) return i + 1;
+  // for (let i = N - 1; i < inputStr.length; ++i) {
+  //   if (new Set(inputStr.slice(i - (N - 1), i + 1)).size === N) return i + 1;
   // }
   // throw `ERROR: DID NOT FIND SUBSTRING OF LENGTH ${N} WITH UNIQUE CHARACTERS`;
 
