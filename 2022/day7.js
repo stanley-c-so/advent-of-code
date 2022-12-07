@@ -116,15 +116,105 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
-  // UTILITY
-  const createDir = () => ({ parent: currentDir, size: 0 });                              // DATA STRUCTURE: folders need to know their size and their parent
+  // // ===== SOLUTION 1: REPRESENT DIRECTORIES AS OBJECTS MAPPED TO STRING REPRESENTATIONS OF THEIR PATHS, AND TRACK ALL DIRECTORIES IN ONE LARGE OBJECT
+
+  // // UTILITY
+  // const createDir = () => ({ parent: currentDir, size: 0 });                              // DATA STRUCTURE: folders need to know their size and their parent
+
+  // // INIT
+  // let currentDir = null;
+  // const DIRS = { '/': createDir() };                                                      // DATA STRUCTURE: init DIRS with root directory '/'
+  
+  // let currentlyInLs = false;                                                              // (OPTIONAL) sanity check to make sure output is coming from `ls` command
+  
+  // // PARSE DATA
+  // for (const line of inputArr) {
+
+  //   if (line[0] === '$') {                                                                // if line represents a command...
+  //     currentlyInLs = false;
+  //     const [COMMAND, ARG] = line.slice(2).split(' ');
+  //     if (COMMAND === 'cd') {                                                             // ...`cd` command...
+  //       if (ARG === '..') currentDir = DIRS[currentDir].parent;                             // go up one directory
+  //       else if (ARG === '/') currentDir = '/';                                             // go to root directory
+  //       else {                                                                              // go to child directory
+  //         const newDir = (currentDir === '/' ? '' : currentDir)
+  //                           + '/'
+  //                           + ARG;
+  //         if (!(newDir in DIRS)) DIRS[newDir] = createDir();                              // IMPORTANT: input DOES sometimes traverse to directories not yet discovered by `ls`
+  //         currentDir = newDir;
+  //       }
+  //     }
+  //     else if (COMMAND === 'ls') currentlyInLs = true;                                    // ...`ls` command (OPTIONAL)
+  //     else throw `ERROR: UNEXPECTED COMMAND ${COMMAND}`;
+  //   }
+
+  //   else {                                                                                // else if line represents output...
+  //     if (!currentlyInLs) throw 'ERROR: NOT CURRENTLY IN LS';                             // (OPTIONAL) sanity check to make sure output is coming from `ls` 
+
+  //     const [LS, RS] = line.split(' ');
+      
+  //     if (LS !== 'dir') {                                                                 // ...discovered file
+  //       const filesize = +LS;
+  //       let dir = currentDir;                                                             // navigate up the filesystem, updating the size of every directory along the way
+  //       while (dir) {
+  //         DIRS[dir].size += filesize;
+  //         dir = DIRS[dir].parent;
+  //       }
+  //     }
+
+  //     // else {                                                                              // ...discovered directory (OPTIONAL) since folders don't matter by themselves unless...
+  //     //                                                                                     // ...the input eventually navigates there and runs `ls`, but then the block above would run
+  //     //   const subdir = RS;
+  //     //   if (!(subdir in DIRS)) DIRS[subdir] = createDir();
+  //     // }
+      
+  //   }
+
+  // }
+
+  // // ANALYZE
+  // if (part === 1) {                                                                       // PART 1: ADD UP ALL DIRECTORIES OF SIZE 100000 OR LESS
+
+  //   const LIMIT = 100000;
+  //   return Object.values(DIRS)
+  //           .filter(dir => dir.size <= LIMIT)
+  //           .reduce((sum, dir) => sum + dir.size, 0);
+
+  // } else {                                                                                // PART 2: FIND SIZE OF SMALLEST DIRECTORY THAT WOULD FREE UP ENOUGH SPACE
+
+  //   const FILESYSTEM_TOTAL_SPACE = 70000000;
+  //   const SIZE_OF_UPDATE = 30000000;
+
+  //   const sizeOfRoot = DIRS['/'].size;
+  //   const freeSpace = FILESYSTEM_TOTAL_SPACE - sizeOfRoot;
+  //   const spaceThatNeedsToBeFreedUp = SIZE_OF_UPDATE - freeSpace;
+
+  //   const LARGE_DIRS_BY_SIZE = Object.values(DIRS)                                        // find all sufficiently large dirs and sort by size in increasing order...
+  //                               .filter(dir => dir.size >= spaceThatNeedsToBeFreedUp)
+  //                               .map(dir => dir.size)
+  //                               .sort((a, b) => a - b);
+
+  //   if (LARGE_DIRS_BY_SIZE.length) return LARGE_DIRS_BY_SIZE[0];                          // ...then return the first one
+
+  //   throw `ERROR: DID NOT FIND A SINGLE DIRECTORY OF SUFFICIENT SIZE ${spaceThatNeedsToBeFreedUp} OR MORE`;
+
+  // }
+
+  // ===== SOLUTION 2: USE A DIRECTORY CLASS TO REPRESENT DIRECTORIES. CONNECT ACTUAL DIRECTORY NODES IN A REAL TREE
+
+  // CLASS
+  class Directory {
+    constructor() {
+      this.parent = currentDir;
+      this.size = 0;
+      this.subdirectories = {};
+    }
+  }
 
   // INIT
   let currentDir = null;
-  const DIRS = { '/': createDir() };                                                      // DATA STRUCTURE: init DIRS with root directory '/'
-  
-  let currentlyInLs = false;                                                              // (OPTIONAL) sanity check to make sure output is coming from `ls` command
-  
+  const ROOT = new Directory();
+
   // PARSE DATA
   for (const line of inputArr) {
 
@@ -132,14 +222,13 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
       currentlyInLs = false;
       const [COMMAND, ARG] = line.slice(2).split(' ');
       if (COMMAND === 'cd') {                                                             // ...`cd` command...
-        if (ARG === '..') currentDir = DIRS[currentDir].parent;                             // go up one directory
-        else if (ARG === '/') currentDir = '/';                                             // go to root directory
+        if (ARG === '..') currentDir = currentDir.parent;                                   // go up one directory
+        else if (ARG === '/') currentDir = ROOT;                                            // go to root directory
         else {                                                                              // go to child directory
-          const newDir = (currentDir === '/' ? '' : currentDir)
-                            + '/'
-                            + ARG;
-          if (!(newDir in DIRS)) DIRS[newDir] = createDir();                              // IMPORTANT: input DOES sometimes traverse to directories not yet discovered by `ls`
-          currentDir = newDir;
+          if (!(ARG in currentDir.subdirectories)) {                                      // IMPORTANT: input DOES sometimes traverse to directories not yet 
+            currentDir.subdirectories[ARG] = new Directory();
+          }
+          currentDir = currentDir.subdirectories[ARG];
         }
       }
       else if (COMMAND === 'ls') currentlyInLs = true;                                    // ...`ls` command (OPTIONAL)
@@ -148,7 +237,6 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
 
     else {                                                                                // else if line represents output...
       if (!currentlyInLs) throw 'ERROR: NOT CURRENTLY IN LS';                             // (OPTIONAL) sanity check to make sure output is coming from `ls` 
-      if (!(currentDir in DIRS)) throw 'ERROR: CURRENT DIRECTORY NOT YET DISCOVERED';     // (OPTIONAL) sanity check to see if input traverses to directories not yet discovered by `ls`
 
       const [LS, RS] = line.split(' ');
       
@@ -156,47 +244,61 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
         const filesize = +LS;
         let dir = currentDir;                                                             // navigate up the filesystem, updating the size of every directory along the way
         while (dir) {
-          DIRS[dir].size += filesize;
-          dir = DIRS[dir].parent;
+          dir.size += filesize;
+          dir = dir.parent;
         }
       }
 
       // else {                                                                              // ...discovered directory (OPTIONAL) since folders don't matter by themselves unless...
       //                                                                                     // ...the input eventually navigates there and runs `ls`, but then the block above would run
       //   const subdir = RS;
-      //   if (!(subdir in DIRS)) DIRS[subdir] = createDir();
+      //   if (!(subdir in currentDir.subdirectories)) {
+      //     currentDir.subdirectories[subdir] = new Directory();
+      //   }
       // }
       
     }
 
   }
 
+  // UTILITY
+  function DFS(dir, callback) {
+    callback(dir);
+    for (const subdir of Object.values(dir.subdirectories)) DFS(subdir, callback);
+  }
+
   // ANALYZE
   if (part === 1) {                                                                       // PART 1: ADD UP ALL DIRECTORIES OF SIZE 100000 OR LESS
 
     const LIMIT = 100000;
-    return Object.values(DIRS)
-            .filter(dir => dir.size <= LIMIT)
-            .reduce((sum, dir) => sum + dir.size, 0);
+    let totalSize = 0;
+    DFS(ROOT, dir => {
+      if (dir.size <= LIMIT) totalSize += dir.size;
+    });
+    return totalSize;
 
   } else {                                                                                // PART 2: FIND SIZE OF SMALLEST DIRECTORY THAT WOULD FREE UP ENOUGH SPACE
 
     const FILESYSTEM_TOTAL_SPACE = 70000000;
     const SIZE_OF_UPDATE = 30000000;
 
-    const sizeOfRoot = DIRS['/'].size;
-    const freeSpace = FILESYSTEM_TOTAL_SPACE - sizeOfRoot;
+    const freeSpace = FILESYSTEM_TOTAL_SPACE - ROOT.size;
     const spaceThatNeedsToBeFreedUp = SIZE_OF_UPDATE - freeSpace;
 
-    const DIR_SIZES = Object.values(DIRS).map(obj => obj.size).sort((a, b) => a - b);     // sort all dirs by size in increasing order...
+    const LARGE_DIRS = [];                                                                // find all sufficiently large dirs...
+    DFS(ROOT, dir => {
+      if (dir.size >= spaceThatNeedsToBeFreedUp) LARGE_DIRS.push(dir.size);
+    });
 
-    for (const dirSize of DIR_SIZES) {
-      if (dirSize >= spaceThatNeedsToBeFreedUp) return dirSize;                           // ...then return the first one that would free up enough space
+    if (LARGE_DIRS.length) {
+      LARGE_DIRS.sort((a, b) => a - b);                                                   // ...then sort and return the first one
+      return LARGE_DIRS[0];
     }
 
     throw `ERROR: DID NOT FIND A SINGLE DIRECTORY OF SUFFICIENT SIZE ${spaceThatNeedsToBeFreedUp} OR MORE`;
 
   }
+
 }
 
 // TEST CASES
@@ -213,6 +315,7 @@ const highestTest = 0;
 
 const fs = require('fs');
 const path = require('path');
+const { dir } = require('console');
 const DAY_NUM = __filename.split('.js')[0].split('day')[1];
 const INPUT_PATH = path.join(__dirname, `day${DAY_NUM}-input.txt`);
 const actualInput = fs.readFileSync(INPUT_PATH, 'utf8');
