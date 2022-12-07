@@ -121,7 +121,7 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
 
   // INIT
   let currentDir = null;
-  const DIRS = { '/': createDir() };                                                      // init DIRS with root directory '/'
+  const DIRS = { '/': createDir() };                                                      // DATA STRUCTURE: init DIRS with root directory '/'
   
   let currentlyInLs = false;                                                              // (OPTIONAL) sanity check to make sure output is coming from `ls` command
   
@@ -150,17 +150,19 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
 
       const [LS, RS] = line.split(' ');
       
-      if (LS === 'dir') {                                                                 // ...discovered directory
-        if (!(RS in DIRS)) DIRS[RS] = createDir();                                        // (OPTIONAL) since folders don't matter by themselves unless the input eventually navigates there and runs `ls`
-      }
-      
-      else {                                                                              // ...discovered file
+      if (LS !== 'dir') {                                                                 // ...discovered file
         let dir = currentDir;                                                             // navigate up the filesystem, updating the size of every directory along the way
         while (dir) {
           DIRS[dir].size += +LS;
           dir = DIRS[dir].parent;
         }
       }
+
+      // else {                                                                              // ...discovered directory (OPTIONAL) since folders don't matter by themselves unless...
+      //                                                                                     // ...the input eventually navigates there and runs `ls`, but then the block above would run
+      //   if (!(RS in DIRS)) DIRS[RS] = createDir();
+      // }
+      
     }
 
   }
@@ -191,7 +193,6 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
     throw `ERROR: DID NOT FIND A SINGLE DIRECTORY OF SUFFICIENT SIZE ${spaceThatNeedsToBeFreedUp} OR MORE`;
 
   }
-
 }
 
 // TEST CASES
