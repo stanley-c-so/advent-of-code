@@ -66,7 +66,7 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
   // }
   // throw `ERROR: DID NOT FIND SUBSTRING OF LENGTH ${N} WITH UNIQUE CHARACTERS`;
 
-  // ===== SOLUTION 2 (BETTER TIME COMPLEXITY): USE A HASH TABLE AND TRACK UNIQUE CHARS
+  // ===== SOLUTION 2 (FEWER OPERATIONS): USE A HASH TABLE AND TRACK UNIQUE CHARS
   const freq = {};
   let numUniqueChars = 0;
 
