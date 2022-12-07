@@ -72,7 +72,9 @@ function countCalories (part, inputStr, DEBUG = false) {
   } else {                                                  // PART 2: GET THE SUM OF THE 3 HIGHEST CALORIE COUNTS
 
     totalCaloriesCarriedByEachElf.sort((a, b) => b - a);
-    return totalCaloriesCarriedByEachElf[0] + totalCaloriesCarriedByEachElf[1] + totalCaloriesCarriedByEachElf[2];
+    return totalCaloriesCarriedByEachElf[0]
+            + totalCaloriesCarriedByEachElf[1]
+            + totalCaloriesCarriedByEachElf[2];
 
   }
 }
