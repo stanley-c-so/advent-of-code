@@ -100,8 +100,8 @@ function findCommonElement (part, inputStr, DEBUG = false) {
     let total = 0;
     for (let k = 0; k < inputArr.length; k += 3) {
       let ERROR = true;
-      const set1 = new Set(inputArr[k].split(""));
-      const set2 = new Set(inputArr[k + 1].split(""));      
+      const set1 = new Set(inputArr[k].split(''));
+      const set2 = new Set(inputArr[k + 1].split(''));      
       for (const c of inputArr[k + 2]) {
         if (set1.has(c) && set2.has(c)) {
           total += LETTERS.indexOf(c) + 1;
