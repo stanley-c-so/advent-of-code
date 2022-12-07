@@ -132,10 +132,12 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
       currentlyInLs = false;
       const [COMMAND, ARG] = line.slice(2).split(' ');
       if (COMMAND === 'cd') {                                                             // ...`cd` command...
-        if (ARG === '..') currentDir = DIRS[currentDir].parent;
-        else if (ARG === '/') currentDir = '/';
-        else {
-          const newDir = (currentDir === '/' ? '' : currentDir) + '/' + ARG;
+        if (ARG === '..') currentDir = DIRS[currentDir].parent;                             // go up one directory
+        else if (ARG === '/') currentDir = '/';                                             // go to root directory
+        else {                                                                              // go to child directory
+          const newDir = (currentDir === '/' ? '' : currentDir)
+                            + '/'
+                            + ARG;
           if (!(newDir in DIRS)) DIRS[newDir] = createDir();                              // IMPORTANT: input DOES sometimes traverse to directories not yet discovered by `ls`
           currentDir = newDir;
         }
@@ -151,16 +153,18 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
       const [LS, RS] = line.split(' ');
       
       if (LS !== 'dir') {                                                                 // ...discovered file
+        const filesize = +LS;
         let dir = currentDir;                                                             // navigate up the filesystem, updating the size of every directory along the way
         while (dir) {
-          DIRS[dir].size += +LS;
+          DIRS[dir].size += filesize;
           dir = DIRS[dir].parent;
         }
       }
 
       // else {                                                                              // ...discovered directory (OPTIONAL) since folders don't matter by themselves unless...
       //                                                                                     // ...the input eventually navigates there and runs `ls`, but then the block above would run
-      //   if (!(RS in DIRS)) DIRS[RS] = createDir();
+      //   const subdir = RS;
+      //   if (!(subdir in DIRS)) DIRS[subdir] = createDir();
       // }
       
     }
