@@ -88,69 +88,62 @@ function visibleTrees (part, inputStr, DEBUG = false) {
   const grid = Array.from({length: H}, (_, i) => inputArr[i].split('').map(n => +n));                   // convert input into numbers
 
   // ANALYZE
-  if (part === 1) {
+  if (part === 1) {                                                                                     // PART 1: COUNT VISIBLE TREES
 
-    // DATA STRUCTURES - store highest tree height when looking in given direction (regardless of tree at given position itself)
-    const highestTreeHeightFromTop = Array.from({length: H}, () => Array(W));
-    const highestTreeHeightFromLeft = Array.from({length: H}, () => Array(W));
-    const highestTreeHeightFromBottom = Array.from({length: H}, () => Array(W));
-    const highestTreeHeightFromRight = Array.from({length: H}, () => Array(W));
+    // INIT
+    let count = 2*(H + W) - 4;
 
-    // INIT DATA STRUCTURES - set 0 along the edges for the corresponding mask
-    for (let row = 0; row < H; ++row) highestTreeHeightFromLeft[row][0] = 0;
-    for (let row = 0; row < H; ++row) highestTreeHeightFromRight[row][W - 1] = 0;
-    for (let col = 0; col < W; ++col) highestTreeHeightFromTop[0][col] = 0;
-    for (let col = 0; col < W; ++col) highestTreeHeightFromBottom[H - 1][col] = 0;
+    // ANALYZE - the input here is sufficiently small to warrant manually checking the visibility by scanning at every position
+    for (let row = 1; row < H - 1; ++row) {
+      for (let col = 1; col < W - 1; ++col) {
 
-    // PROCESS DATA STRUCTURES
-    for (let row = 1; row < H; ++row) {                                                                 // NOTE: SKIP TOP ROW
-      for (let col = 0; col < W; ++col) {
-        highestTreeHeightFromTop[row][col] = Math.max(grid[row - 1][col],
-                                                        highestTreeHeightFromTop[row - 1][col]);
+        let visible = false;
+        let rowPtr, colPtr;
+
+        // check visibility from the top
+        rowPtr = row - 1;
+        while (!visible) {
+          if (grid[rowPtr][col] >= grid[row][col]) break;
+          if (rowPtr === 0) visible = true;
+          --rowPtr;
+        }
+
+        // check visibility from the bottom
+        rowPtr = row + 1;
+        while (!visible) {
+          if (grid[rowPtr][col] >= grid[row][col]) break;
+          if (rowPtr === H - 1) visible = true;
+          ++rowPtr;
+        }
+
+        // check visibility from the left
+        colPtr = col - 1;
+        while (!visible) {
+          if (grid[row][colPtr] >= grid[row][col]) break;
+          if (colPtr === 0) visible = true;
+          --colPtr;
+        }
+
+        // check visibility from the right
+        colPtr = col + 1;
+        while (!visible) {
+          if (grid[row][colPtr] >= grid[row][col]) break;
+          if (colPtr === W - 1) visible = true;
+          ++colPtr;
+        }
+
+        if (visible) ++count;
       }
     }
-    for (let row = 0; row < H; ++row) {
-      for (let col = 1; col < W; ++col) {                                                               // NOTE: SKIP LEFT COL
-        highestTreeHeightFromLeft[row][col] = Math.max(grid[row][col - 1],
-                                                        highestTreeHeightFromLeft[row][col - 1]);
-      }
-    }
 
-    for (let row = H - 2; row >= 0; --row) {                                                            // NOTE: SKIP BOTTOM ROW
-      for (let col = W - 1; col >= 0; --col) {
-        highestTreeHeightFromBottom[row][col] = Math.max(grid[row + 1][col],
-                                                          highestTreeHeightFromBottom[row + 1][col]);
-      }
-    }
-    for (let row = H - 1; row >= 0; --row) {
-      for (let col = W - 2; col >= 0; --col) {                                                          // NOTE: SKIP RIGHT COL
-        highestTreeHeightFromRight[row][col] = Math.max(grid[row][col + 1],
-                                                          highestTreeHeightFromRight[row][col + 1]);
-      }
-    }
-
-    // COUNT VISIBLE TREES (init count with edge trees, and iterate through interior trees)
-    let count = 2*(H + W) - 4;                                                                          // subtract 4 corners due to double counting
-    for (let row = 1; row < H - 1; ++row) {                                                             // NOTE: SKIP TOP AND BOTTOM ROWS
-      for (let col = 1; col < W - 1; ++col) {                                                           // NOTE: SKIP LEFT AND RIGHT COLS
-        if (
-          grid[row][col] > highestTreeHeightFromTop[row][col]
-          || grid[row][col] > highestTreeHeightFromBottom[row][col]
-          || grid[row][col] > highestTreeHeightFromLeft[row][col]
-          || grid[row][col] > highestTreeHeightFromRight[row][col]
-        ) ++count;                                                                                      // tree is visible if its height exceeds ANY of...
-                                                                                                        // ...its mask values in the 4 directions
-      }
-    }
     return count;
 
-  } else {
+  } else {                                                                                              // PART 2: FIND BEST SCENIC SCORE
 
     // INIT
     let bestScenicScore = 0;
 
-    // ANALYZE - there's probably a more performant way to do this with DP, but the input here is sufficiently small to warrant manually...
-    // ...checking the scenic score at every position
+    // ANALYZE - the input here is sufficiently small to warrant manually checking the scenic score by scanning at every position
     for (let row = 0; row < H; ++row) {
       for (let col = 0; col < W; ++col) {
 
@@ -201,12 +194,166 @@ function visibleTrees (part, inputStr, DEBUG = false) {
   }
 }
 
+function visibleTrees2 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
+
+  // INIT
+  const H = inputArr.length;
+  const W = inputArr[0].length;
+  const grid = Array.from({length: H}, (_, i) => inputArr[i].split('').map(n => +n));                   // convert input into numbers
+
+  // DATA STRUCTURE - each position contains an object with 4 key/value pairs for each of the 4 directions (up, left, down, right)
+  const dp = Array.from({length: H}, () => Array.from({length: W}, () => ({})));
+
+  // ANALYZE
+  if (part === 1) {                                                                                     // PART 1: COUNT VISIBLE TREES
+                                                                                                        // dp[row][col] represents height of highest obstacle...
+                                                                                                        // ...at given coords, from given direction
+
+    // PROCESS DATA STRUCTURES
+    for (let row = 0; row < H; ++row) {
+      for (let col = 0; col < W; ++col) {
+        dp[row][col].up = row === 0 ? 0                                                                 // set to 0 for top edge
+                                    : Math.max(grid[row - 1][col],
+                                                dp[row - 1][col].up);
+      }
+    }
+    for (let row = 0; row < H; ++row) {
+      for (let col = 0; col < W; ++col) {
+        dp[row][col].left = col === 0 ? 0                                                               // set to 0 for left edge
+                                      : Math.max(grid[row][col - 1],
+                                                  dp[row][col - 1].left);
+      }
+    }
+    for (let row = H - 1; row >= 0; --row) {
+      for (let col = W - 1; col >= 0; --col) {
+        dp[row][col].down = row === H - 1 ? 0                                                           // set to 0 for bottom edge
+                                          : Math.max(grid[row + 1][col],
+                                                      dp[row + 1][col].down);
+      }
+    }
+    for (let row = H - 1; row >= 0; --row) {
+      for (let col = W - 1; col >= 0; --col) {
+        dp[row][col].right = col === W - 1 ? 0                                                          // set to 0 for right edge
+                                            : Math.max(grid[row][col + 1],
+                                                        dp[row][col + 1].right);
+      }
+    }
+
+    // COUNT VISIBLE TREES (init count with edge trees, and iterate through interior trees)
+    let count = 2*(H + W) - 4;                                                                          // subtract 4 corners due to double counting
+    for (let row = 1; row < H - 1; ++row) {                                                             // NOTE: SKIP TOP AND BOTTOM ROWS
+      for (let col = 1; col < W - 1; ++col) {                                                           // NOTE: SKIP LEFT AND RIGHT COLS
+        const { up, left, down, right } = dp[row][col];
+        if (
+          grid[row][col] > up
+          || grid[row][col] > left
+          || grid[row][col] > down
+          || grid[row][col] > right
+        ) ++count;                                                                                      // tree is visible if its height exceeds ANY of...
+                                                                                                        // ...its mask values in the 4 directions
+      }
+    }
+    return count;
+
+  } else {                                                                                              // PART 2: FIND BEST SCENIC SCORE
+                                                                                                        // dp[row][col] represents view distance...
+                                                                                                        // ...at given coords, while looking in given direction
+
+    // PROCESS DATA STRUCTURES
+    const monotonicStack = [];                                                                          // should be non-increasing
+
+    for (let col = 0; col < W; ++col) {
+      monotonicStack.length = 0;                                                                        // clear stack
+      for (let row = 0; row < H; ++row) {
+        if (row === 0) {                                                                                // init dp value to 0 for top edge
+          dp[row][col].up = 0;
+        } else {
+          while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {             // pop outdated values from monotonic stack
+            monotonicStack.pop();
+          }
+          dp[row][col].up = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - row)         // set dp value based on monotonic stack...
+                                                  : row                                                 // ...or if stack empty, measure from edge
+        }
+        monotonicStack.push({ highest: grid[row][col], coord: row });                                   // add current value to monotonic stack
+      }
+    }
+
+    for (let row = 0; row < H; ++row) {
+      monotonicStack.length = 0;
+      for (let col = 0; col < W; ++col) {
+        if (col === 0) {                                                                                // init dp value to 0 for left edge
+          dp[row][col].left = 0;
+        } else {
+          while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
+            monotonicStack.pop();
+          }
+          dp[row][col].left = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - col)
+                                                    : col
+        }
+        monotonicStack.push({ highest: grid[row][col], coord: col });
+      }
+    }
+
+    for (let col = 0; col < W; ++col) {
+      monotonicStack.length = 0;
+      for (let row = H - 1; row >= 0; --row) {
+        if (row === H - 1) {                                                                            // init dp value to 0 for bottom edge
+          dp[row][col].down = 0;
+        } else {
+          while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
+            monotonicStack.pop();
+          }
+          dp[row][col].down = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - row)
+                                                    : H - 1 - row
+        }
+        monotonicStack.push({ highest: grid[row][col], coord: row });                                   // add current value to monotonic stack
+      }
+    }
+
+    for (let row = 0; row < H; ++row) {
+      monotonicStack.length = 0;
+      for (let col = W - 1; col >= 0; --col) {
+        if (col === W - 1) {                                                                            // init dp value to 0 for right edge
+          dp[row][col].right = 0;
+        } else {
+          while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
+            monotonicStack.pop();
+          }
+          dp[row][col].right = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - col)
+                                                      : W - 1 - col
+        }
+        monotonicStack.push({ highest: grid[row][col], coord: col });
+      }
+    }
+
+    // INIT
+    let bestScenicScore = 0;
+
+    // ANALYZE
+    for (let row = 1; row < H - 1; ++row) {
+      for (let col = 1; col < W - 1; ++col) {
+        const { up, left, down, right } = dp[row][col];
+        bestScenicScore = Math.max(bestScenicScore, up * left * down * right);
+      }
+    }
+
+    return bestScenicScore;
+
+  }
+}
+
 // TEST CASES
 
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = visibleTrees;
+// const func = visibleTrees;
+const func = visibleTrees2;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
