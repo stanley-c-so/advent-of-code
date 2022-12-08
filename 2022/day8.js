@@ -90,8 +90,8 @@ function visibleTrees (part, inputStr, DEBUG = false) {
   // ANALYZE
   if (part === 1) {                                                                                     // PART 1: COUNT VISIBLE TREES
 
-    // INIT
-    let count = 2*(H + W) - 4;
+    // COUNT VISIBLE TREES (init count with edge trees, and iterate through interior trees)
+    let count = 2*(H + W) - 4;                                                                          // subtract 4 corners due to double counting
 
     // ANALYZE - the input here is sufficiently small to warrant manually checking the visibility by scanning at every position
     for (let row = 1; row < H - 1; ++row) {
