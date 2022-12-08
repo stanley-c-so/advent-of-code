@@ -167,7 +167,7 @@ function pushAndPopStacks (part, inputStr, DEBUG = false) {
 
   }
 
-  return STACKS.map(c => c[c.length - 1]).join('');
+  return STACKS.map(c => c.at(-1)).join('');
 }
 
 // TEST CASES
