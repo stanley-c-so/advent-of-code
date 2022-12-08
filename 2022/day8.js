@@ -344,7 +344,7 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
     // INIT
     let bestScenicScore = 0;
 
-    // ANALYZE
+    // ANALYZE (interior coords only, as all edge positions have a scenic score of 0 since at least one direction's viewing distance will be 0)
     for (let row = 1; row < H - 1; ++row) {
       for (let col = 1; col < W - 1; ++col) {
         const { up, left, down, right } = dp[row][col];
