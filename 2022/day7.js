@@ -137,9 +137,7 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
         if (ARG === '..') currentDir = DIRS[currentDir].parent;                             // go up one directory
         else if (ARG === '/') currentDir = '/';                                             // go to root directory
         else {                                                                              // go to child directory
-          const newDir = (currentDir === '/' ? '' : currentDir)
-                            + '/'
-                            + ARG;
+          const newDir = (currentDir === '/' ? '/' : `${currentDir}/`) + ARG;
           if (!(newDir in DIRS)) DIRS[newDir] = createDir();                              // IMPORTANT: input DOES sometimes traverse to directories not yet discovered by `ls`
           currentDir = newDir;
         }
