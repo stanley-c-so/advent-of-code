@@ -109,6 +109,8 @@ Find the smallest directory that, if deleted, would free up enough space on the 
 
 */
 
+// ===== SOLUTION 1: REPRESENT DIRECTORIES AS OBJECTS MAPPED TO STRING REPRESENTATIONS OF THEIR PATHS, AND TRACK ALL DIRECTORIES IN ONE LARGE OBJECT
+
 function parseFilesystem (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
@@ -116,91 +118,98 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
-  // // ===== SOLUTION 1: REPRESENT DIRECTORIES AS OBJECTS MAPPED TO STRING REPRESENTATIONS OF THEIR PATHS, AND TRACK ALL DIRECTORIES IN ONE LARGE OBJECT
+  // UTILITY
+  const createDir = () => ({ parent: currentDir, size: 0 });                              // DATA STRUCTURE: folders need to know their size and their parent
 
-  // // UTILITY
-  // const createDir = () => ({ parent: currentDir, size: 0 });                              // DATA STRUCTURE: folders need to know their size and their parent
-
-  // // INIT
-  // let currentDir = null;
-  // const DIRS = { '/': createDir() };                                                      // DATA STRUCTURE: init DIRS with root directory '/'
+  // INIT
+  let currentDir = null;
+  const DIRS = { '/': createDir() };                                                      // DATA STRUCTURE: init DIRS with root directory '/'
   
-  // let currentlyInLs = false;                                                              // (OPTIONAL) sanity check to make sure output is coming from `ls` command
+  let currentlyInLs = false;                                                              // (OPTIONAL) sanity check to make sure output is coming from `ls` command
   
-  // // PARSE DATA
-  // for (const line of inputArr) {
+  // PARSE DATA
+  for (const line of inputArr) {
 
-  //   if (line[0] === '$') {                                                                // if line represents a command...
-  //     currentlyInLs = false;
-  //     const [COMMAND, ARG] = line.slice(2).split(' ');
-  //     if (COMMAND === 'cd') {                                                             // ...`cd` command...
-  //       if (ARG === '..') currentDir = DIRS[currentDir].parent;                             // go up one directory
-  //       else if (ARG === '/') currentDir = '/';                                             // go to root directory
-  //       else {                                                                              // go to child directory
-  //         const newDir = (currentDir === '/' ? '' : currentDir)
-  //                           + '/'
-  //                           + ARG;
-  //         if (!(newDir in DIRS)) DIRS[newDir] = createDir();                              // IMPORTANT: input DOES sometimes traverse to directories not yet discovered by `ls`
-  //         currentDir = newDir;
-  //       }
-  //     }
-  //     else if (COMMAND === 'ls') currentlyInLs = true;                                    // ...`ls` command (OPTIONAL)
-  //     else throw `ERROR: UNEXPECTED COMMAND ${COMMAND}`;
-  //   }
+    if (line[0] === '$') {                                                                // if line represents a command...
+      currentlyInLs = false;
+      const [COMMAND, ARG] = line.slice(2).split(' ');
+      if (COMMAND === 'cd') {                                                             // ...`cd` command...
+        if (ARG === '..') currentDir = DIRS[currentDir].parent;                             // go up one directory
+        else if (ARG === '/') currentDir = '/';                                             // go to root directory
+        else {                                                                              // go to child directory
+          const newDir = (currentDir === '/' ? '' : currentDir)
+                            + '/'
+                            + ARG;
+          if (!(newDir in DIRS)) DIRS[newDir] = createDir();                              // IMPORTANT: input DOES sometimes traverse to directories not yet discovered by `ls`
+          currentDir = newDir;
+        }
+      }
+      else if (COMMAND === 'ls') currentlyInLs = true;                                    // ...`ls` command (OPTIONAL)
+      else throw `ERROR: UNEXPECTED COMMAND ${COMMAND}`;
+    }
 
-  //   else {                                                                                // else if line represents output...
-  //     if (!currentlyInLs) throw 'ERROR: NOT CURRENTLY IN LS';                             // (OPTIONAL) sanity check to make sure output is coming from `ls` 
+    else {                                                                                // else if line represents output...
+      if (!currentlyInLs) throw 'ERROR: NOT CURRENTLY IN LS';                             // (OPTIONAL) sanity check to make sure output is coming from `ls` 
 
-  //     const [LS, RS] = line.split(' ');
+      const [LS, RS] = line.split(' ');
       
-  //     if (LS !== 'dir') {                                                                 // ...discovered file
-  //       const filesize = +LS;
-  //       let dir = currentDir;                                                             // navigate up the filesystem, updating the size of every directory along the way
-  //       while (dir) {
-  //         DIRS[dir].size += filesize;
-  //         dir = DIRS[dir].parent;
-  //       }
-  //     }
+      if (LS !== 'dir') {                                                                 // ...discovered file
+        const filesize = +LS;
+        let dir = currentDir;                                                             // navigate up the filesystem, updating the size of every directory along the way
+        while (dir) {
+          DIRS[dir].size += filesize;
+          dir = DIRS[dir].parent;
+        }
+      }
 
-  //     // else {                                                                              // ...discovered directory (OPTIONAL) since folders don't matter by themselves unless...
-  //     //                                                                                     // ...the input eventually navigates there and runs `ls`, but then the block above would run
-  //     //   const subdir = RS;
-  //     //   if (!(subdir in DIRS)) DIRS[subdir] = createDir();
-  //     // }
+      // else {                                                                              // ...discovered directory (OPTIONAL) since folders don't matter by themselves unless...
+      //                                                                                     // ...the input eventually navigates there and runs `ls`, but then the block above would run
+      //   const subdir = RS;
+      //   if (!(subdir in DIRS)) DIRS[subdir] = createDir();
+      // }
       
-  //   }
+    }
 
+  }
+
+  // ANALYZE
+  if (part === 1) {                                                                       // PART 1: ADD UP ALL DIRECTORIES OF SIZE 100000 OR LESS
+
+    const LIMIT = 100000;
+    return Object.values(DIRS)
+            .filter(dir => dir.size <= LIMIT)
+            .reduce((sum, dir) => sum + dir.size, 0);
+
+  } else {                                                                                // PART 2: FIND SIZE OF SMALLEST DIRECTORY THAT WOULD FREE UP ENOUGH SPACE
+
+    const FILESYSTEM_TOTAL_SPACE = 70000000;
+    const SIZE_OF_UPDATE = 30000000;
+
+    const sizeOfRoot = DIRS['/'].size;
+    const freeSpace = FILESYSTEM_TOTAL_SPACE - sizeOfRoot;
+    const spaceThatNeedsToBeFreedUp = SIZE_OF_UPDATE - freeSpace;
+
+    const LARGE_DIRS_BY_SIZE = Object.values(DIRS)                                        // find all sufficiently large dirs and sort by size in increasing order...
+                                .filter(dir => dir.size >= spaceThatNeedsToBeFreedUp)
+                                .map(dir => dir.size)
+                                .sort((a, b) => a - b);
+
+    if (LARGE_DIRS_BY_SIZE.length) return LARGE_DIRS_BY_SIZE[0];                          // ...then return the first one
+
+    throw `ERROR: DID NOT FIND A SINGLE DIRECTORY OF SUFFICIENT SIZE ${spaceThatNeedsToBeFreedUp} OR MORE`;
+
+  }
+}
+
+
+// ===== SOLUTION 2: USE A DIRECTORY CLASS TO REPRESENT DIRECTORIES. CONNECT ACTUAL DIRECTORY NODES IN A REAL TREE
+
+function parseFilesystem2 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
   // }
-
-  // // ANALYZE
-  // if (part === 1) {                                                                       // PART 1: ADD UP ALL DIRECTORIES OF SIZE 100000 OR LESS
-
-  //   const LIMIT = 100000;
-  //   return Object.values(DIRS)
-  //           .filter(dir => dir.size <= LIMIT)
-  //           .reduce((sum, dir) => sum + dir.size, 0);
-
-  // } else {                                                                                // PART 2: FIND SIZE OF SMALLEST DIRECTORY THAT WOULD FREE UP ENOUGH SPACE
-
-  //   const FILESYSTEM_TOTAL_SPACE = 70000000;
-  //   const SIZE_OF_UPDATE = 30000000;
-
-  //   const sizeOfRoot = DIRS['/'].size;
-  //   const freeSpace = FILESYSTEM_TOTAL_SPACE - sizeOfRoot;
-  //   const spaceThatNeedsToBeFreedUp = SIZE_OF_UPDATE - freeSpace;
-
-  //   const LARGE_DIRS_BY_SIZE = Object.values(DIRS)                                        // find all sufficiently large dirs and sort by size in increasing order...
-  //                               .filter(dir => dir.size >= spaceThatNeedsToBeFreedUp)
-  //                               .map(dir => dir.size)
-  //                               .sort((a, b) => a - b);
-
-  //   if (LARGE_DIRS_BY_SIZE.length) return LARGE_DIRS_BY_SIZE[0];                          // ...then return the first one
-
-  //   throw `ERROR: DID NOT FIND A SINGLE DIRECTORY OF SUFFICIENT SIZE ${spaceThatNeedsToBeFreedUp} OR MORE`;
-
-  // }
-
-  // ===== SOLUTION 2: USE A DIRECTORY CLASS TO REPRESENT DIRECTORIES. CONNECT ACTUAL DIRECTORY NODES IN A REAL TREE
 
   // CLASS
   class Directory {
@@ -298,7 +307,6 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
     throw `ERROR: DID NOT FIND A SINGLE DIRECTORY OF SUFFICIENT SIZE ${spaceThatNeedsToBeFreedUp} OR MORE`;
 
   }
-
 }
 
 // TEST CASES
@@ -306,7 +314,7 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = parseFilesystem;
+const func = parseFilesystem2;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);

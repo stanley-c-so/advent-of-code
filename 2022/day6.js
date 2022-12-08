@@ -52,6 +52,8 @@ How many characters need to be processed before the first start-of-message marke
 
 */
 
+// ===== SOLUTION 1: TAKE SLICES BASED ON INDEX POSITION, INSERT INTO A SET, AND MEASURE SET SIZE
+
 function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
   // if (DEBUG) {
   //   console.log(inputStr);
@@ -60,13 +62,23 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
   const N = part === 1 ? 4                                                      // PART 1: NEED SUBSTRING OF LENGTH 4
                        : 14;                                                    // PART 2: NEED SUBSTRING OF LENGTH 14
 
-  // // ===== SOLUTION 1: TAKE SLICES BASED ON INDEX POSITION, INSERT INTO A SET, AND MEASURE SET SIZE
-  // for (let i = N - 1; i < inputStr.length; ++i) {
-  //   if (new Set(inputStr.slice(i - (N - 1), i + 1)).size === N) return i + 1;
-  // }
-  // throw `ERROR: DID NOT FIND SUBSTRING OF LENGTH ${N} WITH UNIQUE CHARACTERS`;
+  for (let i = N - 1; i < inputStr.length; ++i) {
+    if (new Set(inputStr.slice(i - (N - 1), i + 1)).size === N) return i + 1;
+  }
+  throw `ERROR: DID NOT FIND SUBSTRING OF LENGTH ${N} WITH UNIQUE CHARACTERS`;
+}
 
-  // ===== SOLUTION 2 (FEWER OPERATIONS): USE A HASH TABLE AND TRACK UNIQUE CHARS
+
+// ===== SOLUTION 2 (FEWER OPERATIONS): USE A HASH TABLE AND TRACK UNIQUE CHARS
+
+function findSubstringWithUniqueChars2 (part, inputStr, DEBUG = false) {
+  // if (DEBUG) {
+  //   console.log(inputStr);
+  // }
+
+  const N = part === 1 ? 4                                                      // PART 1: NEED SUBSTRING OF LENGTH 4
+                       : 14;                                                    // PART 2: NEED SUBSTRING OF LENGTH 14
+
   const freq = {};
   let numUniqueChars = 0;
 
@@ -95,7 +107,7 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = findSubstringWithUniqueChars;
+const func = findSubstringWithUniqueChars2;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);

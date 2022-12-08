@@ -45,6 +45,8 @@ Following the Elf's instructions for the second column, what would your total sc
 
 */
 
+// ===== SOLUTION 1: TRY TO WRITE CODE IN A SOMEWHAT MODULAR, READABLE WAY
+
 function rockPaperScissors (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
@@ -52,71 +54,78 @@ function rockPaperScissors (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
-  // // ===== SOLUTION 1: TRY TO WRITE CODE IN A SOMEWHAT MODULAR, READABLE WAY
+  const REF = {
+    'rock': { points: 1, beats: 'scissors', losesTo: 'paper' },
+    'paper': { points: 2, beats: 'rock', losesTo: 'scissors' },
+    'scissors': { points: 3, beats: 'paper', losesTo: 'rock' },
+  };
 
-  // const REF = {
-  //   'rock': { points: 1, beats: 'scissors', losesTo: 'paper' },
-  //   'paper': { points: 2, beats: 'rock', losesTo: 'scissors' },
-  //   'scissors': { points: 3, beats: 'paper', losesTo: 'rock' },
-  // };
+  const OPPONENT = {
+    'A': 'rock',
+    'B': 'paper',
+    'C': 'scissors',
+  };
 
-  // const OPPONENT = {
-  //   'A': 'rock',
-  //   'B': 'paper',
-  //   'C': 'scissors',
-  // };
-
-  // const RESULTS = {
-  //   'win': 6,
-  //   'tie': 3,
-  //   'lose': 0,
-  // };
+  const RESULTS = {
+    'win': 6,
+    'tie': 3,
+    'lose': 0,
+  };
   
-  // let score = 0;
-  // for (const line of inputArr) {
-  //   const opponentMove = OPPONENT[line[0]];
-  //   const you = line[2];
+  let score = 0;
+  for (const line of inputArr) {
+    const opponentMove = OPPONENT[line[0]];
+    const you = line[2];
 
-  //   if (part === 1) {
+    if (part === 1) {                                                                     // PART 1: X/Y/Z REPRESENT ROCK/PAPER/SCISSORS
 
-  //     const PART1 = {
-  //       'X': 'rock',
-  //       'Y': 'paper',
-  //       'Z': 'scissors',
-  //     };
+      const PART1 = {
+        'X': 'rock',
+        'Y': 'paper',
+        'Z': 'scissors',
+      };
 
-  //     const yourMove = PART1[you];
-  //     score += REF[yourMove].points;                                                      // add points from shape
-  //     if (opponentMove === yourMove) score += RESULTS.tie;                                // then add points from result
-  //     else if (opponentMove === REF[yourMove].beats) score += RESULTS.win;
-  //     else if (opponentMove === REF[yourMove].losesTo) score += RESULTS.lose;
-  //     else throw 'ERROR!';
+      const yourMove = PART1[you];
+      score += REF[yourMove].points;                                                      // add points from shape
+      if (opponentMove === yourMove) score += RESULTS.tie;                                // then add points from result
+      else if (opponentMove === REF[yourMove].beats) score += RESULTS.win;
+      else if (opponentMove === REF[yourMove].losesTo) score += RESULTS.lose;
+      else throw 'ERROR!';
 
-  //   } else {
+    } else {                                                                              // PART 2: X/Y/Z REPRESENT LOSE/TIE/WIN FOR YOU
 
-  //     const PART2 = {
-  //       'X': 'lose',
-  //       'Y': 'tie',
-  //       'Z': 'win',
-  //     };
+      const PART2 = {
+        'X': 'lose',
+        'Y': 'tie',
+        'Z': 'win',
+      };
 
-  //     const yourResult = PART2[you];
-  //     score += RESULTS[yourResult];                                                       // add points from result
-  //     if (yourResult === 'win') score += REF[REF[opponentMove].losesTo].points;           // then add points from shape
-  //     else if (yourResult === 'lose') score += REF[REF[opponentMove].beats].points;
-  //     else if (yourResult === 'tie') score += REF[opponentMove].points;
-  //     else throw 'ERROR!';
+      const yourResult = PART2[you];
+      score += RESULTS[yourResult];                                                       // add points from result
+      if (yourResult === 'win') score += REF[REF[opponentMove].losesTo].points;           // then add points from shape
+      else if (yourResult === 'lose') score += REF[REF[opponentMove].beats].points;
+      else if (yourResult === 'tie') score += REF[opponentMove].points;
+      else throw 'ERROR!';
 
-  //   }
+    }
+  }
+
+  return score;
+}
+
+
+// ===== SOLUTION 2: HARD CODE EVERYTHING
+
+function rockPaperScissors2 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
   // }
-
-  // return score;
-
-  // ===== SOLUTION 2: HARD CODE EVERYTHING
 
   let score = 0;
   for (const line of inputArr) {
-    if (part === 1) {               // PART 1: X/Y/Z REPRESENT ROCK/PAPER/SCISSORS
+    if (part === 1) {                                                                     // PART 1: X/Y/Z REPRESENT ROCK/PAPER/SCISSORS
       switch (line) {
         case 'A X':
           score += 1 + 3;
@@ -146,7 +155,7 @@ function rockPaperScissors (part, inputStr, DEBUG = false) {
           score += 3 + 3;
           break;
       }
-    } else {                        // PART 2: X/Y/Z REPRESENT LOSE/TIE/WIN FOR YOU
+    } else {                                                                              // PART 2: X/Y/Z REPRESENT LOSE/TIE/WIN FOR YOU
       switch (line) {
         case 'A X':
           score += 3 + 0;
