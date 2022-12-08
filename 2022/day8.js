@@ -75,6 +75,8 @@ Consider each tree on your map. What is the highest scenic score possible for an
 
 */
 
+// ===== SOLUTION 1: MORE BRUTE FORCE - AT EACH POSITION, PERFORM SCAN TO THE EDGES OF GRID
+
 function visibleTrees (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
@@ -194,6 +196,9 @@ function visibleTrees (part, inputStr, DEBUG = false) {
   }
 }
 
+
+// ===== SOLUTION 2: BETTER TIME COMPLEXITY, BUT SLOWER ON SMALL INPUTS, AS HERE - USE DP, AS WELL AS A MONOTONIC STACK FOR PART 2
+
 function visibleTrees2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
@@ -215,30 +220,30 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
                                                                                                         // ...at given coords, from given direction
 
     // PROCESS DATA STRUCTURES
-    for (let row = 0; row < H; ++row) {
+
+    for (let row = 0; row < H; ++row) {                                                                 // NOTE: ITERATE FROM TOP TO BOTTOM, LEFT TO RIGHT
       for (let col = 0; col < W; ++col) {
+
+        // check up
         dp[row][col].up = row === 0 ? 0                                                                 // set to 0 for top edge
-                                    : Math.max(grid[row - 1][col],
+                                    : Math.max(grid[row - 1][col],                                      // otherwise, compare against grid AND dp values above
                                                 dp[row - 1][col].up);
-      }
-    }
-    for (let row = 0; row < H; ++row) {
-      for (let col = 0; col < W; ++col) {
-        dp[row][col].left = col === 0 ? 0                                                               // set to 0 for left edge
+        // check left
+        dp[row][col].left = col === 0 ? 0
                                       : Math.max(grid[row][col - 1],
-                                                  dp[row][col - 1].left);
+                                                  dp[row][col - 1].left);                                        
       }
     }
-    for (let row = H - 1; row >= 0; --row) {
+
+    for (let row = H - 1; row >= 0; --row) {                                                            // NOTE: ITERATE FROM BOTTOM TO TOP, RIGHT TO LEFT
       for (let col = W - 1; col >= 0; --col) {
-        dp[row][col].down = row === H - 1 ? 0                                                           // set to 0 for bottom edge
+
+        // check down
+        dp[row][col].down = row === H - 1 ? 0
                                           : Math.max(grid[row + 1][col],
                                                       dp[row + 1][col].down);
-      }
-    }
-    for (let row = H - 1; row >= 0; --row) {
-      for (let col = W - 1; col >= 0; --col) {
-        dp[row][col].right = col === W - 1 ? 0                                                          // set to 0 for right edge
+        // check right
+        dp[row][col].right = col === W - 1 ? 0
                                             : Math.max(grid[row][col + 1],
                                                         dp[row][col + 1].right);
       }
@@ -267,7 +272,8 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
     // PROCESS DATA STRUCTURES
     const monotonicStack = [];                                                                          // should be non-increasing
 
-    for (let col = 0; col < W; ++col) {
+    // check up
+    for (let col = 0; col < W; ++col) {                                                                 // NOTE: OUTER LOOP IS COLS, INNER LOOP IS ROWS
       monotonicStack.length = 0;                                                                        // clear stack
       for (let row = 0; row < H; ++row) {
         if (row === 0) {                                                                                // init dp value to 0 for top edge
@@ -283,10 +289,11 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
       }
     }
 
-    for (let row = 0; row < H; ++row) {
+    // check left
+    for (let row = 0; row < H; ++row) {                                                                 // NOTE: OUTER LOOP IS ROWS, INNER LOOP IS COLS
       monotonicStack.length = 0;
       for (let col = 0; col < W; ++col) {
-        if (col === 0) {                                                                                // init dp value to 0 for left edge
+        if (col === 0) {
           dp[row][col].left = 0;
         } else {
           while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
@@ -299,33 +306,35 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
       }
     }
 
-    for (let col = 0; col < W; ++col) {
+    // check down
+    for (let col = 0; col < W; ++col) {                                                                 // NOTE: OUTER LOOP IS COLS, INNER LOOP IS ROWS
       monotonicStack.length = 0;
-      for (let row = H - 1; row >= 0; --row) {
-        if (row === H - 1) {                                                                            // init dp value to 0 for bottom edge
+      for (let row = H - 1; row >= 0; --row) {                                                          // NOTE: ITERATE THROUGH ROWS BACKWARD
+        if (row === H - 1) {
           dp[row][col].down = 0;
         } else {
           while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
             monotonicStack.pop();
           }
           dp[row][col].down = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - row)
-                                                    : H - 1 - row
+                                                    : H - 1 - row                                       // NOTE: DISTANCE TO EDGE CALCULATION BASED ON BOTTOM EDGE
         }
-        monotonicStack.push({ highest: grid[row][col], coord: row });                                   // add current value to monotonic stack
+        monotonicStack.push({ highest: grid[row][col], coord: row });
       }
     }
 
-    for (let row = 0; row < H; ++row) {
+    // check right
+    for (let row = 0; row < H; ++row) {                                                                 // NOTE: OUTER LOOP IS ROWS, INNER LOOP IS COLS
       monotonicStack.length = 0;
-      for (let col = W - 1; col >= 0; --col) {
-        if (col === W - 1) {                                                                            // init dp value to 0 for right edge
+      for (let col = W - 1; col >= 0; --col) {                                                          // NOTE: ITERATE THROUGH COLS BACKWARD
+        if (col === W - 1) {
           dp[row][col].right = 0;
         } else {
           while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
             monotonicStack.pop();
           }
           dp[row][col].right = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - col)
-                                                      : W - 1 - col
+                                                      : W - 1 - col                                     // NOTE: DISTANCE TO EDGE CALCULATION BASED ON RIGHT EDGE
         }
         monotonicStack.push({ highest: grid[row][col], coord: col });
       }
