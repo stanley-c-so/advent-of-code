@@ -270,7 +270,8 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
                                                                                                         // ...at given coords, while looking in given direction
 
     // PROCESS DATA STRUCTURES
-    const monotonicStack = [];                                                                          // should be non-increasing
+    const monotonicStack = [];                                                                          // i.e. non-increasing. values take on this form:
+                                                                                                        // { highest: NUM, coord: ROW/COL (contextual) }
 
     // check up
     for (let col = 0; col < W; ++col) {                                                                 // NOTE: OUTER LOOP IS COLS, INNER LOOP IS ROWS
