@@ -196,7 +196,8 @@ function rockPaperScissors2 (part, inputStr, DEBUG = false) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = rockPaperScissors;
+// const func = rockPaperScissors;
+const func = rockPaperScissors2;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
