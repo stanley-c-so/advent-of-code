@@ -700,35 +700,19 @@ function ropePull (part, inputStr, DEBUG = false) {
 
   // HELPER
   function resolve(followerKnotIndex) {
-
     const A = followerKnotIndex - 1;
     const B = followerKnotIndex;
-    const deltaX = Math.abs(positions[A].x - positions[B].x);
-    const deltaY = Math.abs(positions[A].y - positions[B].y);
 
-    if (deltaX > 1 && deltaY > 1) {                                                   // KNOT B DISCONNECTED FROM A IN BOTH AXES
+    const deltaX = positions[A].x - positions[B].x;
+    const deltaY = positions[A].y - positions[B].y;
 
-      if (positions[A].x > positions[B].x) ++positions[B].x;                          // knot B will move horizontally toward A for sure
-      else --positions[B].x;
+    if (Math.abs(deltaX) <= 1 && Math.abs(deltaY) <= 1) return;                       // A and B are still touching; no-op
 
-      if (positions[A].y > positions[B].y) ++positions[B].y;                          // knot B will also move vertically toward A for sure
-      else --positions[B].y;
+    if (deltaX > 0)       ++positions[B].x;                                           // move B toward A along the x-axis, if different
+    else if (deltaX < 0)  --positions[B].x;
 
-    } else {                                                                          // KNOT B DISCONNECTED FROM A IN AT MOST 1 AXIS (IF AT ALL)
-
-      if (deltaX > 1) {                                                               // knot B will move horizontally toward A for sure...
-        if (positions[A].x > positions[B].x) ++positions[B].x;
-        else --positions[B].x;
-        positions[B].y = positions[A].y;                                              // ...and knot B will match A in the y axis for sure
-      }
-      else if (deltaY > 1) {                                                          // knot B will move vertically toward A for sure...
-        if (positions[A].y > positions[B].y) ++positions[B].y;
-        else --positions[B].y;
-        positions[B].x = positions[A].x;                                              // ...and knot B will match A in the x axis for sure
-      }
-      else {}                                                                         // knot B is still touching A; no-op for knot B
-
-    }
+    if (deltaY > 0)       ++positions[B].y;                                           // move B toward A along the y-axis, if different
+    else if (deltaY < 0)  --positions[B].y;
   }
 
   // PARSE INPUT AND ANALYZE
