@@ -708,9 +708,10 @@ function ropePull (part, inputStr, DEBUG = false) {
 
     if (deltaX > 1 && deltaY > 1) {                                                   // KNOT B DISCONNECTED FROM A IN BOTH AXES
 
-      if (positions[A].x > positions[B].x) ++positions[B].x;
+      if (positions[A].x > positions[B].x) ++positions[B].x;                          // knot B will move horizontally toward A for sure
       else --positions[B].x;
-      if (positions[A].y > positions[B].y) ++positions[B].y;
+
+      if (positions[A].y > positions[B].y) ++positions[B].y;                          // knot B will also move vertically toward A for sure
       else --positions[B].y;
 
     } else {                                                                          // KNOT B DISCONNECTED FROM A IN 1 AXIS (IF AT ALL)
