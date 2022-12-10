@@ -699,20 +699,22 @@ function ropePull (part, inputStr, DEBUG = false) {
   const tailVisited = new Set();
 
   // HELPER
-  function resolve(followerKnotIndex) {
+  function resolve(followerKnotIndex) {                                               // return bool for whether B had to move
     const A = followerKnotIndex - 1;
     const B = followerKnotIndex;
 
     const deltaX = positions[A].x - positions[B].x;
     const deltaY = positions[A].y - positions[B].y;
 
-    if (Math.abs(deltaX) <= 1 && Math.abs(deltaY) <= 1) return;                       // A and B are still touching; no-op
+    if (Math.abs(deltaX) <= 1 && Math.abs(deltaY) <= 1) return false;                 // A and B are still touching; no-op
 
     if (deltaX > 0)       ++positions[B].x;                                           // move B toward A along the x-axis, if different
     else if (deltaX < 0)  --positions[B].x;
 
     if (deltaY > 0)       ++positions[B].y;                                           // move B toward A along the y-axis, if different
     else if (deltaY < 0)  --positions[B].y;
+
+    return true;
   }
 
   // PARSE INPUT AND ANALYZE
@@ -728,7 +730,9 @@ function ropePull (part, inputStr, DEBUG = false) {
       else throw 'ERROR: UNRECOGNIZED DIRECTION';
 
       // resolve remaining knots
-      for (let k = 1; k < NUM_KNOTS; ++k) resolve(k);
+      for (let k = 1; k < NUM_KNOTS; ++k) {
+        if (!resolve(k)) break;                                                       // early exit as soon as no-op
+      }
 
       // mark tail's position as visited
       tailVisited.add(`${positions[NUM_KNOTS - 1].x},${positions[NUM_KNOTS - 1].y}`);
