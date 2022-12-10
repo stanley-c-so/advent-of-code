@@ -390,7 +390,7 @@ function CRT (part, inputStr, DEBUG = false) {
     parseInput(renderCRT);
 
     console.log('');
-    for (const row of CRT) console.log(row.join(''));             // draw CRT image to console
+    for (const row of CRT) console.log(row.join(' '));            // draw CRT image to console
     console.log('');
 
     return CRT.map(row => row.join('')).join('\n');
