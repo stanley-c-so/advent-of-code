@@ -317,16 +317,16 @@ function numberTransformations (part, inputStr, DEBUG = false) {
 
   // INIT
   const N = inputArr.length;
-  const ITEMS = Array(N);
-  const OPERATION = Array(N);
-  const DIVISOR_TEST = Array(N);
-  const TRUE = Array(N);
-  const FALSE = Array(N);
+  const ITEMS = Array(N);                                                                           // each element is an array "queue" of items held
+  const OPERATION = Array(N);                                                                       // each element is a callback function
+  const DIVISOR_TEST = Array(N);                                                                    // each element is a divisor number
+  const TRUE = Array(N);                                                                            // each element is a target monkey index
+  const FALSE = Array(N);                                                                           // each element is a target monkey index
 
   // PARSE DATA
   for (let i = 0; i < inputArr.length; ++i) {
     const MONKEY_DATA = inputArr[i].split('\r\n');
-    if (MONKEY_DATA.length !== 6) throw `ERROR: INCORRECTLY PARSED INPUT`;                          // sanity check: make sure each monkey contains 6 lines of data
+    if (MONKEY_DATA.length !== 6) throw `ERROR: INCORRECTLY PARSED INPUT`;                          // sanity check: each monkey should contain 6 lines of data
 
     // init each monkey's queue
     ITEMS[i] = MONKEY_DATA[1].split(': ').at(-1).split(', ').map(n => +n);
@@ -377,8 +377,8 @@ function numberTransformations (part, inputStr, DEBUG = false) {
   // (the fact that the puzzle input has divisibility tests with divisors that are prime doesn't matter - the divisors could be any numbers!)
 
   const PRODUCT_OF_ALL_DIVISORS = DIVISOR_TEST.reduce((product, num) => product * num);             // math trick needed for part 2
-  const TRANSFORMATION_CALLBACK = part === 1 ? item => Math.floor(item / 3)                         // PART 1: DIVIDE ITEM BY 3, AND FLOOR
-                                              : item => item % PRODUCT_OF_ALL_DIVISORS;             // PART 2 (MATH TRICK): MOD BY PRODUCT OF ALL DIVISORS
+  const REDUCTION_CALLBACK = part === 1 ? item => Math.floor(item / 3)                              // PART 1: DIVIDE ITEM BY 3, AND FLOOR
+                                        : item => item % PRODUCT_OF_ALL_DIVISORS;                   // PART 2 (MATH TRICK): MOD BY PRODUCT OF ALL DIVISORS
   const NUM_ROUNDS = part === 1 ? 20                                                                // PART 1: SIMULATE 20 ROUNDS
                                 : 10000;                                                            // PART 2: SIMULATE 10,000 ROUNDS
 
@@ -388,7 +388,7 @@ function numberTransformations (part, inputStr, DEBUG = false) {
     for (let monkey = 0; monkey < N; ++monkey) {
       for (const item of ITEMS[monkey]) {                                                           // i.e. the item is a number representing its worry value
         ++INSPECTED[monkey];                                                                        // increment this monkey's inspect count
-        const newItem = TRANSFORMATION_CALLBACK(OPERATION[monkey](item));                           // transform item's worry value
+        const newItem = REDUCTION_CALLBACK(OPERATION[monkey](item));                                // reduce item's worry value
         if (newItem % DIVISOR_TEST[monkey] === 0) ITEMS[TRUE[monkey]].push(newItem);                // send to TRUE target if item passes divisibility test...
         else ITEMS[FALSE[monkey]].push(newItem);                                                    // ...else, send to FALSE target
       }
