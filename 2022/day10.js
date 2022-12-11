@@ -331,24 +331,25 @@ function CRT (part, inputStr, DEBUG = false) {
   // }
 
   // INIT
-  let cycle = 1;
+  let cycle = 0;
   let x = 1;
 
   // HELPER
   function tick(callback) {
-    callback();
     ++cycle;
+    callback();
   }
 
   function parseInput(callback) {
     for (const line of inputArr) {
-      tick(callback);                                             // every command takes up at least 1 tick
-
       const [COMMAND, ARG] = line.split(' ');
-      if (COMMAND === 'noop') {}                                  // 'noop' requires nothing further
+      if (COMMAND === 'noop') {                                   // 'noop'...
+        tick(callback);                                           // ...does nothing for one tick
+      }
       else if (COMMAND === 'addx') {                              // 'addx'...
         tick(callback);                                           // ...does nothing for one tick...
-        x += +ARG;                                                // ...then on the subsequent tick, changes value of x
+        tick(callback);                                           // ...then on the subsequent tick...
+        x += +ARG;                                                // ...changes value of x
       }
       else throw 'ERROR: UNRECOGNIZED COMMAND';
     }
