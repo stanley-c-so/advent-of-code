@@ -340,7 +340,7 @@ function CRT (part, inputStr, DEBUG = false) {
     callback();
   }
 
-  function parseInput(callback) {
+  function analyzeInput(callback) {
     for (const line of inputArr) {
       const [COMMAND, ARG] = line.split(' ');
       if (COMMAND === 'noop') {                                   // 'noop'...
@@ -369,7 +369,7 @@ function CRT (part, inputStr, DEBUG = false) {
       }
     }
 
-    parseInput(checkSignalStrength);
+    analyzeInput(checkSignalStrength);
 
     return VALUES.reduce((sum, num) => sum + num);
 
@@ -388,7 +388,7 @@ function CRT (part, inputStr, DEBUG = false) {
       }
     }
 
-    parseInput(renderCRT);
+    analyzeInput(renderCRT);
 
     console.log('');
     for (const row of CRT) console.log(row.join(' '));            // draw CRT image to console
