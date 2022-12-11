@@ -358,14 +358,14 @@ function CRT (part, inputStr, DEBUG = false) {
   // ANALYZE
   if (part === 1) {                                               // PART 1: ADD UP SIGNAL STRENGTH VALUES FROM SIX KEY CYCLES
 
-    const CYCLES_TO_CHECK = [20, 60, 100, 140, 180, 220];
-    const VALUES = Array(CYCLES_TO_CHECK.length).fill(null);
-    let ptr = 0;
+    const CYCLES_TO_CHECK = [ 20, 60, 100, 140, 180, 220 ]
+                              .reverse();                         // (reverse so we can pop)
+    const VALUES = [];
 
     function checkSignalStrength() {
-      if (cycle === CYCLES_TO_CHECK[ptr]) {
-        VALUES[ptr] = cycle * x;                                  // signal strength is cycle number multiplied by value of x
-        ++ptr;
+      if (cycle === CYCLES_TO_CHECK.at(-1)) {
+        VALUES.push(cycle * x);                                   // signal strength is cycle number multiplied by value of x
+        CYCLES_TO_CHECK.pop();
       }
     }
 
