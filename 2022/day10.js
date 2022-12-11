@@ -391,7 +391,9 @@ function CRT (part, inputStr, DEBUG = false) {
     analyzeInput(renderCRT);
 
     console.log('');
-    for (const row of CRT) console.log(row.join(' '));            // draw CRT image to console
+    for (const row of CRT) console.log(                           // draw CRT image to console
+      row.map(c => !DEBUG && c === '.' ? ' ' : c).join(' ')       // slight modification to make output easier to read
+    );
     console.log('');
 
     return CRT.map(row => row.join('')).join('\n');
