@@ -84,8 +84,8 @@ function elevationBFS (part, inputStr, DEBUG = false) {
   for (let i = 0; i < 26; ++i) HEIGHTS[ALPHABET[i]] = i;
 
   // PARSE INPUT
-  let inputStartRow, inputStartCol;                                                   // will be discovered during input parsing
-  let endRow, endCol;                                                                 // will be discovered during input parsing
+  let inputStartRow = null, inputStartCol = null;                                     // will be discovered during input parsing
+  let endRow = null, endCol = null;                                                   // will be discovered during input parsing
   for (let row = 0; row < H; ++row) {
     for (let col = 0; col < W; ++col) {
       if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];        // PART 1: discover input start
@@ -93,10 +93,10 @@ function elevationBFS (part, inputStr, DEBUG = false) {
       if (HEIGHTS[GRID[row][col]] === 0) possibleStarts.push([row, col]);             // PART 2: discover input start OR 'a'
     }
   }
-  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                         // sanity check to make sure input start was found
+  if ([ inputStartRow, inputStartCol ].includes(null)) {                              // sanity check to make sure input start was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF INPUT START';
   }
-  if ([ endRow, endCol ].includes(undefined)) {                                       // sanity check to make sure end was found
+  if ([ endRow, endCol ].includes(null)) {                                            // sanity check to make sure end was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF END';
   }
 
@@ -212,8 +212,8 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
   for (let i = 0; i < 26; ++i) HEIGHTS[ALPHABET[i]] = i;
 
   // PARSE INPUT
-  let inputStartRow, inputStartCol;                                                   // will be discovered during input parsing
-  let endRow, endCol;                                                                 // will be discovered during input parsing
+  let inputStartRow = null, inputStartCol = null;                                     // will be discovered during input parsing
+  let endRow = null, endCol = null;                                                   // will be discovered during input parsing
   for (let row = 0; row < H; ++row) {
     for (let col = 0; col < W; ++col) {
       if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];        // PART 1: discover input start
@@ -221,10 +221,10 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
       if (HEIGHTS[GRID[row][col]] === 0) possibleStarts.push([row, col]);             // PART 2: discover input start OR 'a'
     }
   }
-  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                         // sanity check to make sure input start was found
+  if ([ inputStartRow, inputStartCol ].includes(null)) {                              // sanity check to make sure input start was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF INPUT START';
   }
-  if ([ endRow, endCol ].includes(undefined)) {                                       // sanity check to make sure end was found
+  if ([ endRow, endCol ].includes(null)) {                                            // sanity check to make sure end was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF END';
   }
 
@@ -303,18 +303,18 @@ function elevationBFS3 (part, inputStr, DEBUG = false) {
   for (let i = 0; i < 26; ++i) HEIGHTS[ALPHABET[i]] = i;
 
   // PARSE INPUT
-  let inputStartRow, inputStartCol;                                                   // will be discovered during input parsing
-  let endRow, endCol;                                                                 // will be discovered during input parsing
+  let inputStartRow = null, inputStartCol = null;                                     // will be discovered during input parsing
+  let endRow = null, endCol = null;                                                   // will be discovered during input parsing
   for (let row = 0; row < H; ++row) {
     for (let col = 0; col < W; ++col) {
       if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];        // PART 1: discover input start
       if (GRID[row][col] === 'E') [endRow, endCol] = [row, col];                      // discover end
     }
   }
-  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                         // sanity check to make sure input start was found
+  if ([ inputStartRow, inputStartCol ].includes(null)) {                              // sanity check to make sure input start was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF INPUT START';
   }
-  if ([ endRow, endCol ].includes(undefined)) {                                       // sanity check to make sure end was found
+  if ([ endRow, endCol ].includes(null)) {                                            // sanity check to make sure end was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF END';
   }
 
