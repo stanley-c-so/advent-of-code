@@ -76,7 +76,7 @@ function elevationBFS (part, inputStr, DEBUG = false) {
   const H = GRID.length;
   const W = GRID[0].length;
   const DIRS = [ [0, +1], [0, -1], [+1, 0], [-1, 0] ];
-  const possibleStarts = [];                                                        // will be filled in during input parsing
+  const possibleStarts = [];                                                          // will be filled in during input parsing
 
   // elevation map
   const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
@@ -84,19 +84,19 @@ function elevationBFS (part, inputStr, DEBUG = false) {
   for (let i = 0; i < 26; ++i) HEIGHTS[ALPHABET[i]] = i;
 
   // PARSE INPUT
-  let inputStartRow, inputStartCol;                                                 // will be discovered during input parsing
-  let endRow, endCol;                                                               // will be discovered during input parsing
+  let inputStartRow, inputStartCol;                                                   // will be discovered during input parsing
+  let endRow, endCol;                                                                 // will be discovered during input parsing
   for (let row = 0; row < H; ++row) {
     for (let col = 0; col < W; ++col) {
-      if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];      // PART 1: discover input start
-      if (GRID[row][col] === 'E') [endRow, endCol] = [row, col];                    // discover end
-      if (HEIGHTS[GRID[row][col]] === 0) possibleStarts.push([row, col]);           // PART 2: discover input start OR 'a'
+      if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];        // PART 1: discover input start
+      if (GRID[row][col] === 'E') [endRow, endCol] = [row, col];                      // discover end
+      if (HEIGHTS[GRID[row][col]] === 0) possibleStarts.push([row, col]);             // PART 2: discover input start OR 'a'
     }
   }
-  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                       // sanity check to make sure input start was found
+  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                         // sanity check to make sure input start was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF INPUT START';
   }
-  if ([ endRow, endCol ].includes(undefined)) {                                     // sanity check to make sure end was found
+  if ([ endRow, endCol ].includes(undefined)) {                                       // sanity check to make sure end was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF END';
   }
 
@@ -104,53 +104,89 @@ function elevationBFS (part, inputStr, DEBUG = false) {
   function getBestPathStartingAt(startRow, startCol) {
 
     // init
-    const Q = [ [startRow, startCol, 0] ];                                          // pseudo queue with moving pointer
+    const Q = [ [startRow, startCol, 0] ];                                            // pseudo queue with moving pointer
     let qPtr = 0;
     const visited = new Set();
 
     // BFS
     while (Q.length > qPtr) {
-      const [row, col, moves] = Q[qPtr++];                                          // dequeue
+      const [row, col, moves] = Q[qPtr++];                                            // dequeue
 
-      if (row === endRow && col === endCol) return moves;                           // END CONDITION: REACHED END
+      if (row === endRow && col === endCol) return moves;                             // END CONDITION: REACHED END
 
-      const serial = `${row},${col}`;                                               // check against visited coords to prevent cycles
+      const serial = `${row},${col}`;                                                 // check against visited coords to prevent cycles
       if (visited.has(serial)) continue;
       visited.add(serial);
 
-      const height = HEIGHTS[GRID[row][col]];                                       // get height of current position
+      const height = HEIGHTS[GRID[row][col]];                                         // get height of current position
 
-      for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
+      for (const [dy, dx] of DIRS) {                                                  // attempt to visit 4 neighbors
         const [ newRow, newCol ] = [ row + dy, col + dx ];
         if (
-          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
-          && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
+          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                      // target destination must be in bounds...
+          && HEIGHTS[GRID[newRow][newCol]] <= height + 1                              // ...and not more than 1 elevation higher
         ) {
           Q.push([newRow, newCol, moves + 1]);
         }
       }
     }
 
-    return Infinity;                                                                // Infinity indicates that no path exists
+    return Infinity;                                                                  // Infinity indicates that no path exists
   }
 
-  if (part === 1) {                                                                 // PART 1: GET BEST PATH STARTING AT INPUT START
+  if (part === 1) {                                                                   // PART 1: GET BEST PATH STARTING AT INPUT START
 
     const best = getBestPathStartingAt(inputStartRow, inputStartCol);
-    if (best === Infinity) throw 'ERROR: DID NOT FIND PATH';                        // sanity check to make sure a path exists
+    if (best === Infinity) throw 'ERROR: DID NOT FIND PATH';                          // sanity check to make sure a path exists
     return best;
 
-  } else {                                                                          // PART 2: GET BEST PATH AMONG ALL POSSIBLE STARTS
+  } else {                                                                            // PART 2: GET BEST PATH AMONG ALL POSSIBLE STARTS
 
     let best = Infinity;
     for (const [row, col] of possibleStarts) {
-      best = Math.min(best, getBestPathStartingAt(row, col));                       // NOTE: some starts may not have a valid path!
+      best = Math.min(best, getBestPathStartingAt(row, col));                         // NOTE: some starts may not have a valid path!
     }
     return best;
 
   }
 }
 
+
+// ========== CLASSES USED IN SUBSEQUENT SOLUTIONS
+
+class Node {
+  constructor(val, next = null) {
+    this.val = val;
+    this.next = next;
+  }
+}
+
+class Queue {
+  constructor(val) {
+    this.head = null;
+    this.tail = null;
+    this.length = 0;
+    if (val) this.enqueue(val);
+  }
+  enqueue(val) {
+    const node = new Node(val);
+    if (this.isEmpty()) this.head = node;
+    else this.tail.next = node;
+    this.tail = node;
+    ++this.length;
+  }
+  dequeue() {
+    if (this.isEmpty()) return null;
+    const node = this.head;
+    this.head = this.head.next;
+    --this.length;
+    if (this.isEmpty()) this.tail = null;
+    return node;
+  }
+  isEmpty() {
+    return this.length === 0;
+  }
+}
 
 // ========== SOLUTION 2: SAME SOLUTION, BUT BUILD A LEGITIMATE QUEUE CLASS TO IMPROVE SPACE COMPLEXITY
 
@@ -161,40 +197,6 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
-  class Node {
-    constructor(val, next = null) {
-      this.val = val;
-      this.next = next;
-    }
-  }
-
-  class Queue {
-    constructor(val) {
-      this.head = null;
-      this.tail = null;
-      this.length = 0;
-      if (val) this.enqueue(val);
-    }
-    enqueue(val) {
-      const node = new Node(val);
-      if (this.isEmpty()) this.head = node;
-      else this.tail.next = node;
-      this.tail = node;
-      ++this.length;
-    }
-    dequeue() {
-      if (this.isEmpty()) return null;
-      const node = this.head;
-      this.head = this.head.next;
-      --this.length;
-      if (this.isEmpty()) this.tail = null;
-      return node;
-    }
-    isEmpty() {
-      return this.length === 0;
-    }
-  }
-
   // INIT
 
   // grid and grid traversal
@@ -202,7 +204,7 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
   const H = GRID.length;
   const W = GRID[0].length;
   const DIRS = [ [0, +1], [0, -1], [+1, 0], [-1, 0] ];
-  const possibleStarts = [];                                                        // will be filled in during input parsing
+  const possibleStarts = [];                                                          // will be filled in during input parsing
 
   // elevation map
   const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
@@ -210,19 +212,19 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
   for (let i = 0; i < 26; ++i) HEIGHTS[ALPHABET[i]] = i;
 
   // PARSE INPUT
-  let inputStartRow, inputStartCol;                                                 // will be discovered during input parsing
-  let endRow, endCol;                                                               // will be discovered during input parsing
+  let inputStartRow, inputStartCol;                                                   // will be discovered during input parsing
+  let endRow, endCol;                                                                 // will be discovered during input parsing
   for (let row = 0; row < H; ++row) {
     for (let col = 0; col < W; ++col) {
-      if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];      // PART 1: discover input start
-      if (GRID[row][col] === 'E') [endRow, endCol] = [row, col];                    // discover end
-      if (HEIGHTS[GRID[row][col]] === 0) possibleStarts.push([row, col]);           // PART 2: discover input start OR 'a'
+      if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];        // PART 1: discover input start
+      if (GRID[row][col] === 'E') [endRow, endCol] = [row, col];                      // discover end
+      if (HEIGHTS[GRID[row][col]] === 0) possibleStarts.push([row, col]);             // PART 2: discover input start OR 'a'
     }
   }
-  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                       // sanity check to make sure input start was found
+  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                         // sanity check to make sure input start was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF INPUT START';
   }
-  if ([ endRow, endCol ].includes(undefined)) {                                     // sanity check to make sure end was found
+  if ([ endRow, endCol ].includes(undefined)) {                                       // sanity check to make sure end was found
     throw 'ERROR: DID NOT DISCOVER COORDS OF END';
   }
 
@@ -235,44 +237,144 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
 
     // BFS
     while (!Q.isEmpty()) {
-      const node = Q.dequeue();                                                     // dequeue
-      const [row, col, moves] = node.val;                                           // extract data from node
+      const node = Q.dequeue();                                                       // dequeue
+      const [row, col, moves] = node.val;                                             // extract data from node
 
-      if (row === endRow && col === endCol) return moves;                           // END CONDITION: REACHED END
+      if (row === endRow && col === endCol) return moves;                             // END CONDITION: REACHED END
 
-      const serial = `${row},${col}`;                                               // check against visited coords to prevent cycles
+      const serial = `${row},${col}`;                                                 // check against visited coords to prevent cycles
       if (visited.has(serial)) continue;
       visited.add(serial);
 
-      const height = HEIGHTS[GRID[row][col]];                                       // get height of current position
+      const height = HEIGHTS[GRID[row][col]];                                         // get height of current position
 
-      for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
+      for (const [dy, dx] of DIRS) {                                                  // attempt to visit 4 neighbors
         const [ newRow, newCol ] = [ row + dy, col + dx ];
         if (
-          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
-          && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
+          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                      // target destination must be in bounds...
+          && HEIGHTS[GRID[newRow][newCol]] <= height + 1                              // ...and not more than 1 elevation higher
         ) {
           Q.enqueue([newRow, newCol, moves + 1]);
         }
       }
     }
 
-    return Infinity;                                                                // Infinity indicates that no path exists
+    return Infinity;                                                                  // Infinity indicates that no path exists
   }
 
-  if (part === 1) {                                                                 // PART 1: GET BEST PATH STARTING AT INPUT START
+  if (part === 1) {                                                                   // PART 1: GET BEST PATH STARTING AT INPUT START
 
     const best = getBestPathStartingAt(inputStartRow, inputStartCol);
-    if (best === Infinity) throw 'ERROR: DID NOT FIND PATH';                        // sanity check to make sure a path exists
+    if (best === Infinity) throw 'ERROR: DID NOT FIND PATH';                          // sanity check to make sure a path exists
     return best;
 
-  } else {                                                                          // PART 2: GET BEST PATH AMONG ALL POSSIBLE STARTS
+  } else {                                                                            // PART 2: GET BEST PATH AMONG ALL POSSIBLE STARTS
 
     let best = Infinity;
     for (const [row, col] of possibleStarts) {
-      best = Math.min(best, getBestPathStartingAt(row, col));                       // NOTE: some starts may not have a valid path!
+      best = Math.min(best, getBestPathStartingAt(row, col));                         // NOTE: some starts may not have a valid path!
     }
     return best;
+
+  }
+}
+
+
+// ========== SOLUTION 3: SAME SOLUTION FOR PART 1; IN PART 2, START AT THE END, AND END ON ANY COORD WITH ELEVATION 0
+
+function elevationBFS3 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
+
+  // INIT
+
+  // grid and grid traversal
+  const GRID = inputArr.map(str => str.split(''));
+  const H = GRID.length;
+  const W = GRID[0].length;
+  const DIRS = [ [0, +1], [0, -1], [+1, 0], [-1, 0] ];
+
+  // elevation map
+  const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
+  const HEIGHTS = { 'S': 0, 'E': 25 };
+  for (let i = 0; i < 26; ++i) HEIGHTS[ALPHABET[i]] = i;
+
+  // PARSE INPUT
+  let inputStartRow, inputStartCol;                                                   // will be discovered during input parsing
+  let endRow, endCol;                                                                 // will be discovered during input parsing
+  for (let row = 0; row < H; ++row) {
+    for (let col = 0; col < W; ++col) {
+      if (GRID[row][col] === 'S') [inputStartRow, inputStartCol] = [row, col];        // PART 1: discover input start
+      if (GRID[row][col] === 'E') [endRow, endCol] = [row, col];                      // discover end
+    }
+  }
+  if ([ inputStartRow, inputStartCol ].includes(undefined)) {                         // sanity check to make sure input start was found
+    throw 'ERROR: DID NOT DISCOVER COORDS OF INPUT START';
+  }
+  if ([ endRow, endCol ].includes(undefined)) {                                       // sanity check to make sure end was found
+    throw 'ERROR: DID NOT DISCOVER COORDS OF END';
+  }
+
+  // HELPER
+  function getBestPathStartingAt(startRow, startCol, traversalCB, terminationCB) {
+
+    // init
+    const Q = new Queue([startRow, startCol, 0]);
+    const visited = new Set();
+
+    // BFS
+    while (!Q.isEmpty()) {
+      const node = Q.dequeue();                                                       // dequeue
+      const [row, col, moves] = node.val;                                             // extract data from node
+
+      if (terminationCB(row, col)) return moves;                                      // END CONDITION: BASED ON TERMINATION CALLBACK
+
+      const serial = `${row},${col}`;                                                 // check against visited coords to prevent cycles
+      if (visited.has(serial)) continue;
+      visited.add(serial);
+
+      const height = HEIGHTS[GRID[row][col]];                                         // get height of current position
+
+      for (const [dy, dx] of DIRS) {                                                  // attempt to visit 4 neighbors
+        const [ newRow, newCol ] = [ row + dy, col + dx ];
+        if (
+          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                      // target destination must be in bounds...
+          && traversalCB(newRow, newCol, height)                                      // ...and destination is accessible based on traversal logic
+        ) {
+          Q.enqueue([newRow, newCol, moves + 1]);
+        }
+      }
+    }
+
+    return Infinity;                                                                  // Infinity indicates that no path exists
+  }
+
+  if (part === 1) {                                                                   // PART 1: GET BEST PATH STARTING AT INPUT START
+
+    const traversalCB = (row, col, h) => HEIGHTS[GRID[row][col]] <= h + 1;            // PART 1: target must be at most 1 elevation higher
+    const terminationCB = (row, col) => row === endRow && col === endCol;             // PART 1: callback checks if coord matches end coords
+    
+    const best = getBestPathStartingAt( inputStartRow,
+                                        inputStartCol,
+                                        traversalCB,
+                                        terminationCB);
+    if (best === Infinity) throw 'ERROR: DID NOT FIND PATH';                          // sanity check to make sure a path exists
+    return best;
+    
+  } else {                                                                            // PART 2: GET BEST PATH AMONG ALL POSSIBLE STARTS
+    
+    // clever trick: work backward! start at the end, and terminate when landing on any coords with elevation 0.
+
+    const traversalCB = (row, col, h) => HEIGHTS[GRID[row][col]] >= h - 1;            // PART 2: target must be at least 1 elevation lower
+    const terminationCB = (row, col) => HEIGHTS[GRID[row][col]] === 0;                // PART 2: callback checks if coord matches and 0 elevation
+
+    return getBestPathStartingAt( endRow,                                             // no need for sanity check since some path must exist from part 1
+                                  endCol,
+                                  traversalCB,
+                                  terminationCB);
 
   }
 }
@@ -283,7 +385,8 @@ const test = require('./_test');
 const testNum = [1];
 let input, expected;
 // const func = elevationBFS;
-const func = elevationBFS2;
+// const func = elevationBFS2;
+const func = elevationBFS3;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
