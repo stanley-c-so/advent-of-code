@@ -121,8 +121,7 @@ function elevationBFS (part, inputStr, DEBUG = false) {
       const height = HEIGHTS[GRID[row][col]];                                       // get height of current position
 
       for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
-        const newRow = row + dy;
-        const newCol = col + dx;
+        const [ newRow, newCol ] = [ row + dy, col + dx ];
         if (
           0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
           && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
@@ -248,8 +247,7 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
       const height = HEIGHTS[GRID[row][col]];                                       // get height of current position
 
       for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
-        const newRow = row + dy;
-        const newCol = col + dx;
+        const [ newRow, newCol ] = [ row + dy, col + dx ];
         if (
           0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
           && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
