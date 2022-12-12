@@ -110,19 +110,19 @@ function elevationBFS (part, inputStr, DEBUG = false) {
 
     // BFS
     while (Q.length > qPtr) {
-      const [r, c, moves] = Q[qPtr++];                                              // dequeue
+      const [row, col, moves] = Q[qPtr++];                                          // dequeue
 
-      if (r === endRow && c === endCol) return moves;                               // END CONDITION: REACHED END
+      if (row === endRow && col === endCol) return moves;                           // END CONDITION: REACHED END
 
-      const serial = `${r},${c}`;                                                   // check against visited coords to prevent cycles
+      const serial = `${row},${col}`;                                               // check against visited coords to prevent cycles
       if (visited.has(serial)) continue;
       visited.add(serial);
 
-      const height = HEIGHTS[GRID[r][c]];                                           // get height of current position
+      const height = HEIGHTS[GRID[row][col]];                                       // get height of current position
 
       for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
-        const newRow = r + dy;
-        const newCol = c + dx;
+        const newRow = row + dy;
+        const newCol = col + dx;
         if (
           0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
           && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
@@ -237,19 +237,19 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
     // BFS
     while (!Q.isEmpty()) {
       const node = Q.dequeue();                                                     // dequeue
-      const [r, c, moves] = node.val;                                               // extract data from node
+      const [row, col, moves] = node.val;                                           // extract data from node
 
-      if (r === endRow && c === endCol) return moves;                               // END CONDITION: REACHED END
+      if (row === endRow && col === endCol) return moves;                           // END CONDITION: REACHED END
 
-      const serial = `${r},${c}`;                                                   // check against visited coords to prevent cycles
+      const serial = `${row},${col}`;                                               // check against visited coords to prevent cycles
       if (visited.has(serial)) continue;
       visited.add(serial);
 
-      const height = HEIGHTS[GRID[r][c]];                                           // get height of current position
+      const height = HEIGHTS[GRID[row][col]];                                       // get height of current position
 
       for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
-        const newRow = r + dy;
-        const newCol = c + dx;
+        const newRow = row + dy;
+        const newCol = col + dx;
         if (
           0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
           && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
