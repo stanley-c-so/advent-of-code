@@ -243,7 +243,7 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
                                           : Math.max(grid[row + 1][col],
                                                       dp[row + 1][col].down);
         // check right
-        dp[row][col].right = col === W - 1 ? 0
+        dp[row][col].right = col === W - 1  ? 0
                                             : Math.max(grid[row][col + 1],
                                                         dp[row][col + 1].right);
       }
@@ -334,7 +334,7 @@ function visibleTrees2 (part, inputStr, DEBUG = false) {
           while (monotonicStack.length && monotonicStack.at(-1).highest < grid[row][col]) {
             monotonicStack.pop();
           }
-          dp[row][col].right = monotonicStack.length ? Math.abs(monotonicStack.at(-1).coord - col)
+          dp[row][col].right = monotonicStack.length  ? Math.abs(monotonicStack.at(-1).coord - col)
                                                       : W - 1 - col                                     // NOTE: DISTANCE TO EDGE CALCULATION BASED ON RIGHT EDGE
         }
         monotonicStack.push({ highest: grid[row][col], coord: col });
