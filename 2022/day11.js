@@ -323,7 +323,7 @@ function numberTransformations (part, inputStr, DEBUG = false) {
   const TRUE = Array(N);                                                                            // each element is a target monkey index
   const FALSE = Array(N);                                                                           // each element is a target monkey index
 
-  // PARSE DATA
+  // PARSE INPUT
   for (let i = 0; i < inputArr.length; ++i) {
     const MONKEY_DATA = inputArr[i].split('\r\n');
     if (MONKEY_DATA.length !== 6) throw `ERROR: INCORRECTLY PARSED INPUT`;                          // sanity check: each monkey should contain 6 lines of data
@@ -356,7 +356,7 @@ function numberTransformations (part, inputStr, DEBUG = false) {
     if (TRUE[i] === i || FALSE[i] === i) throw 'ERROR: MONKEY SHOULD NOT PASS ITEM TO ITSELF';      // sanity check: make sure no monkey ever passes to itself
   }
 
-  // INIT (CONT'D AFTER PARSING DATA)
+  // INIT (CONT'D AFTER PARSING INPUT)
 
   // at this point, a discussion of the math trick needed for part 2 is warranted. there, since we no longer divide items by 3 upon inspection, the numbers
   // will blow up out of control, leading to math errors. the trick, then, is to reduce the numbers in a way such that they still retain the same relevant
