@@ -121,13 +121,13 @@ function elevationBFS (part, inputStr, DEBUG = false) {
       const height = HEIGHTS[GRID[r][c]];                                           // get height of current position
 
       for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
-        const newY = r + dy;
-        const newX = c + dx;
+        const newRow = r + dy;
+        const newCol = c + dx;
         if (
-          0 <= newY && newY < H && 0 <= newX && newX < W                            // target destination must be in bounds...
-          && HEIGHTS[GRID[newY][newX]] <= height + 1                                // ...and not more than 1 elevation higher
+          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
+          && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
         ) {
-          Q.push([newY, newX, moves + 1]);
+          Q.push([newRow, newCol, moves + 1]);
         }
       }
     }
@@ -248,13 +248,13 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
       const height = HEIGHTS[GRID[r][c]];                                           // get height of current position
 
       for (const [dy, dx] of DIRS) {                                                // attempt to visit 4 neighbors
-        const newY = r + dy;
-        const newX = c + dx;
+        const newRow = r + dy;
+        const newCol = c + dx;
         if (
-          0 <= newY && newY < H && 0 <= newX && newX < W                            // target destination must be in bounds...
-          && HEIGHTS[GRID[newY][newX]] <= height + 1                                // ...and not more than 1 elevation higher
+          0 <= newRow && newRow < H && 0 <= newCol && newCol < W                    // target destination must be in bounds...
+          && HEIGHTS[GRID[newRow][newCol]] <= height + 1                            // ...and not more than 1 elevation higher
         ) {
-          Q.enqueue([newY, newX, moves + 1]);
+          Q.enqueue([newRow, newCol, moves + 1]);
         }
       }
     }
