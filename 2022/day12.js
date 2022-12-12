@@ -132,19 +132,20 @@ function elevationBFS (part, inputStr, DEBUG = false) {
       }
     }
 
-    if (part === 1) throw 'ERROR: DID NOT FIND PATH';                               // PART 1: sanity check to make sure a path exists
-    else return Infinity;                                                           // PART 2: some starts may not have a valid path!
+    return Infinity;                                                                // Infinity indicates that no path exists
   }
 
   if (part === 1) {                                                                 // PART 1: GET BEST PATH STARTING AT INPUT START
 
-    return getBestPathStartingAt(inputStartRow, inputStartCol);
+    const best = getBestPathStartingAt(inputStartRow, inputStartCol);
+    if (best === Infinity) throw 'ERROR: DID NOT FIND PATH';                        // sanity check to make sure a path exists
+    return best;
 
   } else {                                                                          // PART 2: GET BEST PATH AMONG ALL POSSIBLE STARTS
 
     let best = Infinity;
     for (const [row, col] of possibleStarts) {
-      best = Math.min(best, getBestPathStartingAt(row, col));                       // if start has no path, function returns Infinity
+      best = Math.min(best, getBestPathStartingAt(row, col));                       // NOTE: some starts may not have a valid path!
     }
     return best;
 
