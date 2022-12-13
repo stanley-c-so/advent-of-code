@@ -170,8 +170,7 @@ function readPackets (part, inputStr, DEBUG = false) {
     else if (Array.isArray(a) && Array.isArray(b)) {
       for (let i = 0; i < Math.min(a.length, b.length); ++i) {
         const res = compare(a[i], b[i]);
-        if (res === 1) return 1;
-        if (res === -1) return -1;
+        if (res !== 0) return res;
       }
       if (a.length < b.length) return 1;
       if (b.length < a.length) return -1;
@@ -278,8 +277,7 @@ function readPackets2 (part, inputStr, DEBUG = false) {
     else if (Array.isArray(a) && Array.isArray(b)) {
       for (let i = 0; i < Math.min(a.length, b.length); ++i) {
         const res = compare(a[i], b[i]);
-        if (res === 1) return 1;
-        if (res === -1) return -1;
+        if (res !== 0) return res;
       }
       if (a.length < b.length) return 1;
       if (b.length < a.length) return -1;
