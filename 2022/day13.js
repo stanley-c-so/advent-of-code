@@ -160,7 +160,7 @@ function readPackets (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
-  // HELPER COMPARE FUNCTION - USED FOR SORT IN PART 2
+  // HELPER COMPARE FUNCTION
   function compare(a, b) {
     if (typeof a === 'number' && typeof b === 'number') {                                             // either a and b are both numbers...
       if (a < b) return 1;
@@ -266,7 +266,7 @@ function readPackets2 (part, inputStr, DEBUG = false) {
     throw 'ERROR: UNEXPECTED END OF STRING';
   }
 
-  // HELPER COMPARE FUNCTION - USED FOR SORT IN PART 2
+  // HELPER COMPARE FUNCTION
   function compare(a, b) {
     if (typeof a === 'number' && typeof b === 'number') {                                             // either a and b are both numbers...
       if (a < b) return 1;
