@@ -162,25 +162,22 @@ function readPackets (part, inputStr, DEBUG = false) {
 
   // HELPER COMPARE FUNCTION - USED FOR SORT IN PART 2
   function compare(a, b) {
-    if (typeof a === 'number' && typeof b === 'number') {
+    if (typeof a === 'number' && typeof b === 'number') {                                             // either a and b are both numbers...
       if (a < b) return 1;
       if (b < a) return -1;
       return 0;
-    }
-    else if (Array.isArray(a) && Array.isArray(b)) {
-      for (let i = 0; i < Math.min(a.length, b.length); ++i) {
-        const res = compare(a[i], b[i]);
-        if (res !== 0) return res;
+    } else {                                                                                          // ...or at least one is an array...
+      if (typeof a === 'number') a = [a];                                                             // ...so make sure for each one...
+      else if (typeof b === 'number') b = [b];                                                        // ...if it is a number, it gets converted to array
+
+      for (let i = 0; i < Math.min(a.length, b.length); ++i) {                                        // run through both arrays...
+        const res = compare(a[i], b[i]);                                                              // ...recursing compare on corresponding elements...
+        if (res) return res;                                                                          // ...and immediately returning if result is not 0
       }
-      if (a.length < b.length) return 1;
-      if (b.length < a.length) return -1;
-      return 0;
-    }
-    else {
-      if (typeof a === 'number') a = [a];
-      else if (typeof b === 'number') b = [b];
-      else throw 'ERROR: WRONG TYPE';
-      return compare(a, b);
+
+      if (a.length < b.length) return 1;                                                              // if one array runs out before the other...
+      if (b.length < a.length) return -1;                                                             // ...return 1 or -1 based on which is shorter...
+      return 0;                                                                                       // ...or 0 if same length
     }
   }
 
@@ -206,10 +203,12 @@ function readPackets (part, inputStr, DEBUG = false) {
 
     // look for the indices of the two special divider packets
     let idx1 = null, idx2 = null;
-    const check = (el, target) => el.length === 1
-                                  && Array.isArray(el[0])
-                                  && el[0].length === 1
-                                  && el[0][0] === target;
+    const check = (el, target) =>
+                                  Array.isArray(el) &&                                                // (OPTIONAL) since all packets are arrays
+                                  el.length === 1 &&                                                  // check to see if el matches divider packet...
+                                  Array.isArray(el[0]) &&                                             // ...[[x]] (where x is target)
+                                  el[0].length === 1 &&
+                                  el[0][0] === target;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
       if (check(PACKET_LIST[i], DIVIDER1)) idx1 = i + 1;                                              // NOTE: indices are 1-indexed
       if (check(PACKET_LIST[i], DIVIDER2)) idx2 = i + 1;                                              // NOTE: indices are 1-indexed
@@ -269,25 +268,22 @@ function readPackets2 (part, inputStr, DEBUG = false) {
 
   // HELPER COMPARE FUNCTION - USED FOR SORT IN PART 2
   function compare(a, b) {
-    if (typeof a === 'number' && typeof b === 'number') {
+    if (typeof a === 'number' && typeof b === 'number') {                                             // either a and b are both numbers...
       if (a < b) return 1;
       if (b < a) return -1;
       return 0;
-    }
-    else if (Array.isArray(a) && Array.isArray(b)) {
-      for (let i = 0; i < Math.min(a.length, b.length); ++i) {
-        const res = compare(a[i], b[i]);
-        if (res !== 0) return res;
+    } else {                                                                                          // ...or at least one is an array...
+      if (typeof a === 'number') a = [a];                                                             // ...so make sure for each one...
+      else if (typeof b === 'number') b = [b];                                                        // ...if it is a number, it gets converted to array
+
+      for (let i = 0; i < Math.min(a.length, b.length); ++i) {                                        // run through both arrays...
+        const res = compare(a[i], b[i]);                                                              // ...recursing compare on corresponding elements...
+        if (res) return res;                                                                          // ...and immediately returning if result is not 0
       }
-      if (a.length < b.length) return 1;
-      if (b.length < a.length) return -1;
-      return 0;
-    }
-    else {
-      if (typeof a === 'number') a = [a];
-      else if (typeof b === 'number') b = [b];
-      else throw 'ERROR: WRONG TYPE';
-      return compare(a, b);
+
+      if (a.length < b.length) return 1;                                                              // if one array runs out before the other...
+      if (b.length < a.length) return -1;                                                             // ...return 1 or -1 based on which is shorter...
+      return 0;                                                                                       // ...or 0 if same length
     }
   }
 
@@ -313,10 +309,12 @@ function readPackets2 (part, inputStr, DEBUG = false) {
 
     // look for the indices of the two special divider packets
     let idx1 = null, idx2 = null;
-    const check = (el, target) => el.length === 1
-                                  && Array.isArray(el[0])
-                                  && el[0].length === 1
-                                  && el[0][0] === target;
+    const check = (el, target) =>
+                                  Array.isArray(el) &&                                                // (OPTIONAL) since all packets are arrays
+                                  el.length === 1 &&                                                  // check to see if el matches divider packet...
+                                  Array.isArray(el[0]) &&                                             // ...[[x]] (where x is target)
+                                  el[0].length === 1 &&
+                                  el[0][0] === target;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
       if (check(PACKET_LIST[i], DIVIDER1)) idx1 = i + 1;                                              // NOTE: indices are 1-indexed
       if (check(PACKET_LIST[i], DIVIDER2)) idx2 = i + 1;                                              // NOTE: indices are 1-indexed
