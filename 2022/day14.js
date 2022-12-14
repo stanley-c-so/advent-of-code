@@ -171,6 +171,11 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
+  // OPTIONAL VARIABLES
+  const OPTIMIZE = true;
+  const DRAW = true;
+  const DRAW_EVERY = 10;
+
   // INIT
   const SAND_ENTRY_X = 500;
   const SAND_ENTRY_Y = 0;
@@ -178,19 +183,23 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   // PARSE DATA: GET WALLS, maxY, FLOOR, AND maxX
   const WALLS = [];
   let maxY = 0;
+  let minX = 0;
+  if (OPTIMIZE) minX = Infinity;                                                                // (OPTIONAL OPTIMIZATION)
   for (const line of inputArr) {
     const currentWall = [];
     for (const [x, y] of line.split(' -> ').map(coord => coord.split(',').map(n => +n))) {
       currentWall.push([x, y]);
       maxY = Math.max(maxY, y);
+      if (OPTIMIZE) minX = Math.min(minX, x);                                                   // (OPTIONAL OPTIMIZATION)
     }
     WALLS.push(currentWall);
   }
   const FLOOR = maxY + 2;
-  const maxX = SAND_ENTRY_X + FLOOR;                                                            // maxX: if a grain of sand starts at entry point and keeps falling right
+  const maxX = SAND_ENTRY_X + FLOOR - SAND_ENTRY_Y;                                             // maxX: if a grain of sand starts at entry point and keeps falling right
+  if (OPTIMIZE) minX = Math.min(minX, SAND_ENTRY_X - FLOOR - SAND_ENTRY_Y);                     // (OPTIONAL OPTIMIZATION)
 
   // BUILD GRID BASED ON maxX, maxY
-  const GRID = Array.from({length: maxY + 3}, () => Array(maxX + 1).fill('.'));                 // maxX, maxY are 0-indexed; also, need to give 2 additional rows for part 2 (FLOOR)
+  const GRID = Array.from({length: maxY + 3}, () => Array(maxX - minX + 1).fill('.'));          // maxX, maxY are 0-indexed; also, need to give 2 additional rows for part 2 (FLOOR)
 
   // DRAW WALLS INTO GRID
   for (const wall of WALLS) {
@@ -207,36 +216,39 @@ function fillWithSand (part, inputStr, DEBUG = false) {
 
       if (y2 > y1) {                                                                            // going up
         while (y <= y2) {
-          GRID[y][x] = '#';
+          GRID[y][x - minX] = '#';
           ++y;
         }
       }
 
       else if (y2 < y1) {                                                                       // going down
         while (y >= y2) {
-          GRID[y][x] = '#';
+          GRID[y][x - minX] = '#';
           --y;
         }
       }
 
       else if (x2 > x1) {                                                                       // going right
         while (x <= x2) {
-          GRID[y][x] = '#';
+          GRID[y][x - minX] = '#';
           ++x;
         }
       }
 
       else if (x2 < x1) {                                                                       // going left
         while (x >= x2) {
-          GRID[y][x] = '#';
+          GRID[y][x - minX] = '#';
           --x;
         }
       }
     }
   }
 
+  // MARK SAND ENTRY POINT WITH '+'
+  GRID[SAND_ENTRY_Y][SAND_ENTRY_X - minX] = '+';
+
   // DRAW FLOOR INTO GRID
-  for (let x = 0; x <= maxX; ++x) GRID[FLOOR][x] = '#';
+  for (let x = 0; x <= maxX; ++x) GRID[FLOOR][x - minX] = '#';
 
   // INIT SAND POSITION AND COUNT
   let sandX = SAND_ENTRY_X;
@@ -244,29 +256,39 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   let count = 0;
 
   const endCondition = () => part === 1 ? sandY === maxY                                      // PART 1: if a grain of sand reaches lowest wall (and thus will continue to fall)
-                                        : GRID[SAND_ENTRY_Y][SAND_ENTRY_X] === 'o';           // PART 2: sand entry point fills up with sand
+                                        : GRID[SAND_ENTRY_Y][SAND_ENTRY_X - minX] === 'o';    // PART 2: sand entry point fills up with sand
+
+  function optionalDraw() {
+    if (DEBUG && DRAW) {
+      console.log(`${count} GRAINS OF SAND AT REST:`);
+      for (const row of GRID) console.log(row.join(' '));
+      console.log('');
+    }
+  }
 
   // SIMULATE
   while (true) {
     if (endCondition()) {                                                                     // end simulation
+      optionalDraw();
       break;
     }
-    else if (GRID[sandY + 1][sandX] === '.') {                                                // check down for air
+    else if (GRID[sandY + 1][sandX - minX] === '.') {                                         // check down for air
       ++sandY;
     }
-    else if (GRID[sandY + 1][sandX - 1] === '.') {                                            // check down-left for air
+    else if (GRID[sandY + 1][sandX - 1 - minX] === '.') {                                     // check down-left for air
       ++sandY;
       --sandX;
     }
-    else if (GRID[sandY + 1][sandX + 1] === '.') {                                            // check down-right for air
+    else if (GRID[sandY + 1][sandX + 1 - minX] === '.') {                                     // check down-right for air
       ++sandY;
       ++sandX;
     }
     else {                                                                                    // sand comes to rest at current position
-      GRID[sandY][sandX] = 'o';
+      GRID[sandY][sandX - minX] = 'o';
       ++count;
       sandX = SAND_ENTRY_X;
       sandY = SAND_ENTRY_Y;
+      if (count % DRAW_EVERY === 0) optionalDraw();
     }
   }
 
