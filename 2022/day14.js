@@ -179,6 +179,7 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   // INIT
   const SAND_ENTRY_X = 500;
   const SAND_ENTRY_Y = 0;
+  const DISTANCE_BETWEEN_MAXY_AND_FLOOR = 2;
 
   // PARSE DATA: GET WALLS, maxY, FLOOR, AND maxX
   const WALLS = [];
@@ -194,13 +195,14 @@ function fillWithSand (part, inputStr, DEBUG = false) {
     }
     WALLS.push(currentWall);
   }
-  const FLOOR = maxY + 2;
+  const FLOOR = maxY + DISTANCE_BETWEEN_MAXY_AND_FLOOR;
   const maxX = SAND_ENTRY_X + FLOOR - SAND_ENTRY_Y;                                             // maxX: if a grain of sand starts at entry point and keeps falling right
   const minY = OPTIMIZE_GRID ? SAND_ENTRY_Y : 0;                                                // not really needed here, but supports non-0 SAND_ENTRY_Y
   if (OPTIMIZE_GRID) minX = Math.min(minX, SAND_ENTRY_X - FLOOR - SAND_ENTRY_Y);                // (OPTIONAL OPTIMIZATION)
 
   // BUILD GRID BASED ON maxX, maxY
-  const GRID = Array.from({length: maxY + 3}, () => Array(maxX - minX + 1).fill('.'));          // maxX, maxY are 0-indexed; also, need to give 2 additional rows for part 2 (FLOOR)
+  const GRID = Array.from({length: maxY + DISTANCE_BETWEEN_MAXY_AND_FLOOR + 1},                 // maxX, maxY are 0-indexed
+                          () => Array(maxX - minX + 1).fill('.'));
 
   // DRAW WALLS INTO GRID
   for (const wall of WALLS) {
