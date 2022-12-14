@@ -151,7 +151,7 @@ Organize all of the packets into the correct order. What is the decoder key for 
 
 */
 
-// ========== SOLUTION 1: USES JAVASCRIPT'S BUILT-IN eval FUNCTION
+// ========== SOLUTION 1: USES JAVASCRIPT'S BUILT-IN eval AND JSON.stringify FUNCTIONS
 
 function readPackets (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n\r\n');
@@ -193,9 +193,9 @@ function readPackets (part, inputStr, DEBUG = false) {
   } else {                                                                                            // PART 2: ADD 2 ELS, SORT, FIND POSITIONS
 
     // create new data (merge pairs together, add two new special elements)
-    const DIVIDER1 = 2;
-    const DIVIDER2 = 6;
-    const PACKET_LIST = [ [[DIVIDER1]], [[DIVIDER2]] ];
+    const DIVIDER1 = [[2]];
+    const DIVIDER2 = [[6]];
+    const PACKET_LIST = [ DIVIDER1, DIVIDER2 ];
     for (const pair of inputArr) PACKET_LIST.push(...pair.split('\r\n').map(str => eval(str)));
 
     // sort data on the basis of compare function
@@ -203,15 +203,9 @@ function readPackets (part, inputStr, DEBUG = false) {
 
     // look for the indices of the two special divider packets
     let idx1 = null, idx2 = null;
-    const check = (el, target) =>
-                                  Array.isArray(el) &&                                                // (OPTIONAL) since all packets are arrays
-                                  el.length === 1 &&                                                  // check to see if el matches divider packet...
-                                  Array.isArray(el[0]) &&                                             // ...[[x]] (where x is target)
-                                  el[0].length === 1 &&
-                                  el[0][0] === target;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
-      if (check(PACKET_LIST[i], DIVIDER1)) idx1 = i + 1;                                              // NOTE: indices are 1-indexed
-      if (check(PACKET_LIST[i], DIVIDER2)) idx2 = i + 1;                                              // NOTE: indices are 1-indexed
+      if (JSON.stringify(PACKET_LIST[i]) === JSON.stringify(DIVIDER1)) idx1 = i + 1;                  // NOTE: indices are 1-indexed
+      if (JSON.stringify(PACKET_LIST[i]) === JSON.stringify(DIVIDER2)) idx2 = i + 1;                  // NOTE: indices are 1-indexed
     }
     if ([idx1, idx2].includes(null)) throw 'ERROR: DID NOT FIND ONE OR MORE OF THE SPECIAL PACKETS';
     return idx1 * idx2;
@@ -299,25 +293,19 @@ function readPackets2 (part, inputStr, DEBUG = false) {
   } else {                                                                                            // PART 2: ADD 2 ELS, SORT, FIND POSITIONS
 
     // create new data (merge pairs together, add two new special elements)
-    const DIVIDER1 = 2;
-    const DIVIDER2 = 6;
-    const PACKET_LIST = [ [[DIVIDER1]], [[DIVIDER2]] ];
-    for (const pair of inputArr) PACKET_LIST.push(...pair.split('\r\n').map(str => EVAL(str)));
+    const DIVIDER1 = [[2]];
+    const DIVIDER2 = [[6]];
+    const PACKET_LIST = [ DIVIDER1, DIVIDER2 ];
+    for (const pair of inputArr) PACKET_LIST.push(...pair.split('\r\n').map(str => eval(str)));
 
     // sort data on the basis of compare function
     PACKET_LIST.sort((a, b) => compare(b, a));
 
     // look for the indices of the two special divider packets
     let idx1 = null, idx2 = null;
-    const check = (el, target) =>
-                                  Array.isArray(el) &&                                                // (OPTIONAL) since all packets are arrays
-                                  el.length === 1 &&                                                  // check to see if el matches divider packet...
-                                  Array.isArray(el[0]) &&                                             // ...[[x]] (where x is target)
-                                  el[0].length === 1 &&
-                                  el[0][0] === target;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
-      if (check(PACKET_LIST[i], DIVIDER1)) idx1 = i + 1;                                              // NOTE: indices are 1-indexed
-      if (check(PACKET_LIST[i], DIVIDER2)) idx2 = i + 1;                                              // NOTE: indices are 1-indexed
+      if (JSON.stringify(PACKET_LIST[i]) === JSON.stringify(DIVIDER1)) idx1 = i + 1;                  // NOTE: indices are 1-indexed
+      if (JSON.stringify(PACKET_LIST[i]) === JSON.stringify(DIVIDER2)) idx2 = i + 1;                  // NOTE: indices are 1-indexed
     }
     if ([idx1, idx2].includes(null)) throw 'ERROR: DID NOT FIND ONE OR MORE OF THE SPECIAL PACKETS';
     return idx1 * idx2;
