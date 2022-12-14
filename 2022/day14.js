@@ -172,7 +172,8 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   // }
 
   // INIT
-  const [ SAND_ENTRY_X, SAND_ENTRY_Y ] = [ 500, 0 ];
+  const SAND_ENTRY_X = 500;
+  const SAND_ENTRY_Y = 0;
 
   // PARSE DATA: GET WALLS, maxY, FLOOR, AND maxX
   const WALLS = [];
