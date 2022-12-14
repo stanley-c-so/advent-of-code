@@ -172,9 +172,9 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   // }
 
   // OPTIONAL VARIABLES
-  const OPTIMIZE = true;
-  const DRAW = true;
-  const DRAW_EVERY = 10;
+  const OPTIMIZE_GRID = true;                                                                   // adjust minX, minY to make grid smaller
+  const DRAW = true;                                                                            // for sample data, draw state on sand rest or at end
+  const DRAW_EVERY = 10;                                                                        // draw only on the resolution of every N grains of sand
 
   // INIT
   const SAND_ENTRY_X = 500;
@@ -184,20 +184,20 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   const WALLS = [];
   let maxY = 0;
   let minX = 0;
-  if (OPTIMIZE) minX = Infinity;                                                                // (OPTIONAL OPTIMIZATION)
+  if (OPTIMIZE_GRID) minX = Infinity;                                                           // (OPTIONAL OPTIMIZATION)
   for (const line of inputArr) {
     const currentWall = [];
     for (const [x, y] of line.split(' -> ').map(coord => coord.split(',').map(n => +n))) {
       currentWall.push([x, y]);
       maxY = Math.max(maxY, y);
-      if (OPTIMIZE) minX = Math.min(minX, x);                                                   // (OPTIONAL OPTIMIZATION)
+      if (OPTIMIZE_GRID) minX = Math.min(minX, x);                                              // (OPTIONAL OPTIMIZATION)
     }
     WALLS.push(currentWall);
   }
   const FLOOR = maxY + 2;
   const maxX = SAND_ENTRY_X + FLOOR - SAND_ENTRY_Y;                                             // maxX: if a grain of sand starts at entry point and keeps falling right
-  const minY = OPTIMIZE ? SAND_ENTRY_Y : 0;                                                     // not really needed here, but supports non-0 SAND_ENTRY_Y
-  if (OPTIMIZE) minX = Math.min(minX, SAND_ENTRY_X - FLOOR - SAND_ENTRY_Y);                     // (OPTIONAL OPTIMIZATION)
+  const minY = OPTIMIZE_GRID ? SAND_ENTRY_Y : 0;                                                // not really needed here, but supports non-0 SAND_ENTRY_Y
+  if (OPTIMIZE_GRID) minX = Math.min(minX, SAND_ENTRY_X - FLOOR - SAND_ENTRY_Y);                // (OPTIONAL OPTIMIZATION)
 
   // BUILD GRID BASED ON maxX, maxY
   const GRID = Array.from({length: maxY + 3}, () => Array(maxX - minX + 1).fill('.'));          // maxX, maxY are 0-indexed; also, need to give 2 additional rows for part 2 (FLOOR)
