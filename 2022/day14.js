@@ -261,7 +261,7 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   function optionalDraw() {
     if (DEBUG && DRAW) {
       console.log(`${count} GRAINS OF SAND AT REST:`);
-      for (const row of GRID) console.log(row.join(' '));
+      for (const row of GRID) console.log(row.map(c => c === '.' ? ' ' : c).join(' '));
       console.log('');
     }
   }
