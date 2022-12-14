@@ -214,7 +214,7 @@ function readPackets (part, inputStr, DEBUG = false) {
 }
 
 
-// ========== SOLUTION 2: USES MY OWN 'EVAL' FUNCTION
+// ========== SOLUTION 2: USES MY OWN 'EVAL' AND 'STRINGIFY' FUNCTIONS
 
 function readPackets2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n\r\n');
@@ -258,6 +258,12 @@ function readPackets2 (part, inputStr, DEBUG = false) {
     }
 
     throw 'ERROR: UNEXPECTED END OF STRING';
+  }
+
+  // HELPER STRINGIFY FUNCTION
+  function STRINGIFY(input) {
+    return typeof input === 'number'  ? String(input)
+                                      : '[' + input.map(el => STRINGIFY(el)).join(',') + ']';
   }
 
   // HELPER COMPARE FUNCTION
@@ -304,8 +310,8 @@ function readPackets2 (part, inputStr, DEBUG = false) {
     // look for the indices of the two special divider packets
     let idx1 = null, idx2 = null;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
-      if (JSON.stringify(PACKET_LIST[i]) === JSON.stringify(DIVIDER1)) idx1 = i + 1;                  // NOTE: indices are 1-indexed
-      if (JSON.stringify(PACKET_LIST[i]) === JSON.stringify(DIVIDER2)) idx2 = i + 1;                  // NOTE: indices are 1-indexed
+      if (STRINGIFY(PACKET_LIST[i]) === STRINGIFY(DIVIDER1)) idx1 = i + 1;                            // NOTE: indices are 1-indexed
+      if (STRINGIFY(PACKET_LIST[i]) === STRINGIFY(DIVIDER2)) idx2 = i + 1;                            // NOTE: indices are 1-indexed
     }
     if ([idx1, idx2].includes(null)) throw 'ERROR: DID NOT FIND ONE OR MORE OF THE SPECIAL PACKETS';
     return idx1 * idx2;
