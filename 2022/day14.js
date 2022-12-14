@@ -196,7 +196,7 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   }
   const FLOOR = maxY + 2;
   const maxX = SAND_ENTRY_X + FLOOR - SAND_ENTRY_Y;                                             // maxX: if a grain of sand starts at entry point and keeps falling right
-  const minY = SAND_ENTRY_Y;                                                                    // not really needed here, but supports non-0 SAND_ENTRY_Y
+  const minY = OPTIMIZE ? SAND_ENTRY_Y : 0;                                                     // not really needed here, but supports non-0 SAND_ENTRY_Y
   if (OPTIMIZE) minX = Math.min(minX, SAND_ENTRY_X - FLOOR - SAND_ENTRY_Y);                     // (OPTIONAL OPTIMIZATION)
 
   // BUILD GRID BASED ON maxX, maxY
