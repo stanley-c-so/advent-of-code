@@ -253,10 +253,14 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
           || getRanges[0][0] > 0                                                            // the non-eliminated x is at the left edge of search area
           || getRanges[0][1] < LIMIT_OF_SEARCH_AREA) {                                      // the non-eliminated x is at the right edge of search area
         
-        if (getRanges.length > 1 && getRanges[1][0] - getRanges[0][1] !== 2) {              // sanity check to make sure only 1 value of x is not eliminated
-          throw `ERROR: TOO MANY NON-ELIMINATED VALUES OF x: ${
-            getRanges[1][0] - getRanges[0][1] - 1
-          }`;
+        if (getRanges.length > 1) {
+          if (getRanges.length !== 2) {                                                     // sanity check to make sure only 1 gap of possible x values
+            throw 'ERROR: TOO MANY GAPS BETWEEN ELIMINATED VALUES OF x';
+          }
+          const sizeOfGap = getRanges[1][0] - getRanges[0][1] - 1;
+          if (sizeOfGap !== 1) {                                                            // sanity check to make sure only 1 value of x is not eliminated
+            throw `ERROR: TOO MANY NON-ELIMINATED VALUES OF x: ${sizeOfGap}`;
+          }
         }
         
         const TIME_AT_END = Date.now();
