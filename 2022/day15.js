@@ -546,25 +546,28 @@ function analyzeSensorCoverage3 (part, inputStr, extraParam, DEBUG = false) {
   }
 
   // HELPER FUNCTION
-  const MEMO = {};
   function getRangesOfEliminatedXValues(row) {
-    if (!(row in MEMO)) {
-      // init
-      const ranges = [];
+    const MEMO = {};
+    function helper(row) {
+      if (!(row in MEMO)) {
+        // init
+        const ranges = [];
 
-      // iterate through sensor data
-      for (const sensor in SENSOR_DATA) {                                                   // check every sensor to see if you can make eliminations in row
-        const [sensorX, sensorY] = sensor.split(',').map(n => +n);
-        const vertDistanceToRow = Math.abs(row - sensorY);
-        if (vertDistanceToRow > SENSOR_DATA[sensor].manhattanDistance) continue;            // this sensor's eliminated area does not reach row; skip it
-        const horizDistance = SENSOR_DATA[sensor].manhattanDistance - vertDistanceToRow;
-        ranges.push([sensorX - horizDistance, sensorX + horizDistance]);
+        // iterate through sensor data
+        for (const sensor in SENSOR_DATA) {                                                 // check every sensor to see if you can make eliminations in row
+          const [sensorX, sensorY] = sensor.split(',').map(n => +n);
+          const vertDistanceToRow = Math.abs(row - sensorY);
+          if (vertDistanceToRow > SENSOR_DATA[sensor].manhattanDistance) continue;          // this sensor's eliminated area does not reach row; skip it
+          const horizDistance = SENSOR_DATA[sensor].manhattanDistance - vertDistanceToRow;
+          ranges.push([sensorX - horizDistance, sensorX + horizDistance]);
+        }
+
+        // merge overlapping intervals to get true range of eliminated x values
+        MEMO[row] = mergeOverlappingRanges(ranges);
       }
-
-      // merge overlapping intervals to get true range of eliminated x values
-      MEMO[row] = mergeOverlappingRanges(ranges);
+      return MEMO[row];
     }
-    return MEMO[row];
+    return helper(row);
   }
 
   // ANALYZE
