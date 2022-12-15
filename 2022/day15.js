@@ -210,6 +210,10 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     const ROW_TO_CHECK = extraParam;
     const ranges = getRangesOfEliminatedXValues(ROW_TO_CHECK);
 
+    // NOTE: it turns out that ranges above will only have 1 range with our data. in other words, our data would have it such that all ranges of
+    // eliminated x values for given row y from the various sensors will overlap. however, going forward, i will NOT make that assumption, and for
+    // purposes of part 1 i will account for the possibility of gaps in between the ranges of eliminated x values for given row y.
+
     // find intervals of gaps
     const gaps = [];
     for (let i = 0; i < ranges.length - 1; ++i) {
@@ -226,10 +230,9 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     const gapsWithBeacons = mergeOverlappingRanges(gaps);
 
     // calculate number of eliminated x values
-    let gapCount = 0;
-    for (const [start, end] of gapsWithBeacons) gapCount += end - start + 1;
-    const spread = ranges.at(-1)[1] - ranges[0][0] + 1;                                     // it turns out there is only 1 range (no gaps), but i won't assume this
-    return spread - gapCount;
+    const spreadOfEliminatedXValues = ranges.at(-1)[1] - ranges[0][0] + 1;
+    const gapCount = gapsWithBeacons.reduce((count, [s, e]) => count += e - s + 1, 0);
+    return spreadOfEliminatedXValues - gapCount;
 
   } else {                                                                                  // PART 2: FIND COORDS OF UNKNOWN DISTRESS BEACON
 
