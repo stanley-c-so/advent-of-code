@@ -247,9 +247,10 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     // for (let y = DEBUG ? 0 : 2000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 2000000
     // for (let y = DEBUG ? 0 : 3000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 3000000
     // for (let y = DEBUG ? 0 : 3017867; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at correct answer
+    
       const ranges = getRangesOfEliminatedXValues(y);
 
-      // check if this row has a single value of x not eliminated:
+      // CHECK IF THIS ROW HAS A SINGLE VALUE OF x NOT ELIMINATED:
 
       // 1) the non-eliminated x is in the middle of the row somewhere
       if (ranges.length > 1) {
@@ -270,12 +271,12 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
       }
 
       // 2) the non-eliminated x is at the left edge of search area
-      else if (ranges[0][0] > 0) {                                                          // NOTE: this is an improbable edge case that doesn't happen)
+      else if (ranges[0][0] > 0) {                                                          // NOTE: this is an improbable edge case that doesn't happen
         return y;                                                                           // x is 0
       }
 
       // 3) the non-eliminated x is at the right edge of search area
-      else if (ranges[0][1] < LIMIT_OF_SEARCH_AREA) {                                       // NOTE: this is an improbable edge case that doesn't happen)
+      else if (ranges[0][1] < LIMIT_OF_SEARCH_AREA) {                                       // NOTE: this is an improbable edge case that doesn't happen
         return LIMIT_OF_SEARCH_AREA * TUNING_FREQUENCY_X_MULTIPLER + y;                     // x is LIMIT_OF_SEARCH_AREA
       }
 
