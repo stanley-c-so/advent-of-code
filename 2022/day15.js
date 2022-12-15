@@ -167,14 +167,16 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     SENSOR_DATA[sensor] = { beacon, manhattanDistance };
 
     // OPTIONAL
-    if (EXPLORE_MIN_MAX) minSensorX = Math.min(minSensorX, sensorX);
-    if (EXPLORE_MIN_MAX) maxSensorX = Math.max(maxSensorX, sensorX);
-    if (EXPLORE_MIN_MAX) minSensorY = Math.min(minSensorY, sensorY);
-    if (EXPLORE_MIN_MAX) maxSensorY = Math.max(maxSensorY, sensorY);
-    if (EXPLORE_MIN_MAX) minBeaconX = Math.min(minBeaconX, beaconX);
-    if (EXPLORE_MIN_MAX) maxBeaconX = Math.max(maxBeaconX, beaconX);
-    if (EXPLORE_MIN_MAX) minBeaconY = Math.min(minBeaconY, beaconY);
-    if (EXPLORE_MIN_MAX) maxBeaconY = Math.max(maxBeaconY, beaconY);
+    if (EXPLORE_MIN_MAX) {
+      minSensorX = Math.min(minSensorX, sensorX);
+      maxSensorX = Math.max(maxSensorX, sensorX);
+      minSensorY = Math.min(minSensorY, sensorY);
+      maxSensorY = Math.max(maxSensorY, sensorY);
+      minBeaconX = Math.min(minBeaconX, beaconX);
+      maxBeaconX = Math.max(maxBeaconX, beaconX);
+      minBeaconY = Math.min(minBeaconY, beaconY);
+      maxBeaconY = Math.max(maxBeaconY, beaconY);
+    }
   }
 
   if (EXPLORE_MIN_MAX) {
