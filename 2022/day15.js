@@ -176,6 +176,7 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     if (EXPLORE_MIN_MAX) minBeaconY = Math.min(minBeaconY, beaconY);
     if (EXPLORE_MIN_MAX) maxBeaconY = Math.max(maxBeaconY, beaconY);
   }
+
   if (EXPLORE_MIN_MAX) {
     console.log(`sensorX: from ${minSensorX} to ${maxSensorX}`);
     console.log(`sensorY: from ${minSensorY} to ${maxSensorY}`);
@@ -246,29 +247,38 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     // for (let y = DEBUG ? 0 : 2000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 2000000
     // for (let y = DEBUG ? 0 : 3000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 3000000
     // for (let y = DEBUG ? 0 : 3017867; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at correct answer
-      const getRanges = getRangesOfEliminatedXValues(y);
+      const ranges = getRangesOfEliminatedXValues(y);
 
-      // check if this row has a single value of x not eliminated
-      if (getRanges.length > 1                                                              // the non-eliminated x is in the middle of the row
-          || getRanges[0][0] > 0                                                            // the non-eliminated x is at the left edge of search area
-          || getRanges[0][1] < LIMIT_OF_SEARCH_AREA) {                                      // the non-eliminated x is at the right edge of search area
+      // check if this row has a single value of x not eliminated:
+
+      // 1) the non-eliminated x is in the middle of the row somewhere
+      if (ranges.length > 1) {
         
-        if (getRanges.length > 1) {
-          if (getRanges.length !== 2) {                                                     // sanity check to make sure only 1 gap of possible x values
-            throw 'ERROR: TOO MANY GAPS BETWEEN ELIMINATED VALUES OF x';
-          }
-          const sizeOfGap = getRanges[1][0] - getRanges[0][1] - 1;
-          if (sizeOfGap !== 1) {                                                            // sanity check to make sure only 1 value of x is not eliminated
-            throw `ERROR: TOO MANY NON-ELIMINATED VALUES OF x: ${sizeOfGap}`;
-          }
+        if (ranges.length !== 2) {                                                          // sanity check to make sure only 1 gap of possible x values
+          throw 'ERROR: TOO MANY GAPS BETWEEN ELIMINATED VALUES OF x';
+        }
+        const sizeOfGap = ranges[1][0] - ranges[0][1] - 1;
+        if (sizeOfGap !== 1) {                                                              // sanity check to make sure only 1 value of x is not eliminated
+          throw `ERROR: TOO MANY NON-ELIMINATED VALUES OF x: ${sizeOfGap}`;
         }
         
         const TIME_AT_END = Date.now();
         if (!DEBUG) console.log(`RUN TOOK ${(TIME_AT_END - TIME_AT_START) / 1000} SECS`);
 
-        const x = getRanges[0][1] + 1;                                                      // found x; y is given by index in for loop
+        const x = ranges[0][1] + 1;                                                         // found x; y is given by index in for loop
         return x * TUNING_FREQUENCY_X_MULTIPLER + y;
       }
+
+      // 2) the non-eliminated x is at the left edge of search area
+      else if (ranges[0][0] > 0) {                                                          // NOTE: this is an improbable edge case that doesn't happen)
+        return y;                                                                           // x is 0
+      }
+
+      // 3) the non-eliminated x is at the right edge of search area
+      else if (ranges[0][1] < LIMIT_OF_SEARCH_AREA) {                                       // NOTE: this is an improbable edge case that doesn't happen)
+        return LIMIT_OF_SEARCH_AREA * TUNING_FREQUENCY_X_MULTIPLER + y;                     // x is LIMIT_OF_SEARCH_AREA
+      }
+
     }
 
     throw 'ERROR: DID NOT FIND LOCATION OF UNKNOWN DISTRESS BEACON';
