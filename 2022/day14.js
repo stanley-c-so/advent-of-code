@@ -164,17 +164,17 @@ Using your scan, simulate the falling sand until the source of the sand becomes 
 
 */
 
+// OPTIONAL VARIABLES
+const OPTIMIZE_GRID = true;                                                                     // adjust minX, minY to make grid smaller
+const DRAW = true;                                                                              // for sample data, draw state on sand rest or at end
+const DRAW_EVERY = 10;                                                                          // draw only on the resolution of every N grains of sand
+
 function fillWithSand (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
   //   console.log(inputArr[0]);
   //   // console.log(inputArr[1]);
   // }
-
-  // OPTIONAL VARIABLES
-  const OPTIMIZE_GRID = true;                                                                   // adjust minX, minY to make grid smaller
-  const DRAW = true;                                                                            // for sample data, draw state on sand rest or at end
-  const DRAW_EVERY = 10;                                                                        // draw only on the resolution of every N grains of sand
 
   // INIT
   const SAND_ENTRY_X = 500;
