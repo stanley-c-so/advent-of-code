@@ -113,15 +113,21 @@ In the example above, the search space is smaller: instead, the x and y coordina
 Find the only possible position for the distress beacon. What is its tuning frequency?
 */
 
+// OPTIONAL VARIABLES
+const EXPLORE_MIN_MAX = false;
+const SEE_AREA_BEING_SKIPPED = false;
+
+
+// ========== SOLUTION 1: CREATE A FUNCTION THAT FINDS ALL ELIMINATED x VALUES FOR A GIVEN ROW y. (EXPECT LARGE INPUTS IN PART 2; RETURN AS LIST OF
+// INTERVALS.) IN PART 1, USE THIS FUNCTION TO COUNT (MINUS ANY KNOWN BEACONS) TO FIND NUMBER OF ELIMINATED x VALUES. IN PART 2, USE THIS FUNCTION IN
+// EVERY ROW y WITHIN SEARCH RANGE TO FIND THE ONE PLACE THAT HAS A SINGLE UNELIMINATED x POSITION.
+
 function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
   //   console.log(inputArr[0]);
   //   // console.log(inputArr[1]);
   // }
-
-  // OPTIONAL VARIABLES
-  const EXPLORE_MIN_MAX = true;
 
   // UTILITY
   const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -144,7 +150,7 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   let maxBeaconX = -Infinity;
   let minBeaconY = Infinity;
   let maxBeaconY = -Infinity;
-  
+
   // INIT DATA STRUCTURE
   const SENSOR_DATA = {};
   
@@ -180,10 +186,10 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   }
 
   if (EXPLORE_MIN_MAX) {
-    console.log(`sensorX: from ${minSensorX} to ${maxSensorX}`);
-    console.log(`sensorY: from ${minSensorY} to ${maxSensorY}`);
-    console.log(`beaconX: from ${minBeaconX} to ${maxBeaconX}`);
-    console.log(`beaconY: from ${minBeaconY} to ${maxBeaconY}`);
+    console.log(`(sensorX: from ${minSensorX} to ${maxSensorX})`);
+    console.log(`(sensorY: from ${minSensorY} to ${maxSensorY})`);
+    console.log(`(beaconX: from ${minBeaconX} to ${maxBeaconX})`);
+    console.log(`(beaconY: from ${minBeaconY} to ${maxBeaconY})`);
   }
 
   // HELPER FUNCTION
@@ -242,6 +248,7 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     const TUNING_FREQUENCY_X_MULTIPLER = 4000000;
     
     const TIME_AT_START = Date.now();
+    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
 
     for (let y = 0; y <= LIMIT_OF_SEARCH_AREA; ++y) {
     // for (let y = DEBUG ? 0 : 1000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 1000000
@@ -264,20 +271,23 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
           throw `ERROR: TOO MANY NON-ELIMINATED VALUES OF x: ${sizeOfGap}`;
         }
         
-        const TIME_AT_END = Date.now();
-        if (!DEBUG) console.log(`RUN TOOK ${(TIME_AT_END - TIME_AT_START) / 1000} SECS`);
+        if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
 
         const x = ranges[0][1] + 1;                                                         // found x; y is given by index in for loop
         return x * TUNING_FREQUENCY_X_MULTIPLER + y;
       }
 
+      // NOTE: THE BELOW ARE POSSIBILITIES THAT ARE HIGHLY IMPROBABLE AND DON'T ACTUALLY HAPPEN WITH THIS DATA
+
       // 2) the non-eliminated x is at the left edge of search area
-      else if (ranges[0][0] > 0) {                                                          // NOTE: this is an improbable edge case that doesn't happen
+      else if (ranges[0][0] > 0) {
+        if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
         return y;                                                                           // x is 0
       }
 
       // 3) the non-eliminated x is at the right edge of search area
-      else if (ranges[0][1] < LIMIT_OF_SEARCH_AREA) {                                       // NOTE: this is an improbable edge case that doesn't happen
+      else if (ranges[0][1] < LIMIT_OF_SEARCH_AREA) {
+        if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
         return LIMIT_OF_SEARCH_AREA * TUNING_FREQUENCY_X_MULTIPLER + y;                     // x is LIMIT_OF_SEARCH_AREA
       }
 
@@ -288,12 +298,432 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   }
 }
 
+
+// ========== SOLUTION 2: SIMILAR TO SOLUTION 1 - IN PART 2, CHECK EVERY POSSIBLE ROW y. RUN ACROSS THAT ROW. IF CURRENT POSITION IS IN AN ELIMINATED REGION,
+// SKIP TO THE END OF THAT ELIMINATED REGION.
+
+function analyzeSensorCoverage2 (part, inputStr, extraParam, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
+
+  // UTILITY
+  const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
+  const mergeOverlappingRanges = ranges => {
+    ranges.sort((a, b) => a[0] - b[0]);
+    const mergedRanges = [ ranges[0] ];
+    for (const range of ranges) {
+      if (range[0] > mergedRanges.at(-1)[1] + 1) mergedRanges.push(range);                  // no overlap
+      else mergedRanges.at(-1)[1] = Math.max(mergedRanges.at(-1)[1], range[1]);             // overlap (even if start of interval is 1 more than end of prev)
+    }
+    return mergedRanges;
+  }
+
+  // OPTIONAL INIT
+  let minSensorX = Infinity;
+  let maxSensorX = -Infinity;
+  let minSensorY = Infinity;
+  let maxSensorY = -Infinity;
+  let minBeaconX = Infinity;
+  let maxBeaconX = -Infinity;
+  let minBeaconY = Infinity;
+  let maxBeaconY = -Infinity;
+
+  // INIT DATA STRUCTURE
+  const SENSOR_DATA = {};
+  
+  // PARSE DATA
+  for (const line of inputArr) {
+
+    // ingest from input
+    const [LS, RS] = line.split(': closest beacon is at ');
+    const [SENSOR_X_DATA, SENSOR_Y_DATA] = LS.split(', ');
+    const sensorX = +SENSOR_X_DATA.split('=')[1];
+    const sensorY = +SENSOR_Y_DATA.split('=')[1];
+    const [BEACON_X_DATA, BEACON_Y_DATA] = RS.split(', ');
+    const beaconX = +BEACON_X_DATA.split('=')[1];
+    const beaconY = +BEACON_Y_DATA.split('=')[1];
+
+    // save critical information to data structure
+    const sensor = `${sensorX},${sensorY}`;
+    const beacon = [beaconX, beaconY];
+    const manhattanDistance = getManhattanDistance(beaconX, beaconY, sensorX, sensorY)
+    SENSOR_DATA[sensor] = { beacon, manhattanDistance };
+
+    // OPTIONAL
+    if (EXPLORE_MIN_MAX) {
+      minSensorX = Math.min(minSensorX, sensorX);
+      maxSensorX = Math.max(maxSensorX, sensorX);
+      minSensorY = Math.min(minSensorY, sensorY);
+      maxSensorY = Math.max(maxSensorY, sensorY);
+      minBeaconX = Math.min(minBeaconX, beaconX);
+      maxBeaconX = Math.max(maxBeaconX, beaconX);
+      minBeaconY = Math.min(minBeaconY, beaconY);
+      maxBeaconY = Math.max(maxBeaconY, beaconY);
+    }
+  }
+
+  if (EXPLORE_MIN_MAX) {
+    console.log(`(sensorX: from ${minSensorX} to ${maxSensorX})`);
+    console.log(`(sensorY: from ${minSensorY} to ${maxSensorY})`);
+    console.log(`(beaconX: from ${minBeaconX} to ${maxBeaconX})`);
+    console.log(`(beaconY: from ${minBeaconY} to ${maxBeaconY})`);
+  }
+
+  // HELPER FUNCTION
+  function getRangesOfEliminatedXValues(row) {
+
+    // init
+    const ranges = [];
+
+    // iterate through sensor data
+    for (const sensor in SENSOR_DATA) {                                                     // check every sensor to see if you can make eliminations in row
+      const [sensorX, sensorY] = sensor.split(',').map(n => +n);
+      const vertDistanceToRow = Math.abs(row - sensorY);
+      if (vertDistanceToRow > SENSOR_DATA[sensor].manhattanDistance) continue;              // this sensor's eliminated area does not reach row; skip it
+      const horizDistance = SENSOR_DATA[sensor].manhattanDistance - vertDistanceToRow;
+      ranges.push([sensorX - horizDistance, sensorX + horizDistance]);
+    }
+
+    // merge overlapping intervals to get true range of eliminated x values
+    return mergeOverlappingRanges(ranges);
+  }
+
+  // ANALYZE
+  if (part === 1) {                                                                         // PART 1: FIND # OF ELIMINATED x VALUES IN GIVEN ROW y
+
+    // find intervals of eliminated x values in given row y
+    const ROW_TO_CHECK = extraParam;
+    const ranges = getRangesOfEliminatedXValues(ROW_TO_CHECK);
+
+    // NOTE: it turns out that ranges above will only have 1 range with our data. in other words, our data would have it such that all ranges of
+    // eliminated x values for given row y from the various sensors will overlap. however, going forward, i will NOT make that assumption, and for
+    // purposes of part 1 i will account for the possibility of gaps in between the ranges of eliminated x values for given row y.
+
+    // find intervals of gaps
+    const gaps = [];
+    for (let i = 0; i < ranges.length - 1; ++i) {
+      gaps.push([ ranges[i][1] + 1, ranges[i + 1][0] - 1 ]);
+    }
+    
+    // look for beacons in given row y and include them in gaps
+    const beaconsInRow = new Set();
+    for (const sensor in SENSOR_DATA) {
+      const [x, y] = SENSOR_DATA[sensor].beacon;
+      if (y === ROW_TO_CHECK) beaconsInRow.add(x);
+    }
+    for (const beacon of beaconsInRow) gaps.push([beacon, beacon]);
+    const gapsWithBeacons = mergeOverlappingRanges(gaps);
+
+    // calculate number of eliminated x values
+    const spreadOfEliminatedXValues = ranges.at(-1)[1] - ranges[0][0] + 1;
+    const gapCount = gapsWithBeacons.reduce((count, [s, e]) => count += e - s + 1, 0);
+    return spreadOfEliminatedXValues - gapCount;
+
+  } else {                                                                                  // PART 2: FIND COORDS OF UNKNOWN DISTRESS BEACON
+
+    // HELPER FUNCTION: CHECK IF GIVEN x IS INVALID (ELIMINATED) FOR BEING WITHIN RANGE OF A SENSOR
+    function checkIfInSensor(x, y) {
+      for (const sensor in SENSOR_DATA) {
+        const [sensorX, sensorY] = sensor.split(',').map(n => +n);
+        const { manhattanDistance } = SENSOR_DATA[sensor];
+        const offsetY = Math.abs(sensorY - y);
+        if (offsetY > manhattanDistance) continue;
+        const offsetX = manhattanDistance - offsetY;
+        if (Math.abs(sensorX - x) <= offsetX) {
+          return { inSensor: true, rightmostX: sensorX + offsetX };
+        }
+      }
+      return { inSensor: false, rightmostX: null };
+    }
+
+    const LIMIT_OF_SEARCH_AREA = extraParam;
+    const TUNING_FREQUENCY_X_MULTIPLER = 4000000;
+    
+    const TIME_AT_START = Date.now();
+    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+
+    for (let y = 0; y <= LIMIT_OF_SEARCH_AREA; ++y) {
+    // for (let y = DEBUG ? 0 : 1000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 1000000
+    // for (let y = DEBUG ? 0 : 2000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 2000000
+    // for (let y = DEBUG ? 0 : 3000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 3000000
+    // for (let y = DEBUG ? 0 : 3017867; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at correct answer
+    
+      for (let x = 0; x <= LIMIT_OF_SEARCH_AREA; ++x) {
+        const { inSensor, rightmostX } = checkIfInSensor(x, y);
+        if (inSensor) {
+          if (SEE_AREA_BEING_SKIPPED) {
+            console.log(`(y: ${y} | SKIPPING RANGE OF LENGTH: ${rightmostX - x})`);
+          }
+          x = rightmostX;
+        } else {
+          if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+          return x * TUNING_FREQUENCY_X_MULTIPLER + y;
+        }
+      }
+
+    }
+
+    throw 'ERROR: DID NOT FIND LOCATION OF UNKNOWN DISTRESS BEACON';
+
+  }
+}
+
+
+// ========== SOLUTION 3: IN PART 2, THINK IN TERMS OF RECTANGULAR SEARCH REGIONS - IF REGION IS FULLY COVERED WITHIN THE SEARCH RANGE OF ANY SENSOR,
+// THEN WE CAN IMMEDIATELY ELIMINATE THIS REGION. OTHERWISE, SPLIT REGION UP INTO FOUR QUADRANTS (2D BINARY SEARCH) AND RECURSE.
+
+function analyzeSensorCoverage3 (part, inputStr, extraParam, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+  // if (DEBUG) {
+  //   console.log(inputArr[0]);
+  //   // console.log(inputArr[1]);
+  // }
+
+  // UTILITY
+  const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
+  const mergeOverlappingRanges = ranges => {
+    ranges.sort((a, b) => a[0] - b[0]);
+    const mergedRanges = [ ranges[0] ];
+    for (const range of ranges) {
+      if (range[0] > mergedRanges.at(-1)[1] + 1) mergedRanges.push(range);                  // no overlap
+      else mergedRanges.at(-1)[1] = Math.max(mergedRanges.at(-1)[1], range[1]);             // overlap (even if start of interval is 1 more than end of prev)
+    }
+    return mergedRanges;
+  }
+
+  // OPTIONAL INIT
+  let minSensorX = Infinity;
+  let maxSensorX = -Infinity;
+  let minSensorY = Infinity;
+  let maxSensorY = -Infinity;
+  let minBeaconX = Infinity;
+  let maxBeaconX = -Infinity;
+  let minBeaconY = Infinity;
+  let maxBeaconY = -Infinity;
+  
+  // INIT DATA STRUCTURE
+  const SENSOR_DATA = {};
+  
+  // PARSE DATA
+  for (const line of inputArr) {
+
+    // ingest from input
+    const [LS, RS] = line.split(': closest beacon is at ');
+    const [SENSOR_X_DATA, SENSOR_Y_DATA] = LS.split(', ');
+    const sensorX = +SENSOR_X_DATA.split('=')[1];
+    const sensorY = +SENSOR_Y_DATA.split('=')[1];
+    const [BEACON_X_DATA, BEACON_Y_DATA] = RS.split(', ');
+    const beaconX = +BEACON_X_DATA.split('=')[1];
+    const beaconY = +BEACON_Y_DATA.split('=')[1];
+
+    // save critical information to data structure
+    const sensor = `${sensorX},${sensorY}`;
+    const beacon = [beaconX, beaconY];
+    const manhattanDistance = getManhattanDistance(beaconX, beaconY, sensorX, sensorY)
+    SENSOR_DATA[sensor] = { beacon, manhattanDistance };
+
+    // OPTIONAL
+    if (EXPLORE_MIN_MAX) {
+      minSensorX = Math.min(minSensorX, sensorX);
+      maxSensorX = Math.max(maxSensorX, sensorX);
+      minSensorY = Math.min(minSensorY, sensorY);
+      maxSensorY = Math.max(maxSensorY, sensorY);
+      minBeaconX = Math.min(minBeaconX, beaconX);
+      maxBeaconX = Math.max(maxBeaconX, beaconX);
+      minBeaconY = Math.min(minBeaconY, beaconY);
+      maxBeaconY = Math.max(maxBeaconY, beaconY);
+    }
+  }
+
+  if (EXPLORE_MIN_MAX) {
+    console.log(`(sensorX: from ${minSensorX} to ${maxSensorX})`);
+    console.log(`(sensorY: from ${minSensorY} to ${maxSensorY})`);
+    console.log(`(beaconX: from ${minBeaconX} to ${maxBeaconX})`);
+    console.log(`(beaconY: from ${minBeaconY} to ${maxBeaconY})`);
+  }
+
+  // HELPER FUNCTION
+  const MEMO = {};
+  function getRangesOfEliminatedXValues(row) {
+    if (!(row in MEMO)) {
+      // init
+      const ranges = [];
+
+      // iterate through sensor data
+      for (const sensor in SENSOR_DATA) {                                                   // check every sensor to see if you can make eliminations in row
+        const [sensorX, sensorY] = sensor.split(',').map(n => +n);
+        const vertDistanceToRow = Math.abs(row - sensorY);
+        if (vertDistanceToRow > SENSOR_DATA[sensor].manhattanDistance) continue;            // this sensor's eliminated area does not reach row; skip it
+        const horizDistance = SENSOR_DATA[sensor].manhattanDistance - vertDistanceToRow;
+        ranges.push([sensorX - horizDistance, sensorX + horizDistance]);
+      }
+
+      // merge overlapping intervals to get true range of eliminated x values
+      MEMO[row] = mergeOverlappingRanges(ranges);
+    }
+    return MEMO[row];
+  }
+
+  // ANALYZE
+  if (part === 1) {                                                                         // PART 1: FIND # OF ELIMINATED x VALUES IN GIVEN ROW y
+
+    // find intervals of eliminated x values in given row y
+    const ROW_TO_CHECK = extraParam;
+    const ranges = getRangesOfEliminatedXValues(ROW_TO_CHECK);
+
+    // NOTE: it turns out that ranges above will only have 1 range with our data. in other words, our data would have it such that all ranges of
+    // eliminated x values for given row y from the various sensors will overlap. however, going forward, i will NOT make that assumption, and for
+    // purposes of part 1 i will account for the possibility of gaps in between the ranges of eliminated x values for given row y.
+
+    // find intervals of gaps
+    const gaps = [];
+    for (let i = 0; i < ranges.length - 1; ++i) {
+      gaps.push([ ranges[i][1] + 1, ranges[i + 1][0] - 1 ]);
+    }
+    
+    // look for beacons in given row y and include them in gaps
+    const beaconsInRow = new Set();
+    for (const sensor in SENSOR_DATA) {
+      const [x, y] = SENSOR_DATA[sensor].beacon;
+      if (y === ROW_TO_CHECK) beaconsInRow.add(x);
+    }
+    for (const beacon of beaconsInRow) gaps.push([beacon, beacon]);
+    const gapsWithBeacons = mergeOverlappingRanges(gaps);
+
+    // calculate number of eliminated x values
+    const spreadOfEliminatedXValues = ranges.at(-1)[1] - ranges[0][0] + 1;
+    const gapCount = gapsWithBeacons.reduce((count, [s, e]) => count += e - s + 1, 0);
+    return spreadOfEliminatedXValues - gapCount;
+
+  } else {                                                                                  // PART 2: FIND COORDS OF UNKNOWN DISTRESS BEACON
+
+    // HELPER FUNCTION: GIVEN 4 CORNERS, RETURN WHETHER RECTANGULAR AREA IS FULLY COVERED A SENSOR (AND THUS DOES NOT NEED TO BE CHECKED)
+    function areaCoveredBySensor(topLeftX, topLeftY, botRightX, botRightY) {
+      const AREA_CORNERS = [
+        [topLeftX, topLeftY],
+        [topLeftX, botRightY],
+        [botRightX, topLeftY],
+        [botRightX, botRightY]
+      ];
+      for (const sensor in SENSOR_DATA) {
+        const [sensorX, sensorY] = sensor.split(',').map(n => +n);
+        if (AREA_CORNERS.every(corner => {
+          const [cornerX, cornerY] = corner;
+          return getManhattanDistance(cornerX, cornerY, sensorX, sensorY)
+                  <= SENSOR_DATA[sensor].manhattanDistance;
+        })) {
+          if (SEE_AREA_BEING_SKIPPED) {
+            console.log(`(SKIPPING REGION WITH AREA: ${
+                        (botRightX - topLeftX + 1) * (topLeftY - botRightY + 1)})`);
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // HELPER FUNCTION: SEARCH A RECTANGULAR AREA BOUNDED BY GIVEN COORDINATES FOR THE COORDS REPRESENTING THE ANSWER TO PART 2. RETURNS null IF NO ANSWER
+    const ALREADY_CHECKED_ROWS = new Set();
+    function binarySearchArea(topLeftX, topLeftY, botRightX, botRightY) {
+
+      const H = topLeftY - botRightY + 1;
+      const W = botRightX - topLeftX + 1;
+      if (H < 1 || W < 1) return null;                                                      // not analyzing real area
+
+      // BASE CASE: search area has been narrowed down to 1 row
+      if (H === 1) {
+
+        // get eliminated x values for this row
+        const y = topLeftY;
+        if (ALREADY_CHECKED_ROWS.has(y)) return null;
+        ALREADY_CHECKED_ROWS.add(y);
+        const ranges = getRangesOfEliminatedXValues(y);
+
+        // CHECK IF THIS ROW HAS A SINGLE VALUE OF x NOT ELIMINATED:
+
+        // 1) the non-eliminated x is in the middle of the row somewhere
+        if (ranges.length > 1) {
+          
+          if (ranges.length !== 2) {                                                        // sanity check to make sure only 1 gap of possible x values
+            throw 'ERROR: TOO MANY GAPS BETWEEN ELIMINATED VALUES OF x';
+          }
+          const sizeOfGap = ranges[1][0] - ranges[0][1] - 1;
+          if (sizeOfGap !== 1) {                                                            // sanity check to make sure only 1 value of x is not eliminated
+            throw `ERROR: TOO MANY NON-ELIMINATED VALUES OF x: ${sizeOfGap}`;
+          }
+
+          if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+
+          const x = ranges[0][1] + 1;                                                       // found x; y is given by index in for loop
+          return x * TUNING_FREQUENCY_X_MULTIPLER + y;
+        }
+
+        // NOTE: THE BELOW ARE POSSIBILITIES THAT ARE HIGHLY IMPROBABLE AND DON'T ACTUALLY HAPPEN WITH THIS DATA
+
+        // 2) the non-eliminated x is at the left edge of search area
+        else if (ranges[0][0] > 0) {
+          if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+          return y;                                                                         // x is 0
+        }
+
+        // 3) the non-eliminated x is at the right edge of search area
+        else if (ranges[0][1] < LIMIT_OF_SEARCH_AREA) {
+          if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+          return LIMIT_OF_SEARCH_AREA * TUNING_FREQUENCY_X_MULTIPLER + y;                   // x is LIMIT_OF_SEARCH_AREA
+        }
+
+        return null;
+      }
+
+      // RECURSIVE CASE: CHECK IF FULL REGION IS ALREADY ELIMINATED BY SENSOR. IF NOT, SPLIT INTO 4 SMALLER REGIONS AND RECURSE
+      else {
+
+        if (areaCoveredBySensor(topLeftX, topLeftY, botRightX, botRightY)) return null;     // OPTIMIZATION: check if region is already eliminated by any one sensor's data
+
+        const midX = topLeftX + Math.floor((botRightX - topLeftX) / 2);
+        const midY = botRightY + Math.floor((topLeftY - botRightY) / 2);
+
+        const recurseTL = binarySearchArea(topLeftX, topLeftY, midX - 1, midY + 1);         // recurse top left (do not include midX, midY)
+        if (recurseTL !== null) return recurseTL;
+
+        const recurseBL = binarySearchArea(topLeftX, midY, midX - 1, botRightY);            // recurse bottom left (do not include midX)
+        if (recurseBL !== null) return recurseBL;
+
+        const recurseTR = binarySearchArea(midX, topLeftY, botRightX, midY + 1);            // recurse top right (do not include midY)
+        if (recurseTR !== null) return recurseTR;
+        
+        const recurseBR = binarySearchArea(midX, midY, botRightX, botRightY);               // recurse bottom right
+        if (recurseBR !== null) return recurseBR;
+        return null;
+      }
+    }
+
+    // INIT
+    const LIMIT_OF_SEARCH_AREA = extraParam;
+    const TUNING_FREQUENCY_X_MULTIPLER = 4000000;
+    
+    const TIME_AT_START = Date.now();
+    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+
+    // ANALYZE
+    const res = binarySearchArea(0, LIMIT_OF_SEARCH_AREA, LIMIT_OF_SEARCH_AREA, 0);
+    if (res !== null) return res;
+    throw 'ERROR: DID NOT FIND LOCATION OF UNKNOWN DISTRESS BEACON';
+
+  }
+}
+
 // TEST CASES
 
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = analyzeSensorCoverage;
+// const func = analyzeSensorCoverage;
+// const func = analyzeSensorCoverage2;
+const func = analyzeSensorCoverage3;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
