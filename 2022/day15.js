@@ -125,6 +125,15 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
 
   // UTILITY
   const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
+  const mergeOverlappingRanges = ranges => {
+    ranges.sort((a, b) => a[0] - b[0]);
+    const mergedRanges = [ ranges[0] ];
+    for (const range of ranges) {
+      if (range[0] > mergedRanges.at(-1)[1] + 1) mergedRanges.push(range);                  // no overlap
+      else mergedRanges.at(-1)[1] = Math.max(mergedRanges.at(-1)[1], range[1]);             // overlap (even if start of interval is 1 more than end of prev)
+    }
+    return mergedRanges;
+  }
 
   // OPTIONAL INIT
   let minSensorX = Infinity;
@@ -191,27 +200,36 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     }
 
     // merge overlapping intervals to get true range of eliminated x values
-    ranges.sort((a, b) => a[0] - b[0]);
-    const mergedRanges = [ ranges[0] ];
-    for (const range of ranges) {
-      if (range[0] > mergedRanges.at(-1)[1] + 1) mergedRanges.push(range);                  // no overlap
-      else mergedRanges.at(-1)[1] = Math.max(mergedRanges.at(-1)[1], range[1]);             // overlap (even if start of interval is 1 more than end of prev)
-    }
-    return mergedRanges;
+    return mergeOverlappingRanges(ranges);
   }
 
   // ANALYZE
   if (part === 1) {                                                                         // PART 1: FIND # OF ELIMINATED x VALUES IN GIVEN ROW y
 
+    // find intervals of eliminated x values in given row y
     const ROW_TO_CHECK = extraParam;
     const ranges = getRangesOfEliminatedXValues(ROW_TO_CHECK);
-    const rangeSize = ranges[0][1] - ranges[0][0] + 1;
+
+    // find intervals of gaps
+    const gaps = [];
+    for (let i = 0; i < ranges.length - 1; ++i) {
+      gaps.push([ ranges[i][1] + 1, ranges[i + 1][0] - 1 ]);
+    }
+    
+    // look for beacons in given row y and include them in gaps
     const beaconsInRow = new Set();
     for (const sensor in SENSOR_DATA) {
       const [x, y] = SENSOR_DATA[sensor].beacon;
       if (y === ROW_TO_CHECK) beaconsInRow.add(x);
     }
-    return rangeSize - beaconsInRow.size;
+    for (const beacon of beaconsInRow) gaps.push([beacon, beacon]);
+    const gapsWithBeacons = mergeOverlappingRanges(gaps);
+
+    // calculate number of eliminated x values
+    let gapCount = 0;
+    for (const [start, end] of gapsWithBeacons) gapCount += end - start + 1;
+    const spread = ranges.at(-1)[1] - ranges[0][0] + 1;                                     // it turns out there is only 1 range (no gaps), but i won't assume this
+    return spread - gapCount;
 
   } else {                                                                                  // PART 2: FIND COORDS OF UNKNOWN DISTRESS BEACON
 
