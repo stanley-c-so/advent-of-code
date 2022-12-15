@@ -198,7 +198,6 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
       const vertDistanceToRow = Math.abs(row - sensorY);
       if (vertDistanceToRow > SENSOR_DATA[sensor].manhattanDistance) continue;              // this sensor's eliminated area does not reach row; skip it
       const horizDistance = SENSOR_DATA[sensor].manhattanDistance - vertDistanceToRow;
-      if (horizDistance < 0) throw 'ERROR: START OF RANGE IS GREATER THAN END OF RANGE';    // sanity check: make sure range is valid
       ranges.push([sensorX - horizDistance, sensorX + horizDistance]);
     }
 
