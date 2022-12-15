@@ -302,17 +302,19 @@ function readPackets2 (part, inputStr, DEBUG = false) {
     const DIVIDER1 = [[2]];
     const DIVIDER2 = [[6]];
     const PACKET_LIST = [ DIVIDER1, DIVIDER2 ];
-    for (const pair of inputArr) PACKET_LIST.push(...pair.split('\r\n').map(str => eval(str)));
+    for (const pair of inputArr) PACKET_LIST.push(...pair.split('\r\n').map(str => EVAL(str)));
 
     // sort data on the basis of compare function
     PACKET_LIST.sort((a, b) => compare(b, a));
 
     // look for the indices of the two special divider packets
+    const STRINGIFIED_DIVIDER1 = STRINGIFY(DIVIDER1);
+    const STRINGIFIED_DIVIDER2 = STRINGIFY(DIVIDER2);
     let idx1 = null, idx2 = null;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
       const stringifiedPacket = STRINGIFY(PACKET_LIST[i]);
-      if (stringifiedPacket === STRINGIFY(DIVIDER1)) idx1 = i + 1;                                    // NOTE: indices are 1-indexed
-      if (stringifiedPacket === STRINGIFY(DIVIDER2)) idx2 = i + 1;                                    // NOTE: indices are 1-indexed
+      if (stringifiedPacket === STRINGIFIED_DIVIDER1) idx1 = i + 1;                                   // NOTE: indices are 1-indexed
+      if (stringifiedPacket === STRINGIFIED_DIVIDER2) idx2 = i + 1;                                   // NOTE: indices are 1-indexed
     }
     if ([idx1, idx2].includes(null)) throw 'ERROR: DID NOT FIND ONE OR MORE OF THE SPECIAL PACKETS';
     return idx1 * idx2;
