@@ -310,8 +310,9 @@ function readPackets2 (part, inputStr, DEBUG = false) {
     // look for the indices of the two special divider packets
     let idx1 = null, idx2 = null;
     for (let i = 0; i < PACKET_LIST.length; ++i) {
-      if (STRINGIFY(PACKET_LIST[i]) === STRINGIFY(DIVIDER1)) idx1 = i + 1;                            // NOTE: indices are 1-indexed
-      if (STRINGIFY(PACKET_LIST[i]) === STRINGIFY(DIVIDER2)) idx2 = i + 1;                            // NOTE: indices are 1-indexed
+      const stringifiedPacket = STRINGIFY(PACKET_LIST[i]);
+      if (stringifiedPacket === STRINGIFY(DIVIDER1)) idx1 = i + 1;                                    // NOTE: indices are 1-indexed
+      if (stringifiedPacket === STRINGIFY(DIVIDER2)) idx2 = i + 1;                                    // NOTE: indices are 1-indexed
     }
     if ([idx1, idx2].includes(null)) throw 'ERROR: DID NOT FIND ONE OR MORE OF THE SPECIAL PACKETS';
     return idx1 * idx2;
