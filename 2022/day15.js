@@ -197,7 +197,6 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
       if (range[0] > mergedRanges.at(-1)[1] + 1) mergedRanges.push(range);                  // no overlap
       else mergedRanges.at(-1)[1] = Math.max(mergedRanges.at(-1)[1], range[1]);             // overlap (even if start of interval is 1 more than end of prev)
     }
-
     return mergedRanges;
   }
 
