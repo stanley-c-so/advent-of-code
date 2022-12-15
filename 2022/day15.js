@@ -242,7 +242,10 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     const TIME_AT_START = Date.now();
 
     for (let y = 0; y <= LIMIT_OF_SEARCH_AREA; ++y) {
-    // for (let y = 3017867; y <= LIMIT_OF_SEARCH_AREA; ++y) {                                 // speeds up test 4 by starting at correct answer
+    // for (let y = DEBUG ? 0 : 1000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 1000000
+    // for (let y = DEBUG ? 0 : 2000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 2000000
+    // for (let y = DEBUG ? 0 : 3000000; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at 3000000
+    // for (let y = DEBUG ? 0 : 3017867; y <= LIMIT_OF_SEARCH_AREA; ++y) {                     // speeds up test 4 by starting at correct answer
       const getRanges = getRangesOfEliminatedXValues(y);
 
       // check if this row has a single value of x not eliminated
