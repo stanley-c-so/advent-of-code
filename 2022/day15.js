@@ -141,6 +141,8 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   
   // PARSE DATA
   for (const line of inputArr) {
+
+    // ingest from input
     const [LS, RS] = line.split(': closest beacon is at ');
     const [SENSOR_X_DATA, SENSOR_Y_DATA] = LS.split(', ');
     const sensorX = +SENSOR_X_DATA.split('=')[1];
@@ -148,6 +150,8 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
     const [BEACON_X_DATA, BEACON_Y_DATA] = RS.split(', ');
     const beaconX = +BEACON_X_DATA.split('=')[1];
     const beaconY = +BEACON_Y_DATA.split('=')[1];
+
+    // save critical information to data structure
     const sensor = `${sensorX},${sensorY}`;
     const beacon = [beaconX, beaconY];
     const manhattanDistance = getManhattanDistance(beaconX, beaconY, sensorX, sensorY)
