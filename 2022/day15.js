@@ -175,7 +175,6 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   }
 
   // HELPER FUNCTION
-
   function getRangesOfEliminatedXValues(row) {
 
     // init
