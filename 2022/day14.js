@@ -206,49 +206,35 @@ function fillWithSand (part, inputStr, DEBUG = false) {
 
   // DRAW WALLS INTO GRID
   for (const wall of WALLS) {
-    for (let i = 0; i < wall.length - 1; ++i) {                                                 // iterate through wall endpoints (excluding last one because of fencepost)
-      const [x1, y1] = wall[i];
-      const [x2, y2] = wall[i + 1];
+    for (let i = 0; i < wall.length - 1; ++i) {                                                 // iterate through wall endpoints (excluding last one - fencepost)
+      const [ x1, y1 ] = wall[i];
+      const [ x2, y2 ] = wall[i + 1];
 
       if (x1 !== x2 && y1 !== y2) {                                                             // sanity check to make sure endpoints are orthogonally aligned
         throw 'ERROR: WALL ENDPOINT COORDINATES ARE NOT ORTHOGONALLY ALIGNED';
       }
 
       // init coords at first endpoint
-      let [x, y] = [x1, y1];
+      let [ x, y ] = [ Math.min(x1, x2), Math.min(y1, y2) ];
 
-      if (y2 > y1) {                                                                            // going up
-        while (y <= y2) {
+      if (x1 === x2) {                                                                          // draw vertical line
+        while (y <= Math.max(y1, y2)) {
           GRID[y - minY][x - minX] = '#';
           ++y;
         }
       }
-
-      else if (y2 < y1) {                                                                       // going down
-        while (y >= y2) {
-          GRID[y - minY][x - minX] = '#';
-          --y;
-        }
-      }
-
-      else if (x2 > x1) {                                                                       // going right
-        while (x <= x2) {
+      else if (y1 === y2) {                                                                     // draw horizontal line
+        while (x <= Math.max(x1, x2)) {
           GRID[y - minY][x - minX] = '#';
           ++x;
         }
       }
-
-      else if (x2 < x1) {                                                                       // going left
-        while (x >= x2) {
-          GRID[y - minY][x - minX] = '#';
-          --x;
-        }
-      }
+      else throw 'ERROR: SOMETHING WENT HORRIBLY WRONG WITH THE UNIVERSE';
     }
   }
 
   // MARK SAND ENTRY POINT WITH '+'
-  GRID[0][SAND_ENTRY_X - minX] = '+';                                                           // row: SAND_ENTRY_Y - minY, but minY === SAND_ENTRY_Y
+  GRID[0][SAND_ENTRY_X - minX] = '+';                                                           // row: SAND_ENTRY_Y - minY, but minY === SAND_ENTRY_Y, so 0
 
   // DRAW FLOOR INTO GRID
   for (let x = 0; x <= maxX; ++x) GRID[FLOOR - minY][x - minX] = '#';
@@ -258,7 +244,7 @@ function fillWithSand (part, inputStr, DEBUG = false) {
   let sandY = SAND_ENTRY_Y;
   let count = 0;
 
-  const endCondition = () => part === 1 ? sandY === maxY                                        // PART 1: if a grain of sand reaches lowest wall (and thus will continue to fall)
+  const endCondition = () => part === 1 ? sandY === maxY                                        // PART 1: sand reaches lowest wall (and thus will continue to fall)
                                         : GRID[0][SAND_ENTRY_X - minX] === 'o';                 // PART 2: sand entry point fills up with sand
 
   function optionalDraw() {
