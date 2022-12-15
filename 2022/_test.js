@@ -2,13 +2,13 @@ const equals = require('./_equality-checker');
 
 function test (func, input, expected, testNum, skippedTests, lowestTest, highestTest) {
   if (skippedTests.has(testNum[0])) {
-    console.log(`TEST ${testNum[0]} SKIPPED`);
+    console.log(`ooooo TEST ${testNum[0]} SKIPPED`);
   } else if ((lowestTest || 0) <= testNum[0] && testNum[0] <= (highestTest || Infinity)) {
     const output = func(...Object.values(input));
     console.log(
       equals(output, expected)
-        ? `TEST ${testNum[0]} PASSED`
-        : `TEST ${testNum[0]} FAILED: EXPECTED ${expected} BUT GOT ${output}`
+        ? `+++++ TEST ${testNum[0]} PASSED`
+        : `----- TEST ${testNum[0]} FAILED: EXPECTED ${expected} BUT GOT ${output}`
     );
   }
   ++testNum[0];
