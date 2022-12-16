@@ -8,7 +8,7 @@ function test (func, input, expected, testNum, skippedTests, lowestTest, highest
       const output = func(...Object.values(input));
       console.log(
         equals(output, expected)
-          ? `+++++ TEST ${testNum[0]} PASSED`
+          ? `+++++ TEST ${testNum[0]} PASSED: RESULT IS ${expected}`
           : `----- TEST ${testNum[0]} FAILED: EXPECTED ${expected} BUT GOT ${output}`
       );
     }
