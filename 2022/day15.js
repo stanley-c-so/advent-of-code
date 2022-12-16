@@ -392,6 +392,7 @@ function analyzeSensorCoverage2 (part, inputStr, extraParam, DEBUG = false) {
   }
 
   // ANALYZE
+  const TIME_AT_START = Date.now();
   if (part === 1) {                                                                         // PART 1: FIND # OF ELIMINATED x VALUES IN GIVEN ROW y
 
     // find intervals of eliminated x values in given row y
@@ -442,7 +443,6 @@ function analyzeSensorCoverage2 (part, inputStr, extraParam, DEBUG = false) {
     const LIMIT_OF_SEARCH_AREA = extraParam;
     const TUNING_FREQUENCY_X_MULTIPLER = 4000000;
     
-    const TIME_AT_START = Date.now();
     if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
 
     for (let y = 0; y <= LIMIT_OF_SEARCH_AREA; ++y) {
