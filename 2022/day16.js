@@ -236,7 +236,7 @@ const { MinHeap } = require('./classes');
 const DISPLAY_EXTRA_INFO = true;
 
 
-// ========== SOLUTION 1: WARNING - I HAVE NOT VERIFIED IF THIS WORKS! IT CAN TAKE POSSIBLY 1.5 HOURS TO RUN! IN PART 2, KEEP SEPARATE
+// ========== SOLUTION 1: WARNING - I HAVE NOT VERIFIED IF THIS WORKS! IT CAN TAKE POSSIBLY MANY HOURS TO RUN! IN PART 2, KEEP SEPARATE
 // 'TIMERS' FOR YOU AND THE ELEPHANT, TRACKING THE AMOUNT OF TIME THAT WILL BE REMAINING WHEN THE ACTOR GETS TO ITS NEXT DESTINATION.
 // WHENEVER I RECURSE, I MOVE THE TIME DOWN TO THE HIGHER VALUE BETWEEN THE TWO. IF ONLY YOU OR THE ELEPHANT IS ACTIVE, I MOVE AND
 // RECURSE ACCORDINGLY. IF BOTH ARE ACTIVE, I CONSIDER ALL POSSIBLE COMBINATIONS OF THE MOVES YOU CAN BOTH MAKE.
@@ -402,10 +402,12 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
 
       // BASE CASE
       if (time === 0 || opened.size === VALVES_WITH_FLOW.length || doneA && doneB) {
-        if (pressureReleased > maxPressureReleased) {
+        if (pressureReleased >= maxPressureReleased) {
           maxPressureReleased = pressureReleased;
           if (DISPLAY_EXTRA_INFO) console.log(
-            'NEW RECORD:', pressureReleased, `- DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS`,
+            `${pressureReleased > maxPressureReleased ? '***NEW***' : 'MATCHED'} RECORD:`,
+            pressureReleased,
+            `- DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS`,
           );
         }
         MEMO[SERIAL] = maxPressureReleased;
@@ -628,7 +630,7 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
 // ========== SOLUTION 2: FOR PART 2, THERE SHOULD NEVER BE ANY CROSSOVER IN THE LOCATIONS THAT YOU MAY POTENTIALLY VISIT, AND THE LOCATIONS
 // THAT THE ELEPHANT MAY POTENTIALLY VISIT. THEREFORE, WE CAN DETERMINE ALL THE POSSIBLE WAYS TO CREATE TWO DISJOINT SETS OF CANDIDATE LOCATIONS
 // FOR THE TWO ACTORS (2^N, WHERE N IS THE NUMBER OF VALVES WITH NON-ZERO FLOW). FOR EACH COMBINATION, WE RUN THE CANDIDATE LIST FOR EACH ACTOR
-// THROUGH THE ANALYZE FUNCTION, AND ADD THE RESULTS.
+// THROUGH THE ANALYZE FUNCTION, AND ADD THE RESULTS. THIS RUNS IN ABOUT 45 SECONDS.
 
 function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
@@ -764,11 +766,13 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
         const RESULT_ELEPHANT = ANALYZE(ELEPHANT_CANDIDATE_VALVES, 26);
         const RESULT = RESULT_YOU.maxPressureReleased + RESULT_ELEPHANT.maxPressureReleased;
 
-        if (RESULT > maxPressureReleased) {
-          if (!DEBUG) console.log(
+        if (RESULT >= maxPressureReleased) {
+          if (!DEBUG && DISPLAY_EXTRA_INFO) console.log(
             `(COMBINATION ${combinationCount}`
             + ' | '
-            + `NEW RECORD: ${RESULT} - DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS)`
+            + `${RESULT > maxPressureReleased ? '***NEW***' : 'MATCHED'} RECORD: ${RESULT}`
+            + ' - '
+            + `DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS)`
           )
           maxPressureReleased = RESULT;
           yourPath = RESULT_YOU.path;
@@ -778,15 +782,16 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
 
       // RECURSIVE CASE
       else {
-        YOU.push(VALVES_WITH_FLOW[i])
+        YOUR_CANDIDATE_VALVES.push(VALVES_WITH_FLOW[i])
         buildCombinationsAndAnalyze(i + 1);
-        ELEPHANT.push(YOU.pop());
+        ELEPHANT_CANDIDATE_VALVES.push(YOUR_CANDIDATE_VALVES.pop());
         buildCombinationsAndAnalyze(i + 1);
-        ELEPHANT.pop();
+        ELEPHANT_CANDIDATE_VALVES.pop();
       }
     }
 
     // ANALYZE
+    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
     buildCombinationsAndAnalyze(0);
 
     if (combinationCount !== 2**(VALVES_WITH_FLOW.length)) {
