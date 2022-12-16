@@ -60,7 +60,7 @@ This path reaches the goal in only 29 steps, the fewest possible.
 What is the fewest steps required to move starting from any square with elevation a to the location that should get the best signal?
 */
 
-const { Queue } = require('./classes');
+const { Queue } = require('./_classes');
 
 // ========== SOLUTION 1: BECAUSE JAVASCRIPT HAS NO BUILT-IN QUEUE CLASS, USE AN ARRAY WITH POINTER FOR O(1) DEQUEUE, AT COST OF SPACE
 

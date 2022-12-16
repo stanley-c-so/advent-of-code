@@ -54,8 +54,12 @@ class MinHeap {
 
   // ===== PQ METHODS =====
 
+  isEmpty () {
+    return this.queue.length === 0;
+  }
+
   peek () {
-    return this.queue[0];
+    return this.isEmpty() ? null : this.queue[0];
   }
 
   insert (value, priority = value) {
@@ -76,7 +80,7 @@ class MinHeap {
   popMin () {
 
     // EDGE CASES: 0- OR 1-LENGTH HEAP
-    if (!this.queue.length) return undefined;
+    if (this.isEmpty()) return null;
     if (this.queue.length === 1) return this.queue.pop();       // if only one node, just pop it off the queue and return
     
     // FIRST, SAVE THE TOP ELEMENT AND THEN REPLACE IT WITH LAST ELEMENT (AFTER POPPING IT OFF)

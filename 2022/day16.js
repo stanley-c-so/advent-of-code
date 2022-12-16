@@ -230,7 +230,7 @@ With you and an elephant working together for 26 minutes, what is the most press
 
 */
 
-const { MinHeap } = require('./classes');
+const { MinHeap } = require('./_classes');
 
 // OPTIONAL VARIABLES
 const DISPLAY_EXTRA_INFO = true;
@@ -276,7 +276,7 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
     for (const loc in VALVE_DATA) COST[loc] = loc === A ? 0 : Infinity;
     const PQ = new MinHeap();
     PQ.insert(A, 0);
-    while (PQ.queue.length) {
+    while (!PQ.isEmpty()) {
       const popped = PQ.popMin();
       const loc = popped.value;
       const cost = popped.priority;
