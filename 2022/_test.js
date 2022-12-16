@@ -12,6 +12,7 @@ function test (func, input, expected, testNum, skippedTests, lowestTest, highest
           : `----- TEST ${testNum[0]} FAILED: EXPECTED ${expected} BUT GOT ${output}`
       );
     }
+    console.log('');
   }
   ++testNum[0];
 };
