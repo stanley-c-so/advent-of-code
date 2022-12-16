@@ -403,12 +403,11 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
       // BASE CASE
       if (time === 0 || opened.size === VALVES_WITH_FLOW.length || doneA && doneB) {
         if (pressureReleased > maxPressureReleased) {
-          console.log(
-            'NEW RECORD:', pressureReleased,
-            `- DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS`,
-          )
+          maxPressureReleased = pressureReleased;
+          if (DISPLAY_EXTRA_INFO) console.log(
+            'NEW RECORD:', pressureReleased, `- DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS`,
+          );
         }
-        maxPressureReleased = Math.max(maxPressureReleased, pressureReleased);
         MEMO[SERIAL] = maxPressureReleased;
         return MEMO[SERIAL];
       }
