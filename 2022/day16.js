@@ -347,14 +347,14 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
     return { maxPressureReleased, path };
   }
 
-  const TIME_START = Date.now();
+  const TIME_AT_START = Date.now();
 
   // ANALYZE
   if (part === 1) {
 
     const { maxPressureReleased, path } = ANALYZE(VALVES_WITH_FLOW, 30)
     if (DISPLAY_EXTRA_INFO) console.log(`(PATH: ${path.join(', ')})`);
-    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_START)/1000} SECS)`)
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`)
     return maxPressureReleased;
 
   } else {
@@ -405,7 +405,7 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
         if (pressureReleased > maxPressureReleased) {
           console.log(
             'NEW RECORD:', pressureReleased,
-            `- DISCOVERED AFTER ${(Date.now() - TIME_START)/1000} SECS`,
+            `- DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS`,
           )
         }
         maxPressureReleased = Math.max(maxPressureReleased, pressureReleased);
@@ -619,7 +619,7 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
     }
 
     go('AA', 'AA', 26, 26, 26, new Set(), new Set(), false, false);
-    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_START)/1000} SECS)`)
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`)
     return maxPressureReleased;
 
   }
@@ -735,14 +735,14 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
     return { maxPressureReleased, path };
   }
 
-  const TIME_START = Date.now();
-
+  
   // ANALYZE
+  const TIME_AT_START = Date.now();
   if (part === 1) {
 
     const { maxPressureReleased, path } = ANALYZE(VALVES_WITH_FLOW, 30)
     if (DISPLAY_EXTRA_INFO) console.log(`(PATH: ${path.join(', ')})`);
-    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_START)/1000} SECS)`)
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`)
     return maxPressureReleased;
 
   } else {
@@ -769,7 +769,7 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
           if (!DEBUG) console.log(
             `(COMBINATION ${combinationCount}`
             + ' | '
-            + `NEW RECORD: ${RESULT} - DISCOVERED AFTER ${(Date.now() - TIME_START)/1000} SECS)`
+            + `NEW RECORD: ${RESULT} - DISCOVERED AFTER ${(Date.now() - TIME_AT_START)/1000} SECS)`
           )
           maxPressureReleased = RESULT;
           yourPath = RESULT_YOU.path;
@@ -797,7 +797,7 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
     if (DISPLAY_EXTRA_INFO) console.log('YOUR PATH:', yourPath.join(', '));
     if (DISPLAY_EXTRA_INFO) console.log('ELEPHANT PATH:', elephantPath.join(', '));
 
-    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_START)/1000} SECS)`);
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
     return maxPressureReleased;
 
   }
