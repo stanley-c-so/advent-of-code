@@ -270,22 +270,26 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
   const VALVES_WITH_FLOW = Object.keys(VALVE_DATA).filter(loc => VALVE_DATA[loc].flowRate > 0);
   const VALVES_WITH_FLOW_PLUS_START = [ 'AA', ...VALVES_WITH_FLOW ];
   
-  function dijkstra(A, B) {
+  function dijkstra(A, B) {                                                                 // return cost of shortest path from A to B
+
+    // init
     const visited = new Set();
     const COST = {};
-    for (const loc in VALVE_DATA) COST[loc] = loc === A ? 0 : Infinity;
+    for (const loc in VALVE_DATA) COST[loc] = loc === A ? 0 : Infinity;                     // all nodes start with infinite cost, except A
+
+    // priority queue via MinHeap
     const PQ = new MinHeap();
-    PQ.insert(A, 0);
+    PQ.insert(A, 0);                                                                        // init MinHeap with node A, cost 0
     while (!PQ.isEmpty()) {
-      const popped = PQ.popMin();
-      const loc = popped.value;
-      const cost = popped.priority;
+      const { value, priority } = PQ.popMin();
+      const loc = value;
+      const cost = priority;
       if (visited.has(loc)) continue;
-      for (const neighbor of VALVE_DATA[loc].neighbors) {
-        const tentativeCost = cost + 1;
-        if (tentativeCost < COST[neighbor]) {
-          COST[neighbor] = tentativeCost;
-          PQ.insert(neighbor, tentativeCost);
+      for (const neighbor of VALVE_DATA[loc].neighbors) {                                   // for all neighbors of current node...
+        const costThroughCurrentNode = cost + 1;                                            // ...cost to go there via this node is cost + 1
+        if (costThroughCurrentNode < COST[neighbor]) {                                      // if the calculated cost is an improvement...
+          COST[neighbor] = costThroughCurrentNode;                                          // ...update the cost in the COST dictionary...
+          PQ.insert(neighbor, costThroughCurrentNode);                                      // ...and insert neighbor node into PQ
         }
       }
     }
@@ -659,22 +663,26 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
   const VALVES_WITH_FLOW = Object.keys(VALVE_DATA).filter(loc => VALVE_DATA[loc].flowRate > 0);
   const VALVES_WITH_FLOW_PLUS_START = [ 'AA', ...VALVES_WITH_FLOW ];
   
-  function dijkstra(A, B) {
+  function dijkstra(A, B) {                                                                 // return cost of shortest path from A to B
+
+    // init
     const visited = new Set();
     const COST = {};
-    for (const loc in VALVE_DATA) COST[loc] = loc === A ? 0 : Infinity;
+    for (const loc in VALVE_DATA) COST[loc] = loc === A ? 0 : Infinity;                     // all nodes start with infinite cost, except A
+
+    // priority queue via MinHeap
     const PQ = new MinHeap();
-    PQ.insert(A, 0);
-    while (PQ.queue.length) {
-      const popped = PQ.popMin();
-      const loc = popped.value;
-      const cost = popped.priority;
+    PQ.insert(A, 0);                                                                        // init MinHeap with node A, cost 0
+    while (!PQ.isEmpty()) {
+      const { value, priority } = PQ.popMin();
+      const loc = value;
+      const cost = priority;
       if (visited.has(loc)) continue;
-      for (const neighbor of VALVE_DATA[loc].neighbors) {
-        const tentativeCost = cost + 1;
-        if (tentativeCost < COST[neighbor]) {
-          COST[neighbor] = tentativeCost;
-          PQ.insert(neighbor, tentativeCost);
+      for (const neighbor of VALVE_DATA[loc].neighbors) {                                   // for all neighbors of current node...
+        const costThroughCurrentNode = cost + 1;                                            // ...cost to go there via this node is cost + 1
+        if (costThroughCurrentNode < COST[neighbor]) {                                      // if the calculated cost is an improvement...
+          COST[neighbor] = costThroughCurrentNode;                                          // ...update the cost in the COST dictionary...
+          PQ.insert(neighbor, costThroughCurrentNode);                                      // ...and insert neighbor node into PQ
         }
       }
     }
