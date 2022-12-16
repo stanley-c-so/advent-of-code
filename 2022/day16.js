@@ -748,8 +748,8 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
   } else {
 
     // INIT
-    const YOU = [];
-    const ELEPHANT = [];
+    const YOUR_CANDIDATE_VALVES = [];
+    const ELEPHANT_CANDIDATE_VALVES = [];
     let combinationCount = 0;
     let maxPressureReleased = 0;
     let yourPath;
@@ -761,8 +761,8 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
       // BASE CASE: COMBINATION HAS BEEN BUILT, NOW ANALYZE YOU AND ELEPHANT ACCORDINGLY AND COMBINE RESULTS
       if (i === VALVES_WITH_FLOW.length) {
         ++combinationCount;
-        const RESULT_YOU = ANALYZE(YOU, 26);
-        const RESULT_ELEPHANT = ANALYZE(ELEPHANT, 26);
+        const RESULT_YOU = ANALYZE(YOUR_CANDIDATE_VALVES, 26);
+        const RESULT_ELEPHANT = ANALYZE(ELEPHANT_CANDIDATE_VALVES, 26);
         const RESULT = RESULT_YOU.maxPressureReleased + RESULT_ELEPHANT.maxPressureReleased;
 
         if (RESULT > maxPressureReleased) {
