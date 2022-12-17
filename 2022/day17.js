@@ -354,7 +354,7 @@ const DISPLAY_EXTRA_INFO = true;
 function getRockHeight (part, inputStr, DEBUG = false) {
 
   // INIT CONSTANTS
-  const LEN = inputStr.length;
+  const LEN_DATA = inputStr.length;
   
   // NOTE: I REPRESENT THIS SIMULATION UPSIDE-DOWN, BECAUSE AS I BUILD UP THIS GRID TO ACCOMMODATE A HIGHER AND HIGHER PILE,
   // I WANTED TO PUSH ROWS INTO THE GRID (RATHER THAN UNSHIFTING). THEREFORE, IMAGINE ROTATING THE IMAGE 180 DEGREES, AND MY GRID
@@ -461,16 +461,17 @@ function getRockHeight (part, inputStr, DEBUG = false) {
 
   // INIT SIMULATION VARIABLES
   let jetIdx = 0;
+  const TOTAL_NUM_ROCKS = part === 1 ? 2022 : 1000000000000;                        // PART 1: 2022 ROCKS; PART 2: 1 TRILLION ROCKS
 
   // INIT PATTERN-DETECTION VARIABLES
   const REPEATING_SERIAL_COUNTS = {};
   const KEY_ROCKS = [];
+  let foundRepeatingDelta = false;
   let highestRepeatSerialCount = 0;
   let lastKeyRock = 0;                                                              // init at 0 because 'rock 0' has serial with frequency 0
-  let KEY_ROCK_DELTA;
-  let foundRepeatingDelta = false;
-  let NUM_ROCKS = part === 1 ? 2022 : 1000000000000;
-  let HEIGHT_AT_FINAL_KEY_ROCK;
+  let KEY_ROCK_DELTA = null;                                                        // we will discover this later
+  let HEIGHT_AT_FINAL_KEY_ROCK = null;                                              // we will discover this later
+  let NUM_ROCKS = TOTAL_NUM_ROCKS;                                                  // init as TOTAL_NUM_ROCKS, but potentially decrease if pattern found
 
   // ANALYZE
   for (let rock = 1; rock <= NUM_ROCKS; ++rock) {                                   // NOTE: in part 2, NUM_ROCKS is prohibitively large. this will be
@@ -553,7 +554,7 @@ function getRockHeight (part, inputStr, DEBUG = false) {
 
       // STEP 1: rock gets blown sideways by jet
       const DIR = inputStr[jetIdx];
-      jetIdx = (jetIdx + 1) % LEN;
+      jetIdx = (jetIdx + 1) % LEN_DATA;
       if (DIR === '>') {                                                            // GO LEFT (our representation is upside down)
         if (checkAnchor(anchorX - 1, anchorY)) --anchorX;                           // move rock to the left if no collision and in bounds
       }
@@ -579,7 +580,7 @@ function getRockHeight (part, inputStr, DEBUG = false) {
       currTopRow = ceilFromThisRock;
     }
 
-    currRockType = (currRockType + 1) % 5;                                          // change to next rock type
+    currRockType = (currRockType + 1) % ROCKS.length;                               // change to next rock type
   }
 
   // RETURN REQUIRED OUTPUT AFTER SIMULATION
@@ -591,6 +592,10 @@ function getRockHeight (part, inputStr, DEBUG = false) {
     
   } else {                                                                          // PART 2: GET HEIGHT AFTER 1,000,000,000,000 ROCKS
     
+    if (HEIGHT_AT_FINAL_KEY_ROCK === null) {                                        // sanity check: make sure a pattern was actually found
+      throw 'ERROR: DID NOT FIND REPEATING PATTERN';
+    }
+
     return (currTopRow + 1)                                                         // current height (currTopRow is 0-indexed)
             - KEY_ROCKS.at(-1).height                                               // minus the height at the last simulated key rock
             + HEIGHT_AT_FINAL_KEY_ROCK;                                             // plus the height at the extrapolated final key rock
