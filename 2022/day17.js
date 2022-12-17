@@ -355,32 +355,67 @@ function getRockHeight (part, inputStr, DEBUG = false) {
 
   // INIT CONSTANTS
   const LEN = inputStr.length;
-  const ROCKS = [
-    [['#', '#', '#', '#']],
+  
+  // NOTE: I REPRESENT THIS SIMULATION UPSIDE-DOWN, BECAUSE AS I BUILD UP THIS GRID TO ACCOMMODATE A HIGHER AND HIGHER PILE,
+  // I WANTED TO PUSH ROWS INTO THE GRID (RATHER THAN UNSHIFTING). THEREFORE, IMAGINE ROTATING THE IMAGE 180 DEGREES, AND MY GRID
+  // LOOKS LIKE THAT. THE GOOD NEWS IS THAT A HIGHER VALUE OF y ALSO TRANSLATES TO A HIGHER VALUE OF ROW IN MY UPSIDE-DOWN GRID.
+  // THE BAD NEWS IS THAT x VALUES ARE REVERSED, AND THE LEFT/RIGHT DIRECTIONAL INPUT FROM THE DATA ALSO NEEDS TO BE TREATED IN
+  // REVERSE.
 
-    [['.', '#', '.'],
-     ['#', '#', '#'],
-     ['.', '#', '.']],
+  // const ROCKS = [
+  //   [['#', '#', '#', '#']],
 
-    [['#', '#', '#'],
-     ['#', '.', '.'],
-     ['#', '.', '.']],
+  //   [['.', '#', '.'],
+  //    ['#', '#', '#'],
+  //    ['.', '#', '.']],
 
-    [['#'],
-     ['#'],
-     ['#'],
-     ['#']],
+  //   [['#', '#', '#'],                                                               // NOTE: this rock is NOT identical when flipped upside down!
+  //    ['#', '.', '.'],
+  //    ['#', '.', '.']],
 
-    [['#', '#'],
-     ['#', '#']],
-  ];
+  //   [['#'],
+  //    ['#'],
+  //    ['#'],
+  //    ['#']],
+
+  //   [['#', '#'],
+  //    ['#', '#']],
+  // ];
+
+  const ROCK_STRS =
+`####
+
+.#.
+###
+.#.
+
+..#
+..#
+###
+
+#
+#
+#
+#
+
+##
+##`;
+  
+  const ROCKS = ROCK_STRS.split('\n\n')
+                          .map(rockStr => rockStr.split('\n')
+                                                  .reverse()
+                                                  .map(str => str.split('')
+                                                                  .reverse()));
   
   // INIT GRID
   let currRockType = 0;
-  let currTopRow = -1;                                                              // floor is at -1
+  let currTopRow = -1;                                                              // floor is at -1, as row 0 is empty space
   const GRID_WIDTH = 7;
-  const SPAWN_DISTANCE_X = 2;
-  const SPAWN_DISTANCE_Y = 4;
+  const SPAWN_DISTANCE_X = 2;                                                       // the problem says the 'anchor' spawns 2 from left wall
+  const SPAWN_DISTANCE_Y = 4;                                                       // the problem says the 'anchor' spawns 3 above floor...
+                                                                                    // ...but their diagram indicates otherwise. i think when...
+                                                                                    // ...they say 'floor' they mean the row of available space...
+                                                                                    // ...whereas i think of it as the row that's blocked off
   const HIGHEST_ROCK_HEIGHT = Math.max(...ROCKS.map(r => r.length));
   const GRID = Array.from({length:  currTopRow
                                     + 1
