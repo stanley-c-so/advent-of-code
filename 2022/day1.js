@@ -58,10 +58,6 @@ function countCalories (part, inputStr, DEBUG = false) {
                     .split('\r\n\r\n')
                     .map(inv => inv.split('\r\n')
                                   .map(n => +n));
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   const totalCaloriesCarriedByEachElf = inputArr.map(elf => elf.reduce((sum, num) => sum + num));
 

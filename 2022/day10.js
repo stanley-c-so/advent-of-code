@@ -325,10 +325,6 @@ Render the image given by your program. What eight capital letters appear on you
 
 function CRT (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
   let cycle = 0;

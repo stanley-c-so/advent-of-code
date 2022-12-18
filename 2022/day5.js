@@ -112,10 +112,6 @@ Before the rearrangement process finishes, update your simulation so that the El
 
 function pushAndPopStacks (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   const COLS = (inputArr[0].length + 1) / 4;                          // each col is [X] with 1 space in between - 4 spaces per col
                                                                       // but we also add 1 before dividing because of fencepost

@@ -245,10 +245,6 @@ const DISPLAY_EXTRA_INFO = true;
 
 function optimalGraphTraversal (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // NOTE: WE SIMPLIFY THE PROBLEM SPACE BY IMAGINING YOU ARE ONLY REALLY TRAVELING BETWEEN VALVES WITH POSITIVE FLOW RATE (AND 'AA').
   // THEREFORE, YOU CAN 'MOVE DIRECTLY' FROM ONE VALVE TO ANOTHER BY ABSTRACTING AWAY INTERMEDIATE NODES, AND ALSO KNOW FOR SURE THAT THE
@@ -638,10 +634,6 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
 
 function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // NOTE: WE SIMPLIFY THE PROBLEM SPACE BY IMAGINING YOU ARE ONLY REALLY TRAVELING BETWEEN VALVES WITH POSITIVE FLOW RATE (AND 'AA').
   // THEREFORE, YOU CAN 'MOVE DIRECTLY' FROM ONE VALVE TO ANOTHER BY ABSTRACTING AWAY INTERMEDIATE NODES, AND ALSO KNOW FOR SURE THAT THE

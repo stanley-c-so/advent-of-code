@@ -124,10 +124,6 @@ const SEE_AREA_BEING_SKIPPED = false;
 
 function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // UTILITY
   const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -304,10 +300,6 @@ function analyzeSensorCoverage (part, inputStr, extraParam, DEBUG = false) {
 
 function analyzeSensorCoverage2 (part, inputStr, extraParam, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // UTILITY
   const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -477,10 +469,6 @@ function analyzeSensorCoverage2 (part, inputStr, extraParam, DEBUG = false) {
 
 function analyzeSensorCoverage3 (part, inputStr, extraParam, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // UTILITY
   const getManhattanDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);

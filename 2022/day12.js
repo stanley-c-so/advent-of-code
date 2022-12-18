@@ -66,10 +66,6 @@ const { Queue } = require('./_classes');
 
 function elevationBFS (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
 
@@ -157,10 +153,6 @@ function elevationBFS (part, inputStr, DEBUG = false) {
 
 function elevationBFS2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
 
@@ -251,10 +243,6 @@ function elevationBFS2 (part, inputStr, DEBUG = false) {
 
 function elevationBFS3 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
 
@@ -331,10 +319,6 @@ function elevationBFS3 (part, inputStr, DEBUG = false) {
 
 function elevationBFS4 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
 
@@ -430,10 +414,6 @@ function elevationBFS4 (part, inputStr, DEBUG = false) {
 
 function elevationBFS5 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
 

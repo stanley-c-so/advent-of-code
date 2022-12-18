@@ -49,10 +49,6 @@ Following the Elf's instructions for the second column, what would your total sc
 
 function rockPaperScissors (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   const REF = {
     'rock': { points: 1, beats: 'scissors', losesTo: 'paper' },
@@ -118,10 +114,6 @@ function rockPaperScissors (part, inputStr, DEBUG = false) {
 
 function rockPaperScissors2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   let score = 0;
   for (const line of inputArr) {

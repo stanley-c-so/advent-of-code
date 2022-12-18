@@ -55,9 +55,6 @@ How many characters need to be processed before the first start-of-message marke
 // ===== SOLUTION 1: TAKE SLICES BASED ON INDEX POSITION, INSERT INTO A SET, AND MEASURE SET SIZE
 
 function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
-  // if (DEBUG) {
-  //   console.log(inputStr);
-  // }
 
   const N = part === 1 ? 4                                                      // PART 1: NEED SUBSTRING OF LENGTH 4
                        : 14;                                                    // PART 2: NEED SUBSTRING OF LENGTH 14
@@ -72,9 +69,6 @@ function findSubstringWithUniqueChars (part, inputStr, DEBUG = false) {
 // ===== SOLUTION 2 (FEWER OPERATIONS): USE A HASH TABLE AND TRACK UNIQUE CHARS
 
 function findSubstringWithUniqueChars2 (part, inputStr, DEBUG = false) {
-  // if (DEBUG) {
-  //   console.log(inputStr);
-  // }
 
   const N = part === 1 ? 4                                                      // PART 1: NEED SUBSTRING OF LENGTH 4
                        : 14;                                                    // PART 2: NEED SUBSTRING OF LENGTH 14

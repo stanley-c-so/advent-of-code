@@ -155,10 +155,6 @@ Organize all of the packets into the correct order. What is the decoder key for 
 
 function readPackets (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // HELPER COMPARE FUNCTION
   function compare(a, b) {
@@ -218,10 +214,6 @@ function readPackets (part, inputStr, DEBUG = false) {
 
 function readPackets2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // HELPER EVAL FUNCTION
   function EVAL(str) {

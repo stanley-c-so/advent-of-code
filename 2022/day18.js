@@ -56,10 +56,6 @@ const DISPLAY_EXTRA_INFO = true;
 
 function analyzeSurfaceAreaOfSolid (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT DATA STRUCTURE AND RELATED KEY VARIABLES
   const CUBES = new Set();
@@ -184,10 +180,6 @@ function analyzeSurfaceAreaOfSolid (part, inputStr, DEBUG = false) {
 
 function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT DATA STRUCTURE AND RELATED KEY VARIABLES
   const CUBES = new Set();

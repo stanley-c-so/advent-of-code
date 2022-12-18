@@ -171,10 +171,6 @@ const DRAW_EVERY = 10;                                                          
 
 function fillWithSand (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
   const SAND_ENTRY_X = 500;

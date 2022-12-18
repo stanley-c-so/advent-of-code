@@ -64,10 +64,6 @@ In how many assignment pairs do the ranges overlap?
 
 function overlappingIntervals (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   let count = 0;
 

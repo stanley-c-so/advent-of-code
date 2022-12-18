@@ -687,10 +687,6 @@ Simulate your complete series of motions on a larger rope with ten knots. How ma
 
 function ropePull (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
   const NUM_KNOTS = part === 1 ? 2                                                    // PART 1: 2 KNOTS

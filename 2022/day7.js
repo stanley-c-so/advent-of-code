@@ -113,10 +113,6 @@ Find the smallest directory that, if deleted, would free up enough space on the 
 
 function parseFilesystem (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // UTILITY
   const createDir = () => ({ parent: currentDir, size: 0 });                              // DATA STRUCTURE: folders need to know their size and their parent
@@ -204,10 +200,6 @@ function parseFilesystem (part, inputStr, DEBUG = false) {
 
 function parseFilesystem2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // CLASS
   class Directory {

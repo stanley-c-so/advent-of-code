@@ -79,10 +79,6 @@ Consider each tree on your map. What is the highest scenic score possible for an
 
 function visibleTrees (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
   const H = inputArr.length;
@@ -201,10 +197,6 @@ function visibleTrees (part, inputStr, DEBUG = false) {
 
 function visibleTrees2 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
-  // if (DEBUG) {
-  //   console.log(inputArr[0]);
-  //   // console.log(inputArr[1]);
-  // }
 
   // INIT
   const H = inputArr.length;
