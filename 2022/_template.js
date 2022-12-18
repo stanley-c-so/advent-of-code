@@ -14,9 +14,21 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
   //   // console.log(inputArr[1]);
   // }
 
+
+
+  const TIME_AT_START = Date.now();
+
+  // ANALYZE
   if (part === 1) {
 
   } else {
+
+    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+
+
+
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+    return TOTAL_SURFACE_AREA_OF_SOLID - TOTAL_INTERIOR_SURFACE_AREA;
 
   }
 }
