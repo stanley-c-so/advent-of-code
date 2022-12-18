@@ -109,28 +109,24 @@ function analyzeSurfaceAreaOfSolid (part, inputStr, DEBUG = false) {
   ]
 
   let TOTAL_SURFACE_AREA_OF_SOLID = 0;
-
   for (const cube of CUBES) {
     const [x, y, z] = cube.split(',').map(n => +n);
-    let surfaceArea = 6;
-    for (const [ dx, dy, dz ] of DIRS) {                                                  // first, assume this cube has a surface area of 6...
-      if (CUBES.has(`${x + dx},${y + dy},${z + dz}`)) --surfaceArea;                      // ...but then decrement for every neighbor that's also a cube
+    for (const [ dx, dy, dz ] of DIRS) {
+      if (!CUBES.has(`${x + dx},${y + dy},${z + dz}`)) ++TOTAL_SURFACE_AREA_OF_SOLID;         // increment surface area for every neighbor that's not a cube
     }
-    TOTAL_SURFACE_AREA_OF_SOLID += surfaceArea;
   }
 
   const TIME_AT_START = Date.now();
 
   // ANALYZE
-  if (part === 1) {                                                                       // PART 1: GET SURFACE AREA OF SOLID
+  if (part === 1) {                                                                           // PART 1: GET SURFACE AREA OF SOLID
 
     return TOTAL_SURFACE_AREA_OF_SOLID;
 
-  } else {                                                                                // PART 2: DON'T INCLUDE SURFACE AREA TOUCHING TRAPPED POCKETS OF SPACE
+  } else {                                                                                    // PART 2: DON'T INCLUDE SURFACE AREA TOUCHING TRAPPED POCKETS OF SPACE
 
     if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
 
-    let TOTAL_INTERIOR_SURFACE_AREA = 0;
     const visited = new Set();
 
     // HELPER FUNCTION: MARK OFF ALL CONTIGUOUS EMPTY SPACES CONNECTED TO START LOCATION; RETURN SURFACE AREA IF THIS IS A CONTAINED REGION, ELSE 0
@@ -139,9 +135,9 @@ function analyzeSurfaceAreaOfSolid (part, inputStr, DEBUG = false) {
       const visitedOnThisRun = new Set();
       const stack = [ startLocation ];
 
-      while (stack.length && visitedOnThisRun.size < TOTAL_VOLUME_OF_PROBLEM_SPACE) {     // NOTE: IMPORTANT TO BREAK IF WE REALIZE THIS IS OPEN SPACE
+      while (stack.length && visitedOnThisRun.size < TOTAL_VOLUME_OF_PROBLEM_SPACE) {         // NOTE: IMPORTANT TO BREAK IF WE REALIZE THIS IS OPEN SPACE
         const serial = stack.pop();
-        if (visitedOnThisRun.has(serial) || CUBES.has(serial)) continue;                  // skip visited locations and non-air locations
+        if (visitedOnThisRun.has(serial) || CUBES.has(serial)) continue;                      // skip visited locations and non-air locations
         visitedOnThisRun.add(serial);
         const [ x, y, z ] = serial.split(',').map(n => +n);
         for (const [ dx, dy, dz ] of DIRS) {
@@ -151,10 +147,12 @@ function analyzeSurfaceAreaOfSolid (part, inputStr, DEBUG = false) {
         }
       }
 
-      for (const el of visitedOnThisRun) visited.add(el);                                 // NOTE: add all visited locations on this run to visited set
-      return visitedOnThisRun.size === TOTAL_VOLUME_OF_PROBLEM_SPACE ? 0 : surfaceArea;   // NOTE: IF THIS RUN FOUND OPEN SPACE, DON'T COUNT IT
+      for (const el of visitedOnThisRun) visited.add(el);                                     // NOTE: add all visited locations on this run to visited set
+      return visitedOnThisRun.size === TOTAL_VOLUME_OF_PROBLEM_SPACE ? 0 : surfaceArea;       // NOTE: IF THIS RUN FOUND OPEN SPACE, DON'T COUNT IT
     }
 
+    // iterate through entire problem space and call DFS on any location that is unvisited air
+    let TOTAL_INTERIOR_SURFACE_AREA = 0;
     for (let x = minX; x <= maxX; ++x) {
       for (let y = minY; y <= maxY; ++y) {
         for (let z = minZ; z <= maxZ; ++z) {
@@ -206,7 +204,7 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
     maxZ = Math.max(maxZ, z);
   }
 
-  // INCREMENT/DECREMENT BOUNDARY VARIABLES TO ALLOW FOR 1-UNIT WRAPPER REGION
+  // INCREMENT/DECREMENT BOUNDARY VARIABLES TO ALLOW FOR 1-UNIT WRAPPER REGION FOR PART 2 FLOOD FILL
   --minX; ++maxX; --minY; ++maxY; --minZ; ++maxZ;
 
   if (DISPLAY_EXTRA_INFO) {
@@ -229,32 +227,27 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
   ]
 
   let TOTAL_SURFACE_AREA_OF_SOLID = 0;
-
   for (const cube of CUBES) {
     const [x, y, z] = cube.split(',').map(n => +n);
-    let surfaceArea = 6;
-    for (const [ dx, dy, dz ] of DIRS) {                                                  // first, assume this cube has a surface area of 6...
-      if (CUBES.has(`${x + dx},${y + dy},${z + dz}`)) --surfaceArea;                      // ...but then decrement for every neighbor that's also a cube
+    for (const [ dx, dy, dz ] of DIRS) {
+      if (!CUBES.has(`${x + dx},${y + dy},${z + dz}`)) ++TOTAL_SURFACE_AREA_OF_SOLID;         // increment surface area for every neighbor that's not a cube
     }
-    TOTAL_SURFACE_AREA_OF_SOLID += surfaceArea;
   }
 
   const TIME_AT_START = Date.now();
 
   // ANALYZE
-  if (part === 1) {                                                                       // PART 1: GET SURFACE AREA OF SOLID
+  if (part === 1) {                                                                           // PART 1: GET SURFACE AREA OF SOLID
 
     return TOTAL_SURFACE_AREA_OF_SOLID;
 
-  } else {                                                                                // PART 2: DON'T INCLUDE SURFACE AREA TOUCHING TRAPPED POCKETS OF SPACE
+  } else {                                                                                    // PART 2: DON'T INCLUDE SURFACE AREA TOUCHING TRAPPED POCKETS OF SPACE
 
     if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
 
-    let TOTAL_INTERIOR_SURFACE_AREA = 0;
-    
     // flood fill to discover all regions of open space
     const OPEN_SPACE = new Set();
-    const stack = [ `${minX},${minY},${minZ}` ];                                          // this location is guaranteed to be open space
+    const stack = [ `${minX},${minY},${minZ}` ];                                              // this location is guaranteed to be open space
     while (stack.length) {
       const serial = stack.pop();
       if (OPEN_SPACE.has(serial)) continue;
@@ -264,7 +257,7 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
         const [ newX, newY, newZ ] = [ x + dx, y + dy, z + dz ];
         const neighbor = `${newX},${newY},${newZ}`;
         if (
-          minX <= newX && newX <= maxX                                                    // NOTE: RESTRICT FLOOD FILL TO WITHIN PROBLEM SPACE
+          minX <= newX && newX <= maxX                                                        // NOTE: RESTRICT FLOOD FILL TO WITHIN PROBLEM SPACE
           && minY <= newY && newY <= maxY
           && minZ <= newZ && newZ <= maxZ
           && !CUBES.has(neighbor)
@@ -275,16 +268,15 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
     }
 
     // iterate through problem space and count up total interior surface area
+    let TOTAL_INTERIOR_SURFACE_AREA = 0;
     for (let x = minX; x <= maxX; ++x) {
       for (let y = minY; y <= maxY; ++y) {
         for (let z = minZ; z <= maxZ; ++z) {
           const serial = `${x},${y},${z}`;
           if (!CUBES.has(serial) && !OPEN_SPACE.has(serial)) {
-            let surfaceArea = 0;
-            for (const [ dx, dy, dz ] of DIRS) {                                          // first, assume this region has a surface area of 0...
-              if (CUBES.has(`${x + dx},${y + dy},${z + dz}`)) ++surfaceArea;              // ...but then increment for every neighbor that's also a cube
+            for (const [ dx, dy, dz ] of DIRS) {
+              if (CUBES.has(`${x + dx},${y + dy},${z + dz}`)) ++TOTAL_INTERIOR_SURFACE_AREA;  // increment surface area for every neighbor that's also a cube
             }
-            TOTAL_INTERIOR_SURFACE_AREA += surfaceArea;
           }
         }
       }
@@ -296,16 +288,126 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
   }
 }
 
+
+// SOLUTION 3: SIMILAR TO SOLUTION 2, WE CREATE A WRAPPER AROUND THE PROBLEM SPACE AND FLOODFILL IT TO IDENTIFY UNENCLOSED SPACES. THEN, RATHER THAN
+// ITERATING THROUGH THE ENTIRE PROBLEM SPACE, WE ITERATE THROUGH THE KNOWN CUBES ONLY (WHICH IS A MUCH SHORTER LIST), AND WE COUNT SURFACE AREA ONLY
+// FOR THOSE SIDES SUCH THAT THE NEIGHBOR WOULD BE A MEMBER OF THE UNENCLOSED SPACE.
+
+function analyzeSurfaceAreaOfSolid3 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+
+  // INIT DATA STRUCTURE AND RELATED KEY VARIABLES
+  const CUBES = new Set();
+
+  // NOTE: we must track the boundaries of our problem space so we can create a wrapper region around it. in my sample data this volume is 54;
+  // in the actual data this volume is 9702.
+
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+
+  // PARSE DATA AND DISCOVER LIMITS OF PROBLEM SPACE
+  for (const line of inputArr) {
+    CUBES.add(line);
+    const [ x, y, z ] = line.split(',').map(n => +n);
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+    minZ = Math.min(minZ, z);
+    maxZ = Math.max(maxZ, z);
+  }
+
+  // INCREMENT/DECREMENT BOUNDARY VARIABLES TO ALLOW FOR 1-UNIT WRAPPER REGION FOR PART 2 FLOOD FILL
+  --minX; ++maxX; --minY; ++maxY; --minZ; ++maxZ;
+
+  if (DISPLAY_EXTRA_INFO) {
+    console.log(`X range: from ${minX} to ${maxX}`);
+    console.log(`Y range: from ${minY} to ${maxY}`);
+    console.log(`Z range: from ${minZ} to ${maxZ}`);
+    console.log(`total volume of problem space: ${
+      (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1)
+    }`);
+  }
+
+  // INIT ADDITIONAL VARIABLES AND DISCOVER TOTAL SURFACE AREA OF SOLID
+  const DIRS = [
+    [ +1, 0, 0 ],
+    [ -1, 0, 0 ],
+    [ 0, +1, 0 ],
+    [ 0, -1, 0 ],
+    [ 0, 0, +1 ],
+    [ 0, 0, -1 ],
+  ]
+
+  // HELPER FUNCTION: ITERATE THROUGH SOLID'S POINTS FROM INPUT DATA, AND CALCULATE THE SURFACE AREA FOR EACH ONE BASED ON LOGIC FROM CALLBACK
+  function getTotalSurfaceAreaOfSolid(callback) {
+    let totalSurfaceArea = 0;
+
+    for (const cube of CUBES) {
+      const [x, y, z] = cube.split(',').map(n => +n);
+      for (const [ dx, dy, dz ] of DIRS) {
+        if (callback(`${x + dx},${y + dy},${z + dz}`)) ++totalSurfaceArea;                    // increment surface area for every neighbor that passes the callback
+      }
+    }
+
+    return totalSurfaceArea;
+  }
+
+  const TIME_AT_START = Date.now();
+
+  // ANALYZE
+  if (part === 1) {                                                                           // PART 1: GET SURFACE AREA OF SOLID
+
+    return getTotalSurfaceAreaOfSolid(neighbor => !CUBES.has(neighbor));                      // callback logic: neighbor must be air to increment surface area
+
+  } else {                                                                                    // PART 2: DON'T INCLUDE SURFACE AREA TOUCHING TRAPPED POCKETS OF SPACE
+
+    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+
+    // flood fill to discover all regions of open space
+    const OPEN_SPACE = new Set();
+    const stack = [ `${minX},${minY},${minZ}` ];                                              // this location is guaranteed to be open space
+    while (stack.length) {
+      const serial = stack.pop();
+      if (OPEN_SPACE.has(serial)) continue;
+      OPEN_SPACE.add(serial);
+      const [ x, y, z ] = serial.split(',').map(n => +n);
+      for (const [ dx, dy, dz ] of DIRS) {
+        const [ newX, newY, newZ ] = [ x + dx, y + dy, z + dz ];
+        const neighbor = `${newX},${newY},${newZ}`;
+        if (
+          minX <= newX && newX <= maxX                                                        // NOTE: RESTRICT FLOOD FILL TO WITHIN PROBLEM SPACE
+          && minY <= newY && newY <= maxY
+          && minZ <= newZ && newZ <= maxZ
+          && !CUBES.has(neighbor)
+        ) {
+          stack.push(neighbor);
+        }
+      }
+    }
+
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+    return getTotalSurfaceAreaOfSolid(neighbor => OPEN_SPACE.has(neighbor));                  // callback logic: neighbor must be open space to increment surface area
+
+  }
+}
+
 // TEST CASES
 
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
 // const func = analyzeSurfaceAreaOfSolid;
-const func = analyzeSurfaceAreaOfSolid2;
-const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
-const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
-const skippedTests = new Set([  ]);
+// const func = analyzeSurfaceAreaOfSolid2;
+const func = analyzeSurfaceAreaOfSolid3;
+// const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
+const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very larg3
+// const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
+const skippedTests = new Set([  ])
 const lowestTest = 0;
 const highestTest = 0;
 
