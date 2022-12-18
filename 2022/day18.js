@@ -262,7 +262,7 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
     
     // flood fill to discover all regions of open space
     const OPEN_SPACE = new Set();
-    const stack = [ `${minX},${minY},${minZ}` ];
+    const stack = [ `${minX},${minY},${minZ}` ];                                          // this location is guaranteed to be open space
     while (stack.length) {
       const serial = stack.pop();
       if (OPEN_SPACE.has(serial)) continue;
@@ -272,7 +272,7 @@ function analyzeSurfaceAreaOfSolid2 (part, inputStr, DEBUG = false) {
         const [ newX, newY, newZ ] = [ x + dx, y + dy, z + dz ];
         const neighbor = `${newX},${newY},${newZ}`;
         if (
-          minX <= newX && newX <= maxX                                                  // NOTE: RESTRICT FLOOD FILL TO WITHIN PROBLEM SPACE
+          minX <= newX && newX <= maxX                                                    // NOTE: RESTRICT FLOOD FILL TO WITHIN PROBLEM SPACE
           && minY <= newY && newY <= maxY
           && minZ <= newZ && newZ <= maxZ
           && !CUBES.has(neighbor)
