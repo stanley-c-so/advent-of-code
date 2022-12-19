@@ -41,9 +41,9 @@ let input, expected;
 const func = NAME_OF_FUNC_HERE;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
-const skippedTests = new Set([  ]);
+const skippedTests = new Set([ 2, 3, 4 ]);
 const lowestTest = 0;
-const highestTest = 2;
+const highestTest = 0;
 
 const fs = require('fs');
 const path = require('path');
