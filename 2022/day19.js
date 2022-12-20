@@ -386,13 +386,18 @@ Don't worry about quality levels; instead, just determine the largest number of 
 const DISPLAY_EXTRA_INFO = true;
 
 
+// NOTE: A QUICK NOTE ABOUT NOMENCLATURE IN THIS SOLUTION - THE TIME UNIT GIVEN IN THIS PROBLEM IS IN TERMS OF MINUTES. HOWEVER,
+// FOR WHATEVER REASON, I CALLED IT A 'DAY' INSTEAD, AND IT WOULD BE TOO MUCH WORK TO FIX IT NOW. SOMEHOW, THIS IS FITTING, BECAUSE ONE
+// WOULD NORMALLY EXPECT THESE SOLUTIONS TO RUN WITHIN A SHORT PERIOD OF TIME, YET MY FIRST FEW ATTEMPTS AT THIS RESULTED IN PROGRAMS THAT
+// RAN FOR SEVERAL HOURS AND NEVER FINISHED BEFORE I TERMINATED.
+
 function optimizeResourceChain (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
 
   // PARSE INPUT DATA
   const BLUEPRINTS = [];
   for (const line of inputArr) {
-    const SPLIT = line.split(' ');
+    const SPLIT = line.split(' ');                                                              // we will parse based on position within sentence
 
     const ORE_ROBOT_ORE = +SPLIT[6];
     const CLAY_ROBOT_ORE = +SPLIT[12];
@@ -422,25 +427,36 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
                       
     const BLUEPRINT_RESULTS = Array(BLUEPRINTS).fill(null);
 
-    for (let b = 1; b <= BLUEPRINTS_TO_BE_EXAMINED; ++b) {
+    for (let b = 1; b <= BLUEPRINTS_TO_BE_EXAMINED; ++b) {                                      // iterate through all blueprints
 
-      if (DISPLAY_EXTRA_INFO) console.log('========== NOW ANALYZING BLUEPRINT:', b);
+      if (DISPLAY_EXTRA_INFO) console.log('> NOW ANALYZING BLUEPRINT:', b);                     // indicates activity while code is running
       const TIME_START_BLUEPRINT = Date.now();
       let NEXT_MIN_TARGET = 1;
 
       const COSTS = BLUEPRINTS[b - 1];
 
+      // NOTE: IMPORTANT OPTIMIZATION. IF YOU HAVE ENOUGH OBSIDIAN ROBOTS SUCH THAT EVERY DAY YOU ARE GETTING A YIELD EQUAL TO
+      // THE OBSIDIAN COST OF A GEODE ROBOT (THE ONLY THING THAT COSTS OBSIDIAN), YOU ARE ALREADY AT THE MAX NUMBER OF OBSIDIAN
+      // ROBOTS YOU SHOULD BUY. THERE IS NO NEED TO BUY MORE.
+      //
+      // THE SAME LOGIC APPLIES TO CLAY ROBOTS. THERE WILL NEVER BE A NEED TO GENERATE MORE CLAY YIELD PER DAY THAN THE CLAY REQUIRED
+      // TO BUY AN OBSIDIAN ROBOT.
+      //
+      // ONCE THE ORE -> CLAY -> OBSIDIAN 'PIPELINE' IS NO LONGER NECESSARY, THEN THE ONLY FURTHER PURPOSE OF ORE WOULD BE TO BUY
+      // GEODE ROBOTS. IF THE NUMBER OF ORE ROBOTS EQUALS THE ORE COST OF A GEODE ROBOT AT THAT POINT, THERE WOULD BE NO NEED TO BUY MORE.
       const MAX_OBSIDIAN_ROBOTS = COSTS.GEODE_ROBOT.obsidian;
       const MAX_CLAY_ROBOTS = COSTS.OBSIDIAN_ROBOT.clay;
       const MAX_ORE_ROBOTS = COSTS.GEODE_ROBOT.ore;
 
-      const STARTING_STATE = [ 0, 0, 0, 0, 1, 0, 0, 0 ];
+      // NOTE: STATE CONSISTS OF: day, amount of each of the four resources (include 'geodes'), and amount of each of the four robot types
+      const STARTING_STATE = [ 0, 0, 0, 0, 1, 0, 0, 0 ];                                        // i.e. you start with 1 ore robot and nothing else
       const MEMO = Array.from({length: TIME_LIMIT + 1}, () => ({}));
       
-      let BEST_GEODES = 0;
+      let BEST_GEODES = 0;                                                                      // tracker variable to access best geode result so far
 
+      // HELPER FUNCTION
       function DFS( day,
-                    TODAY_ORE,
+                    TODAY_ORE,                                                                  // amount of resources at the start of the day
                     TODAY_CLAY,
                     TODAY_OBSIDIAN,
                     TODAY_GEODES,
@@ -450,7 +466,8 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
                     TODAY_GEODE_ROBOTS) {
         
         if (DISPLAY_EXTRA_INFO
-            && Math.floor((Date.now() - TIME_START_BLUEPRINT)/(1000*60)) === NEXT_MIN_TARGET) {
+            && Math.floor((Date.now() - TIME_START_BLUEPRINT)/(1000*60)) === NEXT_MIN_TARGET)
+        {
           console.log(`... ${
             NEXT_MIN_TARGET
             } mins have passed since beginning this blueprint`);
@@ -460,9 +477,10 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
           ++NEXT_MIN_TARGET;
         }
 
-        if (day > TIME_LIMIT) return 0;
+        if (day > TIME_LIMIT) return 0;                                                         // if DFS gets called past TIME_LIMIT, return 0
+                                                                                                // to indicate a 'dead' branch
 
-        if (day === TIME_LIMIT) {
+        if (day === TIME_LIMIT) {                                                               // BASE CASE: AT TIME LIMIT
           BEST_GEODES = Math.max(BEST_GEODES, TODAY_GEODES);
           return TODAY_GEODES;
         }
@@ -480,6 +498,9 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
         const SERIAL = STATE.join(',')
 
 
+        // NOTE: IMPORTANT OPTIMIZATION. WE CHECK IF WE COULD MAGICALLY GUARANTEE THAT WE BUY A GEODE ROBOT EVERY DAY FOR THE
+        // REST OF THE SIMULATION, STARTING NOW, THAT WOULD STILL NOT GENERATE ENOUGH GEODES COMPARED TO A PREVIOUSLY KNOWN VALUE.
+        // IF THIS HAPPENS WE CAN PRUNE THIS BRANCH.
         const CANNOT_GET_ENOUGH_GEODES = TODAY_GEODES
                                           + ((TIME_LIMIT - day) * TODAY_GEODE_ROBOTS)
                                           + ((TIME_LIMIT - day - 1) * (TIME_LIMIT - day) / 2)
@@ -487,11 +508,18 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
         if (CANNOT_GET_ENOUGH_GEODES) MEMO[day][SERIAL] = 0;
 
 
+        // TNOTE: these booleans make it very easy to reason through the decision tree
         const NO_MORE_OBSIDIAN_ROBOTS = TODAY_OBSIDIAN_ROBOTS >= MAX_OBSIDIAN_ROBOTS;
         const NO_MORE_CLAY_ROBOTS = NO_MORE_OBSIDIAN_ROBOTS || TODAY_CLAY_ROBOTS >= MAX_CLAY_ROBOTS;
         const NO_MORE_ORE_ROBOTS = NO_MORE_OBSIDIAN_ROBOTS && TODAY_ORE_ROBOTS >= MAX_ORE_ROBOTS;
 
         if (!(SERIAL in MEMO[day])) {
+
+          // NOTE: INSTEAD OF SIMULATING EACH INDIVIDUAL DAY, THE OPTIMIZATION HEURISTIC WE USE HERE IS TO RECOGNIZE THAT
+          // EVERY TIME WE RUN THE DFS FUNCTION, WE HAVE A CHOICE TO MAKE: WHICH ROBOT, IF ANY, WILL BE THE ONE WE BUY NEXT
+          // (WHETHER IMMEDIATELY OR AFTER A FEW DAYS)? NOTE THAT WE SHOULD BUY THIS ROBOT AS SOON AS IT IS POSSIBLE TO DO SO.
+          // FURTHERMORE WE CAN, BY DEFINITION, ASSERT THAT THERE ARE NO OTHER CHANGES TO THE ROBOT COUNT UNTIL THE NEXT ROBOT IS
+          // PURCHASED.
 
           function GET_DAYS_TO_WAIT(NEXT_ROBOT) {
             switch (NEXT_ROBOT) {
@@ -535,15 +563,21 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
           const DAYS_TO_WAIT_FOR_CLAY_ROBOT = GET_DAYS_TO_WAIT(CLAY);
           const DAYS_TO_WAIT_FOR_ORE_ROBOT = GET_DAYS_TO_WAIT(ORE);
 
+          // NOTE: ANOTHER IMPORTANT OPTIMIZATION IS THAT WE *THROW AWAY EXTRA RESOURCES* THAT WE DON'T NEED, IN HOPES OF REDUCING
+          // UNNECESSARY VARIATION TO STATES, AND INCREASING THE LIKELIHOOD OF GETTING A CACHE HIT ON THE MEMO.
+          
+          // NOTE ALSO THAT IT SEEMS (THOUGH I AM NOT ENTIRELY SURE) THAT IT IS BETTER TO RECURSE WITH THE MOST AGGRESSIVE BUYING STRATEGY
+          // FIRST BEFORE THE OTHERS, BECAUSE I BELIEVE IT WILL RESULT IN MORE CACHE HITS (WHICH IS TIME SAVED).
+
           const BUY_GEODE_ROBOT = DFS(day + (DAYS_TO_WAIT_FOR_GEODE_ROBOT + 1),
-                                      NO_MORE_ORE_ROBOTS      ? MAX_ORE_ROBOTS
+                                      NO_MORE_ORE_ROBOTS      ? MAX_ORE_ROBOTS                                                    // max useful # ore robots
                                                               : TODAY_ORE
                                                                   + (DAYS_TO_WAIT_FOR_GEODE_ROBOT + 1) * TODAY_ORE_ROBOTS
                                                                   - COSTS.GEODE_ROBOT.ore,
-                                      NO_MORE_CLAY_ROBOTS     ? 0
+                                      NO_MORE_CLAY_ROBOTS     ? 0                                                                 // throw away extra clay
                                                               : TODAY_CLAY
                                                                   + (DAYS_TO_WAIT_FOR_GEODE_ROBOT + 1) * TODAY_CLAY_ROBOTS,
-                                      NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
+                                      NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS                                               // max useful # obsidian robots
                                                               : TODAY_OBSIDIAN
                                                                   + (DAYS_TO_WAIT_FOR_GEODE_ROBOT + 1) * TODAY_OBSIDIAN_ROBOTS
                                                                   - COSTS.GEODE_ROBOT.obsidian,
@@ -608,7 +642,9 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
                                         TODAY_OBSIDIAN_ROBOTS,
                                         TODAY_GEODE_ROBOTS);
 
-          const BUY_NOTHING = TODAY_GEODES + TODAY_GEODE_ROBOTS * (TIME_LIMIT - day);
+          const BUY_NOTHING = TODAY_GEODES + TODAY_GEODE_ROBOTS * (TIME_LIMIT - day);           // calculate total geode yield based on geode robots owned today
+
+          // THERE ARE ONLY 5 THINGS YOU CAN DO: CHOOSE THE ROBOT TYPE YOU WILL BUY NEXT BEFORE ANY OTHERS, OR COMMIT TO NEVER BUY ANOTHER ROBOT
 
           MEMO[day][SERIAL] = Math.max( BUY_GEODE_ROBOT, BUY_OBSIDIAN_ROBOT, BUY_CLAY_ROBOT, BUY_ORE_ROBOT, BUY_NOTHING );
         }
@@ -617,7 +653,11 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
         return MEMO[day][SERIAL];
       }
       
-      DFS(0, ...STARTING_STATE);
+      DFS(0, ...STARTING_STATE);                                                                // kick-start recursion. note that it should return
+                                                                                                // the highest geode count, but the tracker variable
+                                                                                                // BEST_GEODES also does the same. this variable is
+                                                                                                // necessary for the DFS to be able to check against
+                                                                                                // best results so far, as a pruning optimization.
       BLUEPRINT_RESULTS[b - 1] = BEST_GEODES;
 
       if (DISPLAY_EXTRA_INFO) {
