@@ -28,7 +28,7 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
 
 
     if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
-    return TOTAL_SURFACE_AREA_OF_SOLID - TOTAL_INTERIOR_SURFACE_AREA;
+    return;
 
   }
 }
