@@ -410,11 +410,6 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
     });
   }
 
-  const NOTHING = 'NOTHING';
-  const ORE = 'ORE';
-  const CLAY = 'CLAY';
-  const OBSIDIAN = 'OBSIDIAN';
-  const GEODE = 'GEODE';
 
   function analyze(TIME_LIMIT, BLUEPRINTS_TO_BE_EXAMINED) {
                       
@@ -441,15 +436,15 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
       const MEMO = Array.from({length: TIME_LIMIT + 1}, () => ({}));
 
 
-      function backtrack( day,
-                          TODAY_ORE,
-                          TODAY_CLAY,
-                          TODAY_OBSIDIAN,
-                          TODAY_GEODES,
-                          TODAY_ORE_ROBOTS,
-                          TODAY_CLAY_ROBOTS,
-                          TODAY_OBSIDIAN_ROBOTS,
-                          TODAY_GEODE_ROBOTS) {
+      function DFS( day,
+                    TODAY_ORE,
+                    TODAY_CLAY,
+                    TODAY_OBSIDIAN,
+                    TODAY_GEODES,
+                    TODAY_ORE_ROBOTS,
+                    TODAY_CLAY_ROBOTS,
+                    TODAY_OBSIDIAN_ROBOTS,
+                    TODAY_GEODE_ROBOTS) {
         
         if (Math.floor((Date.now() - TIME_START_BLUEPRINT)/(1000*60)) === NEXT_MIN_TARGET) {
           console.log(`... ${NEXT_MIN_TARGET} mins have passed since beginning this blueprint`)
@@ -484,298 +479,293 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
         }
 
         const NO_MORE_OBSIDIAN_ROBOTS = TODAY_OBSIDIAN_ROBOTS >= MAX_OBSIDIAN_ROBOTS;
-        const NO_MORE_CLAY_ROBOTS = TODAY_CLAY_ROBOTS >= MAX_CLAY_ROBOTS;
+        const NO_MORE_CLAY_ROBOTS = NO_MORE_OBSIDIAN_ROBOTS || TODAY_CLAY_ROBOTS >= MAX_CLAY_ROBOTS;
         const NO_MORE_ORE_ROBOTS = NO_MORE_OBSIDIAN_ROBOTS && TODAY_ORE_ROBOTS >= MAX_ORE_ROBOTS;
-        // const NO_MORE_OBSIDIAN_ROBOTS = false;
-        // const NO_MORE_CLAY_ROBOTS = false;
-        // const NO_MORE_ORE_ROBOTS = false;
 
         if (!(SERIAL in MEMO[day])) {
 
           // can afford geode robot - always buy one
           if (TODAY_OBSIDIAN >= COSTS.GEODE_ROBOT.obsidian && TODAY_ORE >= COSTS.GEODE_ROBOT.ore) {
 
-            const BUY_GEODE_ROBOT = backtrack(day + 1,
-                                              // TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.GEODE_ROBOT.ore,
-                                              // TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                              // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS - COSTS.GEODE_ROBOT.obsidian,
-                                              NO_MORE_ORE_ROBOTS  ? MAX_ORE_ROBOTS
-                                                                  : TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.GEODE_ROBOT.ore,
-                                              NO_MORE_OBSIDIAN_ROBOTS ? 0
-                                                                      : TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                              NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
-                                                                      : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS - COSTS.GEODE_ROBOT.obsidian,
-                                              TODAY_GEODES + TODAY_GEODE_ROBOTS,
-                                              TODAY_ORE_ROBOTS,
-                                              TODAY_CLAY_ROBOTS,
-                                              TODAY_OBSIDIAN_ROBOTS,
-                                              TODAY_GEODE_ROBOTS + 1);
+            const BUY_GEODE_ROBOT = DFS(day + 1,
+
+                                        // TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.GEODE_ROBOT.ore,
+                                        // TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                        // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS - COSTS.GEODE_ROBOT.obsidian,
+
+                                        NO_MORE_ORE_ROBOTS  ? MAX_ORE_ROBOTS
+                                                            : TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.GEODE_ROBOT.ore,
+                                        NO_MORE_CLAY_ROBOTS ? 0
+                                                            : TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                        NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
+                                                                : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS - COSTS.GEODE_ROBOT.obsidian,
+
+                                        TODAY_GEODES + TODAY_GEODE_ROBOTS,
+                                        TODAY_ORE_ROBOTS,
+                                        TODAY_CLAY_ROBOTS,
+                                        TODAY_OBSIDIAN_ROBOTS,
+                                        TODAY_GEODE_ROBOTS + 1);
 
             MEMO[day][SERIAL] = BUY_GEODE_ROBOT;
 
           }
-          // either do nothing, or buy another type of robot
+
+          // either buy another type of robot, or do nothing
           else {
-
-            const BUY_NOTHING = backtrack(day + 1,
-                                          // TODAY_ORE + TODAY_ORE_ROBOTS,
-                                          // TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                          // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                          NO_MORE_ORE_ROBOTS  ? MAX_ORE_ROBOTS
-                                                              : TODAY_ORE + TODAY_ORE_ROBOTS,
-                                          NO_MORE_OBSIDIAN_ROBOTS ? 0
-                                                                  : TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                          NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
-                                                                  : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                          TODAY_GEODES + TODAY_GEODE_ROBOTS,
-                                          TODAY_ORE_ROBOTS,
-                                          TODAY_CLAY_ROBOTS,
-                                          TODAY_OBSIDIAN_ROBOTS,
-                                          TODAY_GEODE_ROBOTS);
-
-            const BUY_ORE_ROBOT = !NO_MORE_ORE_ROBOTS
-                                  && TODAY_ORE >= COSTS.ORE_ROBOT.ore
-                                    ? backtrack(day + 1,
-                                                TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.ORE_ROBOT.ore,
-                                                // TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                                // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                                NO_MORE_OBSIDIAN_ROBOTS ? 0
-                                                                        : TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                                NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
-                                                                        : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                                TODAY_GEODES + TODAY_GEODE_ROBOTS,
-                                                TODAY_ORE_ROBOTS + 1,
-                                                TODAY_CLAY_ROBOTS,
-                                                TODAY_OBSIDIAN_ROBOTS,
-                                                TODAY_GEODE_ROBOTS)
-                                    : 0;
-
-            const BUY_CLAY_ROBOT =  !NO_MORE_CLAY_ROBOTS
-                                    && TODAY_ORE >= COSTS.CLAY_ROBOT.ore
-                                      ? backtrack(day + 1,
-                                                  // TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.CLAY_ROBOT.ore,
-                                                  // TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                                  // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                                  NO_MORE_ORE_ROBOTS  ? MAX_ORE_ROBOTS
-                                                                      : TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.CLAY_ROBOT.ore,
-                                                  NO_MORE_OBSIDIAN_ROBOTS ? 0
-                                                                          : TODAY_CLAY + TODAY_CLAY_ROBOTS,
-                                                  NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
-                                                                          : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                                  TODAY_GEODES + TODAY_GEODE_ROBOTS,
-                                                  TODAY_ORE_ROBOTS,
-                                                  TODAY_CLAY_ROBOTS + 1,
-                                                  TODAY_OBSIDIAN_ROBOTS,
-                                                  TODAY_GEODE_ROBOTS)
-                                      : 0;
 
             const BUY_OBSIDIAN_ROBOT =  !NO_MORE_OBSIDIAN_ROBOTS
                                         && TODAY_ORE >= COSTS.OBSIDIAN_ROBOT.ore
                                         && TODAY_CLAY >= COSTS.OBSIDIAN_ROBOT.clay
-                                          ? backtrack(day + 1,
-                                                      TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.OBSIDIAN_ROBOT.ore,
-                                                      TODAY_CLAY + TODAY_CLAY_ROBOTS - COSTS.OBSIDIAN_ROBOT.clay,
-                                                      TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
-                                                      TODAY_GEODES + TODAY_GEODE_ROBOTS,
-                                                      TODAY_ORE_ROBOTS,
-                                                      TODAY_CLAY_ROBOTS,
-                                                      TODAY_OBSIDIAN_ROBOTS + 1,
-                                                      TODAY_GEODE_ROBOTS)
+                                          ? DFS(day + 1,
+                                                TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.OBSIDIAN_ROBOT.ore,
+                                                TODAY_CLAY + TODAY_CLAY_ROBOTS - COSTS.OBSIDIAN_ROBOT.clay,
+                                                TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+                                                TODAY_GEODES + TODAY_GEODE_ROBOTS,
+                                                TODAY_ORE_ROBOTS,
+                                                TODAY_CLAY_ROBOTS,
+                                                TODAY_OBSIDIAN_ROBOTS + 1,
+                                                TODAY_GEODE_ROBOTS)
                                           : 0;
-                                                                        
-            MEMO[day][SERIAL] = Math.max( BUY_NOTHING, BUY_ORE_ROBOT, BUY_CLAY_ROBOT, BUY_OBSIDIAN_ROBOT );
+
+            const BUY_CLAY_ROBOT =  !NO_MORE_CLAY_ROBOTS
+                                    && TODAY_ORE >= COSTS.CLAY_ROBOT.ore
+                                      ? DFS(day + 1,
+
+                                            TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.CLAY_ROBOT.ore,
+                                            TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                            TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+
+                                            // NO_MORE_ORE_ROBOTS  ? MAX_ORE_ROBOTS
+                                            //                     : TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.CLAY_ROBOT.ore,
+                                            // NO_MORE_CLAY_ROBOTS ? 0
+                                            //                     : TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                            // NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
+                                            //                         : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+
+                                            TODAY_GEODES + TODAY_GEODE_ROBOTS,
+                                            TODAY_ORE_ROBOTS,
+                                            TODAY_CLAY_ROBOTS + 1,
+                                            TODAY_OBSIDIAN_ROBOTS,
+                                            TODAY_GEODE_ROBOTS)
+                                      : 0;
+
+            const BUY_ORE_ROBOT = !NO_MORE_ORE_ROBOTS
+                                  && TODAY_ORE >= COSTS.ORE_ROBOT.ore
+                                    ? DFS(day + 1,
+                                          TODAY_ORE + TODAY_ORE_ROBOTS - COSTS.ORE_ROBOT.ore,
+
+                                          // TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                          // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+
+                                          NO_MORE_CLAY_ROBOTS ? 0
+                                                              : TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                          NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
+                                                                  : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+
+                                          TODAY_GEODES + TODAY_GEODE_ROBOTS,
+                                          TODAY_ORE_ROBOTS + 1,
+                                          TODAY_CLAY_ROBOTS,
+                                          TODAY_OBSIDIAN_ROBOTS,
+                                          TODAY_GEODE_ROBOTS)
+                                    : 0;
+            
+            const BUY_NOTHING = DFS(day + 1,
+
+                                    // TODAY_ORE + TODAY_ORE_ROBOTS,
+                                    // TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                    // TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+
+                                    NO_MORE_ORE_ROBOTS  ? MAX_ORE_ROBOTS
+                                                        : TODAY_ORE + TODAY_ORE_ROBOTS,
+                                    NO_MORE_CLAY_ROBOTS ? 0
+                                                        : TODAY_CLAY + TODAY_CLAY_ROBOTS,
+                                    NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS
+                                                            : TODAY_OBSIDIAN + TODAY_OBSIDIAN_ROBOTS,
+
+                                    TODAY_GEODES + TODAY_GEODE_ROBOTS,
+                                    TODAY_ORE_ROBOTS,
+                                    TODAY_CLAY_ROBOTS,
+                                    TODAY_OBSIDIAN_ROBOTS,
+                                    TODAY_GEODE_ROBOTS);
+
+            MEMO[day][SERIAL] = Math.max( BUY_OBSIDIAN_ROBOT, BUY_CLAY_ROBOT, BUY_ORE_ROBOT, BUY_NOTHING );
           }
         }
 
         return MEMO[day][SERIAL];
       }
       
-      const res = backtrack(0, ...STARTING_STATE);
+      const res = DFS(0, ...STARTING_STATE);
       console.log('BEST_GEODES:', BEST_GEODES)
       console.log(`(BLUEPRINT TOOK ${(Date.now() - TIME_START_BLUEPRINT)/1000} SECS)`);
       if (res !== BEST_GEODES) throw 'ERROR: DID NOT MATCH';
       console.log('')
       BLUEPRINT_RESULTS[b - 1] = res;
-      // throw 'done bp1'
 
 
-    //   const STARTING_SERIAL = STARTING_STATE.join(',');
-    //   MEMO[0][STARTING_SERIAL] = 0;
-    //   const NON_OBSOLETE = Array.from({length: TIME_LIMIT + 1}, () => new Set());
-    //   NON_OBSOLETE[0].add(STARTING_SERIAL);
-    //   for (let day = 1; day <= TIME_LIMIT; ++day) {
+      // const STARTING_SERIAL = STARTING_STATE.join(',');
+      // MEMO[0][STARTING_SERIAL] = 0;
+      // const NON_OBSOLETE = Array.from({length: TIME_LIMIT + 1}, () => new Set());
+      // NON_OBSOLETE[0].add(STARTING_SERIAL);
 
-    //     // ELIMINATE OBSOLETE STATES?
-    //     console.log(`DAY ${day} | # NON_OBSOLETE FROM PREVIOUS DAY:`, NON_OBSOLETE[day - 1].size)
-    //     let removed = 0;
-    //     for (const serial1 of NON_OBSOLETE[day - 1]) {
-    //       for (const serial2 of NON_OBSOLETE[day - 1]) {
-    //         if (serial1 !== serial2) {
-    //           const state1Vals = serial1.split(',').map(n => +n);
-    //           const state2Vals = serial2.split(',').map(n => +n);
-    //           if (state1Vals.every((val, i) => val <= state2Vals[i])) {
-    //             // console.log('@@@ CONFIRMED STATE 1 WAS OBSOLETE');
-    //             // console.log('    STATE 1:', state1Vals);
-    //             // console.log('    STATE 2:', state2Vals);
-    //             MEMO[day - 1][serial1] = null;
-    //             NON_OBSOLETE[day - 1].delete(serial1);
-    //             ++removed;
-    //           }
-    //         }
-    //       }
-    //     }
-    //     console.log(`       | removed: ${removed}`)
+      // const NOTHING = 'NOTHING';
+      // const ORE = 'ORE';
+      // const CLAY = 'CLAY';
+      // const OBSIDIAN = 'OBSIDIAN';
+      // const GEODE = 'GEODE';
 
-    //     for (const YESTERDAY_SERIAL of NON_OBSOLETE[day - 1]) {
-    //       const STATE = YESTERDAY_SERIAL.split(',').map(n => +n);
-    //       let [ YTD_ORE, YTD_CLAY, YTD_OBSIDIAN, YTD_GEODES, YTD_ORE_ROBOTS, YTD_CLAY_ROBOTS, YTD_OBSIDIAN_ROBOTS, YTD_GEODE_ROBOTS ] = STATE;
+      // for (let day = 1; day <= TIME_LIMIT; ++day) {
 
-    //       const BUY_POSSIBILITIES = [];
-    //       if (YTD_OBSIDIAN >= COSTS.GEODE_ROBOT.obsidian && YTD_ORE >= COSTS.GEODE_ROBOT.ore) BUY_POSSIBILITIES.push(GEODE);
-    //       else {
-    //         BUY_POSSIBILITIES.push(NOTHING);
+      //   console.log(`DAY ${day} | # NON_OBSOLETE FROM PREVIOUS DAY:`, NON_OBSOLETE[day - 1].size)
 
-    //         if (YTD_OBSIDIAN_ROBOTS < MAX_OBSIDIAN_ROBOTS
-    //             && YTD_CLAY >= COSTS.OBSIDIAN_ROBOT.clay
-    //             && YTD_ORE >= COSTS.OBSIDIAN_ROBOT.ore)
-    //         {
-    //           BUY_POSSIBILITIES.push(OBSIDIAN);
-    //         }
+      //   // // ELIMINATE OBSOLETE STATES?
+      //   // let removed = 0;
+      //   // const SORTED_SERIALS = [];
+      //   // for (let i = 0; i < 8; ++i) {
+      //   //   SORTED_SERIALS.push( [...NON_OBSOLETE[day - 1]].sort((a, b) => b.split(',').map(n => +n)[i] - a.split(',').map(n => +n)[i]) );
+      //   // }
+      //   // for (const serial of NON_OBSOLETE[day - 1]) {
+      //   //   let eliminated = false;
+      //   //   const serialVals = serial.split(',').map(n => +n);
+      //   //   for (let i = 0; !eliminated && i < 8; ++i) {
+      //   //     for (const s of SORTED_SERIALS[i]) {
+      //   //       if (serial !== s) {
+      //   //         const sVals = s.split(',').map(n => +n);
+      //   //         if (sVals.every((val, i) => val >= serialVals[i])) {
+      //   //           eliminated = true;
+      //   //           break;
+      //   //         }
+      //   //       }
+      //   //     }
+      //   //   }
+      //   //   if (eliminated) {
+      //   //     ++removed;
+      //   //     NON_OBSOLETE[day - 1].delete(serial);
+      //   //   }
+      //   // }
+      //   // console.log(`       | removed: ${removed}`)
 
-    //         if (YTD_CLAY_ROBOTS < MAX_CLAY_ROBOTS
-    //             && YTD_ORE >= COSTS.CLAY_ROBOT.ore)
-    //         {
-    //           BUY_POSSIBILITIES.push(CLAY);
-    //         }
+      //   for (const YESTERDAY_SERIAL of NON_OBSOLETE[day - 1]) {
+      //     const STATE = YESTERDAY_SERIAL.split(',').map(n => +n);
+      //     let [ YTD_ORE, YTD_CLAY, YTD_OBSIDIAN, YTD_GEODES, YTD_ORE_ROBOTS, YTD_CLAY_ROBOTS, YTD_OBSIDIAN_ROBOTS, YTD_GEODE_ROBOTS ] = STATE;
 
-    //         if (YTD_ORE >= COSTS.ORE_ROBOT.ore) {
-    //           BUY_POSSIBILITIES.push(ORE);
-    //         }
-    //       }
+      //     const NO_MORE_OBSIDIAN_ROBOTS = YTD_OBSIDIAN_ROBOTS >= MAX_OBSIDIAN_ROBOTS;
+      //     const NO_MORE_CLAY_ROBOTS = NO_MORE_OBSIDIAN_ROBOTS || YTD_CLAY_ROBOTS >= MAX_CLAY_ROBOTS;
+      //     const NO_MORE_ORE_ROBOTS = NO_MORE_OBSIDIAN_ROBOTS && YTD_ORE >= MAX_ORE_ROBOTS;
 
-    //       for (const PURCHASE of BUY_POSSIBILITIES) {
+      //     const BUY_POSSIBILITIES = [];
+      //     if (YTD_OBSIDIAN >= COSTS.GEODE_ROBOT.obsidian
+      //         && YTD_ORE >= COSTS.GEODE_ROBOT.ore)
+      //     {
+      //       BUY_POSSIBILITIES.push(GEODE);
+      //     }
+      //     else {
+      //       if (!NO_MORE_OBSIDIAN_ROBOTS
+      //           && YTD_CLAY >= COSTS.OBSIDIAN_ROBOT.clay
+      //           && YTD_ORE >= COSTS.OBSIDIAN_ROBOT.ore)
+      //       {
+      //         BUY_POSSIBILITIES.push(OBSIDIAN);
+      //       }
 
-    //         let TODAY_ORE = YTD_ORE;
-    //         let TODAY_CLAY = YTD_CLAY;
-    //         let TODAY_OBSIDIAN = YTD_OBSIDIAN;
-    //         let TODAY_GEODES = YTD_GEODES;
-    //         let TODAY_ORE_ROBOTS = YTD_ORE_ROBOTS;
-    //         let TODAY_CLAY_ROBOTS = YTD_CLAY_ROBOTS;
-    //         let TODAY_OBSIDIAN_ROBOTS = YTD_OBSIDIAN_ROBOTS;
-    //         let TODAY_GEODE_ROBOTS = YTD_GEODE_ROBOTS;
+      //       if (!NO_MORE_CLAY_ROBOTS
+      //           && YTD_ORE >= COSTS.CLAY_ROBOT.ore)
+      //       {
+      //         BUY_POSSIBILITIES.push(CLAY);
+      //       }
 
-    //         // FIRST, DECREASE RESOURCES FROM PURCHASE
-    //         if (PURCHASE === GEODE) {
-    //           TODAY_OBSIDIAN -= COSTS.GEODE_ROBOT.obsidian;
-    //           TODAY_ORE -= COSTS.GEODE_ROBOT.ore;
-    //         }
-    //         else if (PURCHASE === OBSIDIAN) {
-    //           TODAY_CLAY -= COSTS.OBSIDIAN_ROBOT.clay;
-    //           TODAY_ORE -= COSTS.OBSIDIAN_ROBOT.ore;
-    //         }
-    //         else if (PURCHASE === CLAY) {
-    //           TODAY_ORE -= COSTS.CLAY_ROBOT.ore;
-    //         }
-    //         else if (PURCHASE === ORE) {
-    //           TODAY_ORE -= COSTS.ORE_ROBOT.ore;
-    //         }
+      //       if (!NO_MORE_ORE_ROBOTS
+      //           && YTD_ORE >= COSTS.ORE_ROBOT.ore) {
+      //         BUY_POSSIBILITIES.push(ORE);
+      //       }
 
-    //         // THEN, INCREASE RESOURCES FROM MINING
-    //         TODAY_ORE += TODAY_ORE_ROBOTS;
-    //         TODAY_CLAY += TODAY_CLAY_ROBOTS;
-    //         TODAY_OBSIDIAN += TODAY_OBSIDIAN_ROBOTS;
-    //         TODAY_GEODES += TODAY_GEODE_ROBOTS;
+      //       BUY_POSSIBILITIES.push(NOTHING);
+      //     }
 
-    //         // FINALLY, INCREASE ROBOTS FROM PURCHASE
-    //         if (PURCHASE === ORE) ++TODAY_ORE_ROBOTS;
-    //         else if (PURCHASE === CLAY) ++TODAY_CLAY_ROBOTS;
-    //         else if (PURCHASE === OBSIDIAN) ++TODAY_OBSIDIAN_ROBOTS;
-    //         else if (PURCHASE === GEODE) ++TODAY_GEODE_ROBOTS;
+      //     for (const PURCHASE of BUY_POSSIBILITIES) {
 
-    //         const TODAY_SERIAL = [ TODAY_ORE, TODAY_CLAY, TODAY_OBSIDIAN, TODAY_GEODES, TODAY_ORE_ROBOTS, TODAY_CLAY_ROBOTS, TODAY_OBSIDIAN_ROBOTS, TODAY_GEODE_ROBOTS ].join(',');
+      //       let TODAY_ORE = YTD_ORE;
+      //       let TODAY_CLAY = YTD_CLAY;
+      //       let TODAY_OBSIDIAN = YTD_OBSIDIAN;
+      //       let TODAY_GEODES = YTD_GEODES;
+      //       let TODAY_ORE_ROBOTS = YTD_ORE_ROBOTS;
+      //       let TODAY_CLAY_ROBOTS = YTD_CLAY_ROBOTS;
+      //       let TODAY_OBSIDIAN_ROBOTS = YTD_OBSIDIAN_ROBOTS;
+      //       let TODAY_GEODE_ROBOTS = YTD_GEODE_ROBOTS;
+
+      //       // FIRST, DECREASE RESOURCES FROM PURCHASE
+      //       if (PURCHASE === GEODE) {
+      //         TODAY_OBSIDIAN -= COSTS.GEODE_ROBOT.obsidian;
+      //         TODAY_ORE -= COSTS.GEODE_ROBOT.ore;
+      //       }
+      //       else if (PURCHASE === OBSIDIAN) {
+      //         TODAY_CLAY -= COSTS.OBSIDIAN_ROBOT.clay;
+      //         TODAY_ORE -= COSTS.OBSIDIAN_ROBOT.ore;
+      //       }
+      //       else if (PURCHASE === CLAY) {
+      //         TODAY_ORE -= COSTS.CLAY_ROBOT.ore;
+      //       }
+      //       else if (PURCHASE === ORE) {
+      //         TODAY_ORE -= COSTS.ORE_ROBOT.ore;
+      //       }
+
+      //       // THEN, INCREASE RESOURCES FROM MINING
+      //       TODAY_ORE += TODAY_ORE_ROBOTS;
+      //       TODAY_CLAY += TODAY_CLAY_ROBOTS;
+      //       TODAY_OBSIDIAN += TODAY_OBSIDIAN_ROBOTS;
+      //       TODAY_GEODES += TODAY_GEODE_ROBOTS;
+
+      //       // FINALLY, INCREASE ROBOTS FROM PURCHASE
+      //       if (PURCHASE === ORE) ++TODAY_ORE_ROBOTS;
+      //       else if (PURCHASE === CLAY) ++TODAY_CLAY_ROBOTS;
+      //       else if (PURCHASE === OBSIDIAN) ++TODAY_OBSIDIAN_ROBOTS;
+      //       else if (PURCHASE === GEODE) ++TODAY_GEODE_ROBOTS;
+
+      //       const TODAY_SERIAL = [
+      //         NO_MORE_ORE_ROBOTS ? MAX_ORE_ROBOTS : TODAY_ORE,
+      //         NO_MORE_CLAY_ROBOTS ? 0 : TODAY_CLAY,
+      //         NO_MORE_OBSIDIAN_ROBOTS ? MAX_OBSIDIAN_ROBOTS : TODAY_OBSIDIAN,
+      //         TODAY_GEODES,
+      //         TODAY_ORE_ROBOTS,
+      //         TODAY_CLAY_ROBOTS,
+      //         TODAY_OBSIDIAN_ROBOTS,
+      //         TODAY_GEODE_ROBOTS
+      //       ].join(',');
             
             
-    //         const CANNOT_GET_ENOUGH_GEODES = YTD_GEODES + ((TIME_LIMIT - day + 1) * YTD_GEODE_ROBOTS) + ((TIME_LIMIT - day) * (TIME_LIMIT - day + 1) / 2) <= BEST_GEODES;
-    //         // every day including today til the end you will get N more geodes, where N is the # of geode robots you had yesterday. (LIMIT - TODAY + 1) * N
-    //         // assuming you build a geode robot every day from today all the way to the final day, that's (LIMIT - TODAY) + (LIMIT - TODAY - 1) + ... + 0, or (LIMIT - TODAY) * (LIMIT - TODAY + 1)/2
-    //         if (CANNOT_GET_ENOUGH_GEODES) {
-    //           // console.log('CANNOT GET ENOUGH GEODES')
-    //           NON_OBSOLETE[day].delete(TODAY_SERIAL);
-    //           continue;
-    //         }
+      //       const CANNOT_GET_ENOUGH_GEODES = YTD_GEODES + ((TIME_LIMIT - day + 1) * YTD_GEODE_ROBOTS) + ((TIME_LIMIT - day) * (TIME_LIMIT - day + 1) / 2) <= BEST_GEODES;
+      //       // every day including today til the end you will get N more geodes, where N is the # of geode robots you had yesterday. (LIMIT - TODAY + 1) * N
+      //       // assuming you build a geode robot every day from today all the way to the final day, that's (LIMIT - TODAY) + (LIMIT - TODAY - 1) + ... + 0, or (LIMIT - TODAY) * (LIMIT - TODAY + 1)/2
+      //       if (CANNOT_GET_ENOUGH_GEODES) {
+      //         // console.log('CANNOT GET ENOUGH GEODES')
+      //         NON_OBSOLETE[day].delete(TODAY_SERIAL);
+      //         continue;
+      //       }
 
-    //         // ELIMINATE OBSOLETE STATES?
-    //         // if (
-    //         //     OBSOLETE[day].has(TODAY_SERIAL) ||
-    //         //     (NON_OBSOLETE[day].size
-    //         //     && ![...NON_OBSOLETE[day]].every(serial => !serial.split(',').map(n => +n).every((val, i) => val >= TODAY_SERIAL[i])))
-    //         // ) {
-    //         //   console.log('@@@ CONFIRMED OBSOLETE STATE TODAY');
-    //         //   MEMO[day][TODAY_SERIAL] = null;
-    //         //   NON_OBSOLETE[day].delete(TODAY_SERIAL);
-    //         //   OBSOLETE[day].add(TODAY_SERIAL);
-    //         //   continue;
-    //         // }
-    //         // for (const serial of NON_OBSOLETE[day]) {
-    //         //   if (serial !== TODAY_SERIAL) {
-    //         //     const stateVals = serial.split(',').map(n => +n);
-    //         //     if (TODAY_SERIAL.split(',').map(n => +n).every((val, i) => val >= stateVals[i])) {
-    //         //       console.log('@@@ CONFIRMED OLD STATE WAS OBSOLETE');
-    //         //       // console.log('    TODAY:', TODAY_SERIAL.split(',').map(n => +n));
-    //         //       // console.log('    OBSOLETE:', serial.split(',').map(n => +n));
-    //         //       MEMO[day][serial] = null;
-    //         //       NON_OBSOLETE[day].delete(serial);
-    //         //       OBSOLETE[day].add(serial);
-    //         //       console.log(`----- NEW NON_OBSOLETE[${day}] SIZE:`, NON_OBSOLETE[day].size)
-    //         //     }
-    //         //   }
-    //         // }
+      //       if (TODAY_SERIAL in MEMO[day] && TODAY_GEODES > MEMO[day][TODAY_SERIAL]) console.log('@@@ CACHE HIT WITH IMPROVEMENT')
+      //       MEMO[day][TODAY_SERIAL] = Math.max( (MEMO[day][TODAY_SERIAL] || 0), TODAY_GEODES );
+      //       NON_OBSOLETE[day].add(TODAY_SERIAL);
+      //       // console.log(`+++++ NEW NON_OBSOLETE[${day}] SIZE:`, NON_OBSOLETE[day].size)
 
-    //         // const TODAYS_ENTRIES_THAT_ARE_NOT_NULL = Object.keys(MEMO[day]).filter(s => MEMO[day][s] !== null);
-    //         // if (TODAYS_ENTRIES_THAT_ARE_NOT_NULL.length
-    //         //     && !TODAYS_ENTRIES_THAT_ARE_NOT_NULL.every(serial => !serial.split(',').map(n => +n).every((val, i) => val >= TODAY_SERIAL[i]))
-    //         // ) {
-    //         //   console.log('@@@ CONFIRMED OBSOLETE STATE TODAY');
-    //         //   MEMO[day][TODAY_SERIAL] = null;
-    //         //   continue;
-    //         // }
-    //         // for (const serial in TODAYS_ENTRIES_THAT_ARE_NOT_NULL) {
-    //         //   if (serial !== TODAY_SERIAL) {
-    //         //     const stateVals = serial.split(',').map(n => +n);
-    //         //     if (TODAY_SERIAL.split(',').map(n => +n).every((val, i) => val >= stateVals[i])) {
-    //         //       console.log('@@@ CONFIRMED OLD STATE WAS OBSOLETE');
-    //         //       // console.log('    TODAY:', TODAY_SERIAL.split(',').map(n => +n));
-    //         //       // console.log('    OBSOLETE:', serial.split(',').map(n => +n));
-    //         //       MEMO[day][serial] = null;
-    //         //     }
-    //         //   }
-    //         // }
+      //       BEST_GEODES = Math.max(BEST_GEODES, TODAY_GEODES);
+      //     }
+      //   }
 
-    //         if (TODAY_SERIAL in MEMO[day] && TODAY_GEODES > MEMO[day][TODAY_SERIAL]) console.log('@@@ CACHE HIT WITH IMPROVEMENT')
-    //         MEMO[day][TODAY_SERIAL] = Math.max( (MEMO[day][TODAY_SERIAL] || 0), TODAY_GEODES );
-    //         NON_OBSOLETE[day].add(TODAY_SERIAL);
-    //         // console.log(`+++++ NEW NON_OBSOLETE[${day}] SIZE:`, NON_OBSOLETE[day].size)
+      //   // console.log(`END DAY ${day}:`, MEMO)
+      // }
 
-    //         BEST_GEODES = Math.max(BEST_GEODES, TODAY_GEODES);
-    //       }
-    //     }
+      // let bestResult = 0;
 
-    //     // console.log(`END DAY ${day}:`, MEMO)
-    //   }
+      // for (const val of Object.values(MEMO[TIME_LIMIT])) bestResult = Math.max(bestResult, val);
+      // console.log('BEST RESULT FOR THIS BLUEPRINT:', bestResult)
+      // console.log(`(BLUEPRINT TOOK ${(Date.now() - TIME_START_BLUEPRINT)/1000} SECS)`);
 
-    //   let bestResult = 0;
+      // // BLUEPRINT_RESULTS.push(bestResult);
+      // BLUEPRINT_RESULTS[b - 1] = bestResult;
 
-    //   for (const val of Object.values(MEMO[TIME_LIMIT])) bestResult = Math.max(bestResult, val);
-    //   console.log('BEST RESULT FOR THIS BLUEPRINT:', bestResult)
-    //   console.log(`(BLUEPRINT TOOK ${(Date.now() - TIME_START_BLUEPRINT)/1000} SECS)`);
-
-    //   // BLUEPRINT_RESULTS.push(bestResult);
-    //   BLUEPRINT_RESULTS[b - 1] = bestResult;
-
-    //   console.log(`FINAL DAY MEMO FOR BLUEPRINT ${b}:`, MEMO[TIME_LIMIT]);
-    //   console.log(`BLUEPRINT RESULTS SO FAR:`, BLUEPRINT_RESULTS);
-    //   console.log('')
-    //   // throw ""
+      // console.log(`FINAL DAY MEMO FOR BLUEPRINT ${b}:`, MEMO[TIME_LIMIT]);
+      // console.log(`BLUEPRINT RESULTS SO FAR:`, BLUEPRINT_RESULTS);
+      // console.log('')
+      // // throw ""
 
     
     }
@@ -807,7 +797,7 @@ const func = optimizeResourceChain;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([ 4 ]);
-const lowestTest = 0;
+const lowestTest = 3;
 const highestTest = 0;
 
 const fs = require('fs');
