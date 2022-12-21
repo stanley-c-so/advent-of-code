@@ -119,6 +119,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   if (DISPLAY_EXTRA_INFO && part === 2) {
     console.log('DEPENDENCY CHAIN (a <- b means b depends on a; chain only includes lowercase monkeys):');
     console.log(['HUMN', ...DEPENDENCY_CHAIN, 'ROOT'].join(' <- '));
+    console.log('');
   }
 
   // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
@@ -131,7 +132,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       }
       if (MONKEY === 'root') {
         const [ A, operator, B ] = REF[MONKEY];
-        MEMO['root'] = `${getValueForMonkey(A, 2)} === ${getValueForMonkey(B, 2)}`;
+        MEMO['root'] = `${getValueForMonkey(A, 2)} = ${getValueForMonkey(B, 2)}`;
       }
     }
 
@@ -201,7 +202,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
 
     // separate the literal and string expression parts of root expression
     const [LS, RS] = getValueForMonkey('root', part)                            // invoke helper function to fill out MEMO data structure and get ` === ` expression belonging to monkey 'root'
-                      .split(' === ')
+                      .split(' = ')
                       .map(n => +n);                                            // cast both sides to numbers (string expressions will become NaN)
 
     if (isNaN(LS) && isNaN(RS)) {
@@ -216,6 +217,11 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       
       const expression = getValueForMonkey( DEPENDENCY_CHAIN.pop(), part );
       const split = expression.split(' ');
+
+      if (DISPLAY_EXTRA_INFO) {
+        console.log(`${expression} = ${LITERAL_VALUE}`);
+        console.log('');
+      }
 
       let LITERAL_NUM_IS_ON_LEFT,                                               // every expression itself should have one half be a literal number, and the other half another expression wrapped in parens
           number,
