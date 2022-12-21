@@ -60,7 +60,16 @@ What number do you yell to pass root's equality test?
 */
 
 // OPTIONAL VARIABLES
-const DISPLAY_EXTRA_INFO = true;
+const DISPLAY_EXTRA_INFO = 0;
+
+
+// ========== SOLUTION 1: FOR PART 1, DO A SIMPLE DFS WITH RECURSION. KEEP A MEMO OF KNOWN VALUES (ANY MONKEYS WITH LITERAL NUMBERS AUTOMATICALLY GET
+// ENTERED INTO THE MEMO ON DATA INGESTION). FOR MONKEYS WITH EXPRESSIONS, WE SIMPLY RECURSE ON THE OPERAND MONKEYS, AND PERFORM THE OPERATION.
+// FOR PART 2, WE DISCOVER THAT THERE IS A LINEAR DEPENDENCY CHAIN: ONLY ONE MONKEY RELIES ON humn, ONLY ONE OTHER MONKEY RELIES ON THE PREVIOUS MONKEY,
+// AND SO ON AND SO FORTH. THEREFORE, FROM THE root MONKEY, ONE SIDE'S EXPRESSION CAN BE EVALUATED INTO A LITERAL NUMBER (BECAUSE AS YOU GO DOWN THAT
+// PART OF THE TREE, WE RUN INTO ALL LITERALS), WHEREAS THE OTHER SIDE'S EXPRESSION IS DEPENDENT ON THE VALUE OF humn. SINCE WE KNOW THAT BOTH EXPRESSIONS
+// FOR root MUST BE EQUAL, WE TREAT THIS AS AN ALGEBRA PROBLEM: THE VALUE OF humn IS X, AND WE CONSTRUCT A STRING OF THE EXPRESSION AND SAVE THAT INTO
+// THE MEMO. THEN WE ITERATE THROUGH THE DEPENDENCY CHAIN, SIMPLIFYING THE EXPRESSION EACH TIME UNTIL WE FIGURE OUT THE VALUE OF X.
 
 function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
@@ -123,23 +132,23 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   }
 
   // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
-  function getValueForMonkey(MONKEY, part) {
+  function getValueForMonkey(monkey, part) {
 
     // PART 2 OVERRIDES: original 'humn' value is replaced with 'X', and original 'root' expression's operator gets replaced with `===`
     if (part === 2) {
-      if (MONKEY === 'humn') {
+      if (monkey === 'humn') {
         MEMO['humn'] = 'X';
       }
-      if (MONKEY === 'root') {
-        const [ A, operator, B ] = REF[MONKEY];
+      if (monkey === 'root') {
+        const [ A, operator, B ] = REF[monkey];
         MEMO['root'] = `${getValueForMonkey(A, 2)} = ${getValueForMonkey(B, 2)}`;
       }
     }
 
     // CACHE MISS
-    if (!(MONKEY in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
+    if (!(monkey in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
 
-      const [ A, operator, B ] = REF[MONKEY];    
+      const [ A, operator, B ] = REF[monkey];    
       const LS = getValueForMonkey(A, part);
       const RS = getValueForMonkey(B, part);
 
@@ -147,19 +156,19 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
 
         switch (operator) {
           case '+':
-            MEMO[MONKEY] = LS + RS;
+            MEMO[monkey] = LS + RS;
             break;
           case '-':
-            MEMO[MONKEY] = LS - RS;
+            MEMO[monkey] = LS - RS;
             break;
           case '*':
-            MEMO[MONKEY] = LS * RS;
+            MEMO[monkey] = LS * RS;
             break;
           case '/':
             if (LS % RS !== 0) {                                                // sanity check: any expressions involving division will always be evenly divisible
               throw `${LS} not divisible by ${RS}`;
             }
-            MEMO[MONKEY] = LS / RS;
+            MEMO[monkey] = LS / RS;
             break;
           default:
             throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
@@ -172,16 +181,16 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
 
         switch (operator) {                                                     // build out new string expression
           case '+':
-            MEMO[MONKEY] = `${ls} + ${rs}`;
+            MEMO[monkey] = `${ls} + ${rs}`;
             break;
           case '-':
-            MEMO[MONKEY] = `${ls} - ${rs}`;
+            MEMO[monkey] = `${ls} - ${rs}`;
             break;
           case '*':
-            MEMO[MONKEY] = `${ls} * ${rs}`;
+            MEMO[monkey] = `${ls} * ${rs}`;
             break;
           case '/':
-            MEMO[MONKEY] = `${ls} / ${rs}`;
+            MEMO[monkey] = `${ls} / ${rs}`;
             break;
           default:
             throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
@@ -190,7 +199,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       }
     }
 
-    return MEMO[MONKEY];
+    return MEMO[monkey];
   }
 
   // ANALYZE
@@ -263,12 +272,182 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   }
 }
 
+
+// ========== SOLUTION 2: IN PART 2, WE DO A BINARY SEARCH. I DON'T ACTUALLY LIKE THIS METHOD AS MUCH BECAUSE IT RELIES ON MORE ASSUMPTIONS THAT NEED
+// TO BE VERIFIED WITH THE DATA. BASICALLY, THE BINARY SEARCH STARTS FROM THE RANGE -9007199254740991 TO 9007199254740991, AND SEE WHAT THE RESULT
+// WOULD BE IF humn HAD THAT VALUE. DEPENDING ON THE DATA, THE VARIABLE EXPRESSION FOR THE root MONKEY WILL EITHER INCREASE OR DECREASE, AS THE CANDIDATE
+// humn VALUE INCREASES. ONCE WE FIGURE OUT WHETHER THE RESULTS ARE ASCENDING OR NOT, WE CAN MAKE OUR BINARY SEARCH RESTRICT THE SEARCH FIELD TO EITHER
+// THE LOWER HALF OR THE GREATER HALF EACH TIME THE MIDDLE NUMBER FAILS. IN TERMS OF SPEED, THIS SOLUTION SEEMS TO BE SLIGHTLY SLOWER, ALTHOUGH FOR
+// PRACTICAL PURPOSES BOTH SOLUTIONS SEEM BLAZINGLY FAST. THE ONE THING THAT IS BETTER IS THAT THIS SOLUTION WAS EASIER TO IMPLEMENT, AND REQUIRES
+// LESS COMPLICATED DATA INGESTION, ALTHOUGH THE RETURN VALUE OF THE RECURSIVE FUNCTION IS MORE COMPLICATED.
+
+function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+
+  // DATA STRUCTURES
+  const MEMO = {};
+  const REF = {};
+
+  // PARSE INPUT DATA
+  for (const line of inputArr) {
+    const [ monkey, expression ] = line.split(': ');
+    const split = expression.split(' ');
+
+    if (split.length === 1) {
+      MEMO[monkey] = { val: +split[0], LS: null, RS: null, fail: false };
+    } else {
+      REF[monkey] = split;
+    }
+  }
+  if (DISPLAY_EXTRA_INFO && DEBUG) {
+    console.log('MEMO OF MONKEYS WITH LITERAL VALUES:', MEMO);
+  }
+
+  // HELPER FUNCTION: RETURNS AN OBJECT WHICH CONTAINS THE VALUE CALLED OUT BY THE GIVEN MONKEY. IF THE MONKEY IS MAPPED TO AN EXPRESSION,
+  // THEN THIS OBJECT WILL ALSO CONTAIN THE LITERAL RESULTS OF THE LEFT AND RIGHT EXPRESSIONS; OTHERWISE THESE WOULD BE null. FINALLY,
+  // THE FAIL ATTRIBUTE IS FOR SANITY CHECKING: THIS GETS SET TO TRUE IF A DIVISION EXPRESSION DOES NOT RESULT IN EVEN DIVISION. THEN ANY
+  // OTHER EXPRESSION THAT RELIES ON A FAILED EXPRESSION ALSO GETS MARKED AS FAILED.
+  function getValueForMonkey(monkey, part, MEMO, HUMN = null) {
+
+    // PART 2 OVERRIDES
+    if (part === 2) {
+      if (monkey === 'humn') {
+        return { val: HUMN, LS: null, RS: null, fail: false };
+      }
+      if (monkey === 'root') {
+        const [ A, operator, B ] = REF[monkey];
+        const LS = getValueForMonkey(A, part, MEMO, HUMN);
+        const RS = getValueForMonkey(B, part, MEMO, HUMN);
+        return {
+          val: LS.val === RS.val,
+          LS: LS.val,
+          RS: RS.val,
+          fail: LS.fail || RS.fail
+        };
+      }
+    }
+
+    // CACHE MISS
+    if (!(monkey in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
+      
+      const [ A, operator, B ] = REF[monkey];    
+      const LS = getValueForMonkey(A, part, MEMO, HUMN);
+      const RS = getValueForMonkey(B, part, MEMO, HUMN);
+
+      const RTN = {
+        val: null,
+        LS: LS.val,
+        RS: RS.val,
+        fail: LS.fail || RS.fail                                                // propagate the fail values of the LS and RS expressions
+      };
+
+      switch (operator) {
+        case '+':
+          RTN.val = LS.val + RS.val;
+          break;
+        case '-':
+          RTN.val = LS.val - RS.val;
+          break;
+        case '*':
+          RTN.val = LS.val * RS.val;
+          break;
+        case '/':
+          if (LS.val % RS.val !== 0) {                                          // sanity check: any expressions involving division will always be evenly divisible
+            if (DISPLAY_EXTRA_INFO) {
+              console.log(`FAIL: ${LS.val} not divisible by ${RS.val}`);
+            }
+            RTN.fail = true;
+          }
+          RTN.val = LS.val / RS.val;
+          break;
+        default:
+          throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
+      }
+
+      MEMO[monkey] = RTN;
+    }
+
+    return MEMO[monkey];
+  }
+
+  // ANALYZE
+  if (part === 1) {                                                             // PART 1: RETURN THE VALUE ASSOCIATED WITH MONKEY 'root'
+
+    return getValueForMonkey('root', part, {...MEMO}).val;                      // invoke helper function to ultimately return value associated with monkey 'root'
+
+  } else {                                                                      // PART 2: IGNORE 'humn' VALUE. INSTEAD, FIND WHAT IT NEEDS TO BE IN ORDER FOR 'root' MATCH EXPRESSION TO WORK
+
+    // init MIN/MAX variables (these will change later during binary search)
+    let MIN = Number.MIN_SAFE_INTEGER;
+    let MAX = Number.MAX_SAFE_INTEGER;
+    
+    // figure out whether the results should be increasing or decreasing
+    const MIN_RES = getValueForMonkey('root', part, {...MEMO}, MIN);
+    const MAX_RES = getValueForMonkey('root', part, {...MEMO}, MAX);
+    if (DISPLAY_EXTRA_INFO) {
+      console.log(`${MIN}:`, MIN_RES);
+      console.log(`${MAX}:`, MAX_RES);
+    }
+
+    // edge case: if it just so happens that the true answer is at the starting extremes, we need to return accordingly
+    if (MIN_RES.LS === MIN_RES.RS) return MIN;                                  // true answer is -9007199254740991
+    if (MAX_RES.LS === MAX_RES.RS) return MAX;                                  // true answer is 9007199254740991
+
+    if (MIN_RES.LS !== MAX_RES.LS && MIN_RES.RS !== MAX_RES.RS) {
+      throw 'ERROR: EITHER THE LS OR THE RS EXPRESSIONS MUST BE CONSTANT';      // since one of root's expressions is NOT dependent on humn
+    }
+
+    const CONSTANT_IS_ON_LEFT = MIN_RES.LS === MAX_RES.LS;
+    const MIN_VAR_RES = CONSTANT_IS_ON_LEFT ? MIN_RES.RS : MIN_RES.LS;          // if constant expression is on LS, then variable expression is RS...
+    const MAX_VAR_RES = CONSTANT_IS_ON_LEFT ? MAX_RES.RS : MAX_RES.LS;          // ...and vice versa. this applies equaly to MIN and MAX.
+    const CONSTANT_RES = CONSTANT_IS_ON_LEFT ? MIN_RES.LS : MIN_RES.RS;
+
+    // sanity check to confirm that either the results will be ascending or descending
+    if (MIN_VAR_RES > CONSTANT_RES && MAX_VAR_RES > CONSTANT_RES) {
+      throw 'ERROR: THE LS AND RS VARIABLE RESULTS CANNOT BOTH BE GREATER THAN THE CONSTANT';
+    }
+    if (MIN_VAR_RES < CONSTANT_RES && MAX_VAR_RES < CONSTANT_RES) {
+      throw 'ERROR: THE LS AND RS VARIABLE RESULTS CANNOT BOTH BE LESS THAN THE CONSTANT';
+    }
+    const ASCENDING = MIN_VAR_RES < CONSTANT_RES && CONSTANT_RES < MAX_VAR_RES;
+
+    // binary search
+    while (MIN <= MAX) {
+      const MID = MIN + Math.floor((MAX - MIN)) / 2;
+      const MID_RES = getValueForMonkey('root', part, {...MEMO}, MID);
+      if (DISPLAY_EXTRA_INFO) console.log(`${MID}:`, MID_RES);
+
+      const MID_VAR_RES = CONSTANT_IS_ON_LEFT ? MID_RES.RS : MID_RES.LS;
+
+      if (MID_VAR_RES > CONSTANT_RES) {
+        if (ASCENDING) MAX = MID - 1;
+        else MIN = MID + 1;
+      }
+      else if (MID_VAR_RES < CONSTANT_RES) {
+        if (ASCENDING) MIN = MID + 1;
+        else MAX = MID - 1;
+      }
+      else {                                                                    // if MID_VAR_RES === CONSTANT_RES, MID should be the answer. but first...
+        if (!MID_RES.val) {                                                     // ...sanity check to make sure that part 2 override for root returns true val
+          throw `ERROR: APPARENT SOLUTION ${MID} DOES NOT RETURN A MATCH`;
+        }
+        if (MID_RES.fail) {                                                     // ...sanity check to make sure no division failures were propagated
+          throw `ERROR: APPARENT SOLUTION ${MID} PROPAGATES A DIVSION FAILURE`;
+        }
+        return MID;
+      }
+    }
+    
+  }
+}
+
 // TEST CASES
 
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
 const func = dependencyChainAlgebra;
+// const func = dependencyChainAlgebra2;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
