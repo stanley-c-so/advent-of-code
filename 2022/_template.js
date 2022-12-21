@@ -7,6 +7,9 @@ COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
 
 */
 
+// OPTIONAL VARIABLES
+const DISPLAY_EXTRA_INFO = true;
+
 function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   // if (DEBUG) {
@@ -16,19 +19,19 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
 
 
 
-  const TIME_AT_START = Date.now();
+  // const TIME_AT_START = Date.now();
 
   // ANALYZE
   if (part === 1) {
 
   } else {
 
-    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+    // if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
 
 
 
-    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
-    return;
+    // if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+    // return;
 
   }
 }
