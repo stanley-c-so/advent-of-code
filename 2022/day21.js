@@ -122,7 +122,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   }
 
   // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
-  function go(MONKEY, part) {
+  function getValueForMonkey(MONKEY, part) {
 
     // PART 2 OVERRIDES: original 'humn' value is replaced with 'X', and original 'root' expression's operator gets replaced with `===`
     if (part === 2) {
@@ -131,7 +131,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       }
       if (MONKEY === 'root') {
         const [ A, operator, B ] = REF[MONKEY];
-        MEMO['root'] = `${go(A, 2)} === ${go(B, 2)}`;
+        MEMO['root'] = `${getValueForMonkey(A, 2)} === ${getValueForMonkey(B, 2)}`;
       }
     }
 
@@ -139,8 +139,8 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
     if (!(MONKEY in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
 
       const [ A, operator, B ] = REF[MONKEY];    
-      const LS = go(A, part);
-      const RS = go(B, part);
+      const LS = getValueForMonkey(A, part);
+      const RS = getValueForMonkey(B, part);
 
       if (part === 1 || ![typeof LS, typeof RS].includes('string')) {           // PART 1, or PART 2 and LS, RS values are not connected to X
 
@@ -156,7 +156,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
             break;
           case '/':
             if (LS % RS !== 0) {                                                // sanity check: any expressions involving division will always be evenly divisible
-              throw `${go(A, part)} not divisible by ${go(B, part)}`;
+              throw `${LS} not divisible by ${RS}`;
             }
             MEMO[MONKEY] = LS / RS;
             break;
@@ -195,12 +195,12 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   // ANALYZE
   if (part === 1) {                                                             // PART 1: RETURN THE VALUE ASSOCIATED WITH MONKEY 'root'
 
-    return go('root', part);                                                    // invoke helper function to ultimately return value associated with monkey 'root'
+    return getValueForMonkey('root', part);                                     // invoke helper function to ultimately return value associated with monkey 'root'
 
   } else {                                                                      // PART 2: IGNORE 'humn' VALUE. INSTEAD, FIND WHAT IT NEEDS TO BE IN ORDER FOR 'root' MATCH EXPRESSION TO WORK
 
     // separate the literal and string expression parts of root expression
-    const [LS, RS] = go('root', part)                                           // invoke helper function to fill out MEMO data structure and get ` === ` expression belonging to monkey 'root'
+    const [LS, RS] = getValueForMonkey('root', part)                            // invoke helper function to fill out MEMO data structure and get ` === ` expression belonging to monkey 'root'
                       .split(' === ')
                       .map(n => +n);                                            // cast both sides to numbers (string expressions will become NaN)
 
@@ -214,7 +214,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
     // eventually the evolving string expression will become '(X)', and the evolving literal value will be what X equals, which solves PART 2.
     while (DEPENDENCY_CHAIN.length) {
       
-      const expression = MEMO[ DEPENDENCY_CHAIN.pop() ];
+      const expression = getValueForMonkey( DEPENDENCY_CHAIN.pop(), part );
       const split = expression.split(' ');
 
       let LITERAL_NUM_IS_ON_LEFT,                                               // every expression itself should have one half be a literal number, and the other half another expression wrapped in parens
