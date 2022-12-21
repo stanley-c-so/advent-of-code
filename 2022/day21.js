@@ -99,6 +99,11 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       MONKEY_DEPENDENT_ON[B] = monkey;
     }
   }
+  if (DISPLAY_EXTRA_INFO && DEBUG) {
+    console.log('MEMO OF MONKEYS WITH LITERAL VALUES:', MEMO);
+    console.log(' ');
+    console.log('MONKEY DEPENDENCIES (dependency: dependent):', MONKEY_DEPENDENT_ON);
+  }
 
   // PART 2: CREATE DEPENDENCY CHAIN TO HELP WORK OUT THE ORDER TO SOLVE THE ALGEBRAIC EXPRESSION
   const DEPENDENCY_CHAIN = [ ];
@@ -110,6 +115,10 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       DEPENDENCY_CHAIN.push(dependent);
       stack.push(dependent);
     }
+  }
+  if (DISPLAY_EXTRA_INFO && part === 2) {
+    console.log('DEPENDENCY CHAIN (a <- b means b depends on a; chain only includes lowercase monkeys):');
+    console.log(['HUMN', ...DEPENDENCY_CHAIN, 'ROOT'].join(' <- '));
   }
 
   // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
@@ -133,29 +142,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       const LS = go(A, part);
       const RS = go(B, part);
 
-      if (part === 2 && [typeof LS, typeof RS].includes('string')) {            // PART 2: any expression involving X (value of humn) should be saved as a string expression
-
-        const ls = typeof LS === 'string' ? `(${LS})` : LS;                     // add parentheses around string expressions
-        const rs = typeof RS === 'string' ? `(${RS})` : RS;                     // note that with our data having a linear dependency chain, monkeys will only have at most one side as a string
-
-        switch (operator) {                                                     // build out new string expression
-          case '+':
-            MEMO[MONKEY] = `${ls} + ${rs}`;
-            break;
-          case '-':
-            MEMO[MONKEY] = `${ls} - ${rs}`;
-            break;
-          case '*':
-            MEMO[MONKEY] = `${ls} * ${rs}`;
-            break;
-          case '/':
-            MEMO[MONKEY] = `${ls} / ${rs}`;
-            break;
-          default:
-            throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
-        }
-
-      } else {                                                                  // PART 1, or PART 2 values not connected to X
+      if (part === 1 || ![typeof LS, typeof RS].includes('string')) {           // PART 1, or PART 2 values not connected to X
 
         switch (operator) {
           case '+':
@@ -172,6 +159,28 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
               throw `${go(A, part)} not divisible by ${go(B, part)}`;
             }
             MEMO[MONKEY] = LS / RS;
+            break;
+          default:
+            throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
+        }
+
+      } else {                                                                  // PART 2: any expression involving X (value of humn) should be saved as a string expression
+
+        const ls = typeof LS === 'string' ? `(${LS})` : LS;                     // add parentheses around string expressions
+        const rs = typeof RS === 'string' ? `(${RS})` : RS;                     // note that with our data having a linear dependency chain, monkeys will only have at most one side as a string
+
+        switch (operator) {                                                     // build out new string expression
+          case '+':
+            MEMO[MONKEY] = `${ls} + ${rs}`;
+            break;
+          case '-':
+            MEMO[MONKEY] = `${ls} - ${rs}`;
+            break;
+          case '*':
+            MEMO[MONKEY] = `${ls} * ${rs}`;
+            break;
+          case '/':
+            MEMO[MONKEY] = `${ls} / ${rs}`;
             break;
           default:
             throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
