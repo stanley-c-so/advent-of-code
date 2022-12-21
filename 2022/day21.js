@@ -193,7 +193,7 @@ function dependencyChain (part, inputStr, DEBUG = false) {
     // separate the literal and string expression parts of root expression
     const [LS, RS] = go('root', part)                                           // invoke helper function to fill out MEMO data structure and get ` === ` expression belonging to monkey 'root'
                       .split(' === ')
-                      .map(n => +n);
+                      .map(n => +n);                                            // cast both sides to numbers (string expressions will become NaN)
 
     if (isNaN(LS) && isNaN(RS)) {
       throw 'ERROR: BOTH SIDES OF ROOT EXPRESSION ARE NOT LITERAL NUMBERS';
