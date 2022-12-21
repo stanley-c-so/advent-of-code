@@ -142,7 +142,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
       const LS = go(A, part);
       const RS = go(B, part);
 
-      if (part === 1 || ![typeof LS, typeof RS].includes('string')) {           // PART 1, or PART 2 values not connected to X
+      if (part === 1 || ![typeof LS, typeof RS].includes('string')) {           // PART 1, or PART 2 and LS, RS values are not connected to X
 
         switch (operator) {
           case '+':
