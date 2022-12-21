@@ -266,7 +266,7 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
   const VALVES_WITH_FLOW = Object.keys(VALVE_DATA).filter(loc => VALVE_DATA[loc].flowRate > 0);
   const VALVES_WITH_FLOW_PLUS_START = [ 'AA', ...VALVES_WITH_FLOW ];
   
-  function dijkstra(A, B) {                                                                 // return cost of shortest path from A to B
+  function dijkstraFromStartNode(A) {                                                       // return cost of shortest path from A to B
 
     // init
     const visited = new Set();
@@ -289,19 +289,21 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
         }
       }
     }
-    return COST[B];
+    return COST;
   }
 
   const DISTANCE_BETWEEN_KEY_NODES = {};
-  for (let i = 0; i < VALVES_WITH_FLOW_PLUS_START.length - 1; ++i) {
-    for (let j = i + 1; j < VALVES_WITH_FLOW_PLUS_START.length; ++j) {
-      const A = VALVES_WITH_FLOW_PLUS_START[i];
+  for (let i = 0; i < VALVES_WITH_FLOW_PLUS_START.length - 1; ++i) {                        // for all nodes (A)...
+    const A = VALVES_WITH_FLOW_PLUS_START[i];
+    if (!(A in DISTANCE_BETWEEN_KEY_NODES)) DISTANCE_BETWEEN_KEY_NODES[A] = {};
+    const DISTANCES_FROM_A = dijkstraFromStartNode(A);                                      // get dijkstra distances to all key nodes starting from A
+
+    for (let j = i + 1; j < VALVES_WITH_FLOW_PLUS_START.length; ++j) {                      // for all other nodes (B)...
       const B = VALVES_WITH_FLOW_PLUS_START[j];
-      const distance = dijkstra(A, B);
-      if (!(A in DISTANCE_BETWEEN_KEY_NODES)) DISTANCE_BETWEEN_KEY_NODES[A] = {};
-      DISTANCE_BETWEEN_KEY_NODES[A][B] = distance;
       if (!(B in DISTANCE_BETWEEN_KEY_NODES)) DISTANCE_BETWEEN_KEY_NODES[B] = {};
-      DISTANCE_BETWEEN_KEY_NODES[B][A] = distance;
+
+      DISTANCE_BETWEEN_KEY_NODES[A][B] = DISTANCES_FROM_A[B];                               // dijkstra distance from A to B...
+      DISTANCE_BETWEEN_KEY_NODES[B][A] = DISTANCES_FROM_A[B];                               // ...is the same as dijkstra distance from B to A
     }
   }
 
@@ -655,7 +657,7 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
   const VALVES_WITH_FLOW = Object.keys(VALVE_DATA).filter(loc => VALVE_DATA[loc].flowRate > 0);
   const VALVES_WITH_FLOW_PLUS_START = [ 'AA', ...VALVES_WITH_FLOW ];
   
-  function dijkstra(A, B) {                                                                 // return cost of shortest path from A to B
+  function dijkstraFromStartNode(A) {                                                       // return cost of shortest path from A to B
 
     // init
     const visited = new Set();
@@ -678,19 +680,21 @@ function optimalGraphTraversal2 (part, inputStr, DEBUG = false) {
         }
       }
     }
-    return COST[B];
+    return COST;
   }
 
   const DISTANCE_BETWEEN_KEY_NODES = {};
-  for (let i = 0; i < VALVES_WITH_FLOW_PLUS_START.length - 1; ++i) {
-    for (let j = i + 1; j < VALVES_WITH_FLOW_PLUS_START.length; ++j) {
-      const A = VALVES_WITH_FLOW_PLUS_START[i];
+  for (let i = 0; i < VALVES_WITH_FLOW_PLUS_START.length - 1; ++i) {                        // for all nodes (A)...
+    const A = VALVES_WITH_FLOW_PLUS_START[i];
+    if (!(A in DISTANCE_BETWEEN_KEY_NODES)) DISTANCE_BETWEEN_KEY_NODES[A] = {};
+    const DISTANCES_FROM_A = dijkstraFromStartNode(A);                                      // get dijkstra distances to all key nodes starting from A
+
+    for (let j = i + 1; j < VALVES_WITH_FLOW_PLUS_START.length; ++j) {                      // for all other nodes (B)...
       const B = VALVES_WITH_FLOW_PLUS_START[j];
-      const distance = dijkstra(A, B);
-      if (!(A in DISTANCE_BETWEEN_KEY_NODES)) DISTANCE_BETWEEN_KEY_NODES[A] = {};
-      DISTANCE_BETWEEN_KEY_NODES[A][B] = distance;
       if (!(B in DISTANCE_BETWEEN_KEY_NODES)) DISTANCE_BETWEEN_KEY_NODES[B] = {};
-      DISTANCE_BETWEEN_KEY_NODES[B][A] = distance;
+
+      DISTANCE_BETWEEN_KEY_NODES[A][B] = DISTANCES_FROM_A[B];                               // dijkstra distance from A to B...
+      DISTANCE_BETWEEN_KEY_NODES[B][A] = DISTANCES_FROM_A[B];                               // ...is the same as dijkstra distance from B to A
     }
   }
 
