@@ -76,7 +76,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
 
   // DATA STRUCTURES
   const MEMO = {};
-  const REF = {};
+  const EXPRESSION = {};
   const MONKEY_DEPENDENT_ON = {};
 
   // PARSE INPUT DATA
@@ -89,7 +89,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
     } else {
 
       // PART 1: save a reference to this monkey's expression
-      REF[monkey] = split;
+      EXPRESSION[monkey] = split;
 
       // PART 2: save dependency information to form dependency chain
       const [A, operator, B] = split;
@@ -132,25 +132,25 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   }
 
   // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
-  function getValueForMonkey(monkey, part) {
+  function getValueForMonkey(monkey) {
 
-    // PART 2 OVERRIDES: original 'humn' value is replaced with 'X', and original 'root' expression's operator gets replaced with `===`
+    // PART 2 OVERRIDES: original 'humn' value is replaced with 'X', and original 'root' expression's operator gets replaced with `=`
     if (part === 2) {
       if (monkey === 'humn') {
         MEMO['humn'] = 'X';
       }
       if (monkey === 'root') {
-        const [ A, operator, B ] = REF[monkey];
-        MEMO['root'] = `${getValueForMonkey(A, 2)} = ${getValueForMonkey(B, 2)}`;
+        const [ A, operator, B ] = EXPRESSION[monkey];
+        MEMO['root'] = `${getValueForMonkey(A)} = ${getValueForMonkey(B)}`;
       }
     }
 
     // CACHE MISS
     if (!(monkey in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
 
-      const [ A, operator, B ] = REF[monkey];    
-      const LS = getValueForMonkey(A, part);
-      const RS = getValueForMonkey(B, part);
+      const [ A, operator, B ] = EXPRESSION[monkey];    
+      const LS = getValueForMonkey(A);
+      const RS = getValueForMonkey(B);
 
       if (part === 1 || ![typeof LS, typeof RS].includes('string')) {           // PART 1, or PART 2 and LS, RS values are not connected to X
 
@@ -205,12 +205,12 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
   // ANALYZE
   if (part === 1) {                                                             // PART 1: RETURN THE VALUE ASSOCIATED WITH MONKEY 'root'
 
-    return getValueForMonkey('root', part);                                     // invoke helper function to ultimately return value associated with monkey 'root'
+    return getValueForMonkey('root');                                           // invoke helper function to ultimately return value associated with monkey 'root'
 
   } else {                                                                      // PART 2: IGNORE 'humn' VALUE. INSTEAD, FIND WHAT IT NEEDS TO BE IN ORDER FOR 'root' MATCH EXPRESSION TO WORK
 
     // separate the literal and string expression parts of root expression
-    const [LS, RS] = getValueForMonkey('root', part)                            // invoke helper function to fill out MEMO data structure and get ` === ` expression belonging to monkey 'root'
+    const [LS, RS] = getValueForMonkey('root')                                  // invoke helper function to fill out MEMO data structure and get ` === ` expression belonging to monkey 'root'
                       .split(' = ')
                       .map(n => +n);                                            // cast both sides to numbers (string expressions will become NaN)
 
@@ -224,7 +224,7 @@ function dependencyChainAlgebra (part, inputStr, DEBUG = false) {
     // eventually the evolving string expression will become '(X)', and the evolving literal value will be what X equals, which solves PART 2.
     while (DEPENDENCY_CHAIN.length) {
       
-      const expression = getValueForMonkey( DEPENDENCY_CHAIN.pop(), part );
+      const expression = getValueForMonkey( DEPENDENCY_CHAIN.pop() );
       const split = expression.split(' ');
 
       if (DISPLAY_EXTRA_INFO) {
@@ -286,7 +286,7 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
 
   // DATA STRUCTURES
   const MEMO = {};
-  const REF = {};
+  const EXPRESSION = {};
 
   // PARSE INPUT DATA
   for (const line of inputArr) {
@@ -296,7 +296,7 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
     if (split.length === 1) {
       MEMO[monkey] = { val: +split[0], LS: null, RS: null, fail: false };
     } else {
-      REF[monkey] = split;
+      EXPRESSION[monkey] = split;
     }
   }
   if (DISPLAY_EXTRA_INFO && DEBUG) {
@@ -307,7 +307,7 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
   // THEN THIS OBJECT WILL ALSO CONTAIN THE LITERAL RESULTS OF THE LEFT AND RIGHT EXPRESSIONS; OTHERWISE THESE WOULD BE null. FINALLY,
   // THE FAIL ATTRIBUTE IS FOR SANITY CHECKING: THIS GETS SET TO TRUE IF A DIVISION EXPRESSION DOES NOT RESULT IN EVEN DIVISION. THEN ANY
   // OTHER EXPRESSION THAT RELIES ON A FAILED EXPRESSION ALSO GETS MARKED AS FAILED.
-  function getValueForMonkey(monkey, part, MEMO, HUMN = null) {
+  function getValueForMonkey(monkey, MEMO, HUMN = null) {
 
     // PART 2 OVERRIDES
     if (part === 2) {
@@ -315,9 +315,9 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
         return { val: HUMN, LS: null, RS: null, fail: false };
       }
       if (monkey === 'root') {
-        const [ A, operator, B ] = REF[monkey];
-        const LS = getValueForMonkey(A, part, MEMO, HUMN);
-        const RS = getValueForMonkey(B, part, MEMO, HUMN);
+        const [ A, operator, B ] = EXPRESSION[monkey];
+        const LS = getValueForMonkey(A, MEMO, HUMN);
+        const RS = getValueForMonkey(B, MEMO, HUMN);
         return {
           val: LS.val === RS.val,
           LS: LS.val,
@@ -330,9 +330,9 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
     // CACHE MISS
     if (!(monkey in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
       
-      const [ A, operator, B ] = REF[monkey];    
-      const LS = getValueForMonkey(A, part, MEMO, HUMN);
-      const RS = getValueForMonkey(B, part, MEMO, HUMN);
+      const [ A, operator, B ] = EXPRESSION[monkey];    
+      const LS = getValueForMonkey(A, MEMO, HUMN);
+      const RS = getValueForMonkey(B, MEMO, HUMN);
 
       const RTN = {
         val: null,
@@ -373,7 +373,7 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
   // ANALYZE
   if (part === 1) {                                                             // PART 1: RETURN THE VALUE ASSOCIATED WITH MONKEY 'root'
 
-    return getValueForMonkey('root', part, {...MEMO}).val;                      // invoke helper function to ultimately return value associated with monkey 'root'
+    return getValueForMonkey('root', {...MEMO}).val;                            // invoke helper function to ultimately return value associated with monkey 'root'
 
   } else {                                                                      // PART 2: IGNORE 'humn' VALUE. INSTEAD, FIND WHAT IT NEEDS TO BE IN ORDER FOR 'root' MATCH EXPRESSION TO WORK
 
@@ -382,8 +382,8 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
     let MAX = Number.MAX_SAFE_INTEGER;
     
     // figure out whether the results should be increasing or decreasing
-    const MIN_RES = getValueForMonkey('root', part, {...MEMO}, MIN);
-    const MAX_RES = getValueForMonkey('root', part, {...MEMO}, MAX);
+    const MIN_RES = getValueForMonkey('root', {...MEMO}, MIN);
+    const MAX_RES = getValueForMonkey('root', {...MEMO}, MAX);
     if (DISPLAY_EXTRA_INFO) {
       console.log(`${MIN}:`, MIN_RES);
       console.log(`${MAX}:`, MAX_RES);
@@ -414,7 +414,7 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
     // binary search
     while (MIN <= MAX) {
       const MID = MIN + Math.floor((MAX - MIN)) / 2;
-      const MID_RES = getValueForMonkey('root', part, {...MEMO}, MID);
+      const MID_RES = getValueForMonkey('root', {...MEMO}, MID);
       if (DISPLAY_EXTRA_INFO) console.log(`${MID}:`, MID_RES);
 
       const MID_VAR_RES = CONSTANT_IS_ON_LEFT ? MID_RES.RS : MID_RES.LS;
@@ -441,13 +441,140 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
   }
 }
 
+
+// ========== SOLUTION 3: MY BEST AND SIMPLEST SOLUTION. THE getValueForMonkey FUNCTION ONCE AGAIN RETURNS THE SIMPLE VALUE OF A MONKEY WITH
+// A KNOWN LITERAL VALUE. EVEN IF THE MONKEY MAPS TO AN EXPRESSION, DFS WILL RECURSE AND FIND OUT THE LITERAL VALUES OF THE OPERANDS TO CONVERT
+// THIS MONKEY INTO AN EXPRESSION, JUST LIKE IN MY PREVIOUS SOLUTIONS. IN PART 2, HOWEVER, IF A MONKEY MAPS TO AN EXPRESSION DEPENDENT ON humn,
+// IT STAYS IN EXPRESSION FORM, REPRESENTED AS AN ARRAY WITH 3 ELEMENTS: AN INNER EXPRESSION, AN OPERATOR, AND A LITERAL VALUE. HOWEVER, SINCE
+// THE INNER EXPRESSION IS DEPENDENT ON humn, WE WILL INSTEAD HAVE humn AND ALL INNER EXPRESSIONS DEPENDENT ON humn HAVE THE VALUE OF THE CONSTANT
+// `HUMN` INSTEAD, WHICH WE CAN ASSIGN TO null. THIS WAY WHEN WE KICKSTART RECURSION ON root, WE WILL SOLVE FOR ALL MONKEYS NOT DEPENDENT ON humn,
+// AND THEN AFTERWARD, WE CAN START AT root, SEPARATE OUT THE INNER EXPRESSION AND THE NOW KNOWN LITERAL VALUE, AND KEEP DRILLING DOWN INTO THE
+// INNER EXPRESSION WHILE WE REASSIGN THE LITERAL VALUE BASED ON ALGEBRA, PROGRESSIVELY 'UNDOING' THE INNER EXPRESSION UNTIL IT BECOMES HUMN (null).
+
+function dependencyChainAlgebra3 (part, inputStr, DEBUG = false) {
+  const inputArr = inputStr.split('\r\n');
+
+  // CONSTANTS
+  const HUMN = null;
+
+  // DATA STRUCTURES
+  const MEMO = {};
+  const EXPRESSION = {};
+
+  // PARSE INPUT DATA
+  for (const line of inputArr) {
+    const [ monkey, expression ] = line.split(': ');
+    const split = expression.split(' ');
+
+    if (split.length === 1) {                                                   // monkey has a literal value
+      MEMO[monkey] = +split[0];
+    } else {                                                                    // monkey has an expression
+      EXPRESSION[monkey] = split;
+    }
+  }
+  if (DISPLAY_EXTRA_INFO && DEBUG) {
+    console.log('MEMO OF MONKEYS WITH LITERAL VALUES:', MEMO);
+  }
+
+  // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
+  function getValueForMonkey(monkey) {
+
+    // PART 2 OVERRIDE: original 'humn' value is replaced with HUMN (null). going forward, any expression ultimately dependent on humn will also be HUMN (null)
+    if (part === 2 && monkey === 'humn') {
+      MEMO['humn'] = HUMN;
+    }
+
+    // CACHE MISS
+    if (!(monkey in MEMO)) {                                                    // NOTE: any monkey associated with a literal number from input data will not be a cache miss
+
+      const [ A, operator, B ] = EXPRESSION[monkey];
+      const LS = getValueForMonkey(A);
+      const RS = getValueForMonkey(B);
+
+      if (typeof LS === 'number' && typeof RS === 'number') {                   // if both sides of expression are now known literals, convert exprsesion into literal
+
+        switch (operator) {
+          case '+':
+            MEMO[monkey] = LS + RS;
+            break;
+          case '-':
+            MEMO[monkey] = LS - RS;
+            break;
+          case '*':
+            MEMO[monkey] = LS * RS;
+            break;
+          case '/':
+            if (LS % RS !== 0) {                                                // sanity check: any expressions involving division will always be evenly divisible
+              throw `${LS} not divisible by ${RS}`;
+            }
+            MEMO[monkey] = LS / RS;
+            break;
+          default:
+            throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
+        }
+
+      }
+      else MEMO[monkey] = [ LS, operator, RS ];
+
+    }
+
+    return MEMO[monkey];
+  }
+
+  // ANALYZE
+  if (part === 1) {                                                             // PART 1: RETURN THE VALUE ASSOCIATED WITH MONKEY 'root'
+
+    return getValueForMonkey('root');                                           // invoke helper function to ultimately return value associated with monkey 'root'
+
+  } else {                                                                      // PART 2: IGNORE 'humn' VALUE. INSTEAD, FIND WHAT IT NEEDS TO BE IN ORDER FOR 'root' MATCH EXPRESSION TO WORK
+    
+    // first, kickstart recursion
+    const [ LS, _, RS ] = getValueForMonkey('root');                            // kickstart recursion; any expressions involving humn will be HUMN (null) instead
+
+    // then do some initial setup based on root result (whose operator is deemed to be unique, so we will handle it a little differently)
+    let literal = typeof LS === 'number' ? LS : RS;                             // init current literal (starts as the literal component of root expression)
+    let expression = typeof LS === 'number' ? RS : LS;                          // init current expression (starts as the expression component of root expression)
+
+    // then, once our values have been initialized, keep drilling down into expression until it becomes HUMN (null)
+    while (expression !== HUMN) {
+      const [ LS, operator, RS ] = expression;
+      const innerLiteral = typeof LS === 'number' ? LS : RS;
+      const innerExpression = typeof LS === 'number' ? RS : LS;
+      const LITERAL_NUM_IS_ON_LEFT = typeof LS === 'number';                    // NOTE: makes a difference for reversing - and / operations!
+
+      switch (operator) {                                                       // drill down deeper by reassigning literal to whatever innerExpression equals
+        case '+':
+          literal -= innerLiteral;                                              // innerExpression + innerLiteral = literal  -->  innerExpression = literal - innerLiteral
+          break;
+        case '-':
+          if (LITERAL_NUM_IS_ON_LEFT) literal = innerLiteral - literal;         // innerLiteral - innerExpression = literal  -->  innerExpression = innerLiteral - literal
+          else literal += innerLiteral;                                         // innerExpression - innerLiteral = literal  -->  innerExpression = literal + innerLiteral
+          break;
+        case '*':
+          literal /= innerLiteral;                                              // innerExpression * innerLiteral = literal  -->  innerExpression = literal / innerLiteral
+          break;
+        case '/':
+          if (LITERAL_NUM_IS_ON_LEFT) literal = innerLiteral / literal;         // innerLiteral / innerExpression = literal  -->  innerExpression = innerLiteral / literal
+          else literal *= innerLiteral;                                         // innerExpression / innerLiteral = literal  -->  innerExpression = literal * innerLiteral
+          break;
+        default:
+          throw `ERROR: UNRECOGNIZED OPERATOR ${operator}`;
+      }
+      expression = innerExpression;                                             // finally, reassign expression to innerExpression to drill down deeper
+    }
+
+    return literal;                                                             // after ending the while loop, literal should equal the true value of humn
+  }
+}
+
 // TEST CASES
 
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = dependencyChainAlgebra;
+// const func = dependencyChainAlgebra;
 // const func = dependencyChainAlgebra2;
+const func = dependencyChainAlgebra3;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
@@ -456,7 +583,6 @@ const highestTest = 0;
 
 const fs = require('fs');
 const path = require('path');
-const { fail } = require('assert');
 const DAY_NUM = __filename.split('.js')[0].split('day')[1];
 const INPUT_PATH = path.join(__dirname, `day${DAY_NUM}-input.txt`);
 const actualInput = fs.readFileSync(INPUT_PATH, 'utf8');
