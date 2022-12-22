@@ -60,7 +60,7 @@ What number do you yell to pass root's equality test?
 */
 
 // OPTIONAL VARIABLES
-const DISPLAY_EXTRA_INFO = 0;
+const DISPLAY_EXTRA_INFO = true;
 
 
 // ========== SOLUTION 1: FOR PART 1, DO A SIMPLE DFS WITH RECURSION. KEEP A MEMO OF KNOWN VALUES (ANY MONKEYS WITH LITERAL NUMBERS AUTOMATICALLY GET
@@ -447,15 +447,15 @@ function dependencyChainAlgebra2 (part, inputStr, DEBUG = false) {
 // THIS MONKEY INTO AN EXPRESSION, JUST LIKE IN MY PREVIOUS SOLUTIONS. IN PART 2, HOWEVER, IF A MONKEY MAPS TO AN EXPRESSION DEPENDENT ON humn,
 // IT STAYS IN EXPRESSION FORM, REPRESENTED AS AN ARRAY WITH 3 ELEMENTS: AN INNER EXPRESSION, AN OPERATOR, AND A LITERAL VALUE. HOWEVER, SINCE
 // THE INNER EXPRESSION IS DEPENDENT ON humn, WE WILL INSTEAD HAVE humn AND ALL INNER EXPRESSIONS DEPENDENT ON humn HAVE THE VALUE OF THE CONSTANT
-// `HUMN` INSTEAD, WHICH WE CAN ASSIGN TO null. THIS WAY WHEN WE KICKSTART RECURSION ON root, WE WILL SOLVE FOR ALL MONKEYS NOT DEPENDENT ON humn,
+// `HUMN` INSTEAD, WHICH WE CAN ASSIGN TO 'X'. THIS WAY WHEN WE KICKSTART RECURSION ON root, WE WILL SOLVE FOR ALL MONKEYS NOT DEPENDENT ON humn,
 // AND THEN AFTERWARD, WE CAN START AT root, SEPARATE OUT THE INNER EXPRESSION AND THE NOW KNOWN LITERAL VALUE, AND KEEP DRILLING DOWN INTO THE
-// INNER EXPRESSION WHILE WE REASSIGN THE LITERAL VALUE BASED ON ALGEBRA, PROGRESSIVELY 'UNDOING' THE INNER EXPRESSION UNTIL IT BECOMES HUMN (null).
+// INNER EXPRESSION WHILE WE REASSIGN THE LITERAL VALUE BASED ON ALGEBRA, PROGRESSIVELY 'UNDOING' THE INNER EXPRESSION UNTIL IT BECOMES HUMN ('X').
 
 function dependencyChainAlgebra3 (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
 
   // CONSTANTS
-  const HUMN = null;
+  const HUMN = 'X';
 
   // DATA STRUCTURES
   const MEMO = {};
@@ -479,7 +479,7 @@ function dependencyChainAlgebra3 (part, inputStr, DEBUG = false) {
   // HELPER FUNCTION: RETURNS VALUE CALLED OUT BY THE GIVEN MONKEY
   function getValueForMonkey(monkey) {
 
-    // PART 2 OVERRIDE: original 'humn' value is replaced with HUMN (null). going forward, any expression ultimately dependent on humn will also be HUMN (null)
+    // PART 2 OVERRIDE: original 'humn' value is replaced with HUMN ('X')
     if (part === 2 && monkey === 'humn') {
       MEMO['humn'] = HUMN;
     }
@@ -529,14 +529,29 @@ function dependencyChainAlgebra3 (part, inputStr, DEBUG = false) {
   } else {                                                                      // PART 2: IGNORE 'humn' VALUE. INSTEAD, FIND WHAT IT NEEDS TO BE IN ORDER FOR 'root' MATCH EXPRESSION TO WORK
     
     // first, kickstart recursion
-    const [ LS, _, RS ] = getValueForMonkey('root');                            // kickstart recursion; any expressions involving humn will be HUMN (null) instead
+    const [ LS, _, RS ] = getValueForMonkey('root');                            // kickstart recursion
 
     // then do some initial setup based on root result (whose operator is deemed to be unique, so we will handle it a little differently)
     let literal = typeof LS === 'number' ? LS : RS;                             // init current literal (starts as the literal component of root expression)
     let expression = typeof LS === 'number' ? RS : LS;                          // init current expression (starts as the expression component of root expression)
 
-    // then, once our values have been initialized, keep drilling down into expression until it becomes HUMN (null)
-    while (expression !== HUMN) {
+    // then, once our values have been initialized, keep drilling down into expression until it becomes HUMN ('X')
+    while (true) {
+
+      if (DISPLAY_EXTRA_INFO) {
+        function stringify(expression) {
+          if (expression === HUMN) return HUMN;
+          const [ LS, operator, RS ] = expression;
+          const ls = Array.isArray(LS) ? `(${stringify(LS)})` : LS;
+          const rs = Array.isArray(RS) ? `(${stringify(RS)})` : RS;
+          return `${ls} ${operator} ${rs}`;
+        }
+        console.log(`${literal} = ${stringify(expression)}`);
+        console.log('');
+      }
+      
+      if (expression === HUMN) break;                                           // this condition is here instead of in the while loop declaration to allow for one last print above
+
       const [ LS, operator, RS ] = expression;
       const innerLiteral = typeof LS === 'number' ? LS : RS;
       const innerExpression = typeof LS === 'number' ? RS : LS;
