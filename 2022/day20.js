@@ -176,7 +176,6 @@ function rotationalOrder (part, inputStr, DEBUG = false) {
             state.push(state.shift());
             IDX = LEN - 1;
           }
-
           [ state[IDX - 1], state[IDX] ] = [ state[IDX], state[IDX - 1] ];
           --IDX;
         }
