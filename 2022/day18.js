@@ -116,9 +116,9 @@ function analyzeSurfaceAreaOfSolid (part, inputStr, DEBUG = false) {
     }
   }
 
-  const TIME_AT_START = Date.now();
-
+  
   // ANALYZE
+  const TIME_AT_START = Date.now();
   if (part === 1) {                                                                           // PART 1: GET SURFACE AREA OF SOLID
 
     return TOTAL_SURFACE_AREA_OF_SOLID;

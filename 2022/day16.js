@@ -349,9 +349,9 @@ function optimalGraphTraversal (part, inputStr, DEBUG = false) {
     return { maxPressureReleased, path };
   }
 
-  const TIME_AT_START = Date.now();
-
+  
   // ANALYZE
+  const TIME_AT_START = Date.now();
   if (part === 1) {
 
     const { maxPressureReleased, path } = ANALYZE(VALVES_WITH_FLOW, 30);
