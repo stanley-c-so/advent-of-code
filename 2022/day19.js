@@ -432,7 +432,7 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
   // MAIN DRIVER FUNCTION
   function analyze(TIME_LIMIT, BLUEPRINTS_TO_BE_EXAMINED) {
 
-    const TIME_START = Date.now();
+    const TIME_AT_START = Date.now();
                       
     const BLUEPRINT_RESULTS = Array(BLUEPRINTS).fill(null);
 
@@ -481,7 +481,7 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
             NEXT_MIN_TARGET
             } mins have passed since beginning this blueprint`);
           console.log(`... ${
-            Math.floor((Date.now() - TIME_START)/(1000*60))
+            Math.floor((Date.now() - TIME_AT_START)/(1000*60))
             } mins have passed since beginning this run`);
           ++NEXT_MIN_TARGET;
         }
@@ -676,7 +676,7 @@ function optimizeResourceChain (part, inputStr, DEBUG = false) {
       }
     }
 
-    console.log(`(ENTIRE RUN TOOK ${(Date.now() - TIME_START)/1000} SECS)`)
+    console.log(`(ENTIRE RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`)
     return BLUEPRINT_RESULTS;
   }
 
