@@ -197,6 +197,7 @@ function baseFiveWithNegativeDigits (part, inputStr, DEBUG = false) {
     const TEST_SNAFUS = [ '1', '2', '1=', '1-', '10', '11', '12', '2=', '2-', '20', '1=0', '1-0', '1=11-2', '1-0---0', '1121-1110-1=0' ];
     const SNAFU_RESULTS = TEST_DECIMALS.map(n => decimalToSNAFU(n));
     for (let i = 0; i < SNAFU_RESULTS.length; ++i) {
+      console.log(`FOR DECIMAL ${TEST_DECIMALS[i]}, EXPECTED ${TEST_SNAFUS[i]}, AND GOT ${SNAFU_RESULTS[i]}`);
       if (SNAFU_RESULTS[i] !== TEST_SNAFUS[i]) {
         throw `ERROR: FOR DECIMAL ${TEST_DECIMALS[i]}, EXPECTED ${TEST_SNAFUS[i]} BUT GOT ${SNAFU_RESULTS[i]}`;
       }
@@ -268,6 +269,7 @@ function baseFiveWithNegativeDigits2 (part, inputStr, DEBUG = false) {
     const TEST_SNAFUS = [ '1', '2', '1=', '1-', '10', '11', '12', '2=', '2-', '20', '1=0', '1-0', '1=11-2', '1-0---0', '1121-1110-1=0' ];
     const SNAFU_RESULTS = TEST_DECIMALS.map(n => decimalToSNAFU(n));
     for (let i = 0; i < SNAFU_RESULTS.length; ++i) {
+      console.log(`FOR DECIMAL ${TEST_DECIMALS[i]}, EXPECTED ${TEST_SNAFUS[i]}, AND GOT ${SNAFU_RESULTS[i]}`);
       if (SNAFU_RESULTS[i] !== TEST_SNAFUS[i]) {
         throw `ERROR: FOR DECIMAL ${TEST_DECIMALS[i]}, EXPECTED ${TEST_SNAFUS[i]} BUT GOT ${SNAFU_RESULTS[i]}`;
       }
