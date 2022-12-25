@@ -285,6 +285,17 @@ function movingObstaclesBFS (part, inputStr, DEBUG = false) {
     [0, -1],
   ];
 
+  // SPACE OPTIMIZATION: FUNCTIONS TO STOP UPDATING BLIZZARD LOCATIONS AFTER REACHING LCM OF H - 2 AND W - 2, BECAUSE THEY REPEAT
+  function GCD (num, denom) {                                                             // uses Euclidean algorithm (https://en.wikipedia.org/wiki/Euclidean_algorithm)
+    num = Math.abs(num);
+    denom = Math.abs(denom);
+    return denom ? GCD(denom, num % denom) : num;                                         // credit to Phrogz (https://stackoverflow.com/questions/4652468/is-there-a-javascript-function-that-reduces-a-fraction)
+  }
+  function LCM (num1, num2) {
+    return (!num1 || !num2) ? 0 : Math.abs((num1 * num2)) / GCD(num1, num2);              // credit to w3resource (https://www.w3resource.com/javascript-exercises/javascript-math-exercise-10.php)
+  }
+  const LCMofGridInteriorDimensions = LCM(H - 2, W - 2);
+
   // DATA STRUCTURE
   const BLIZZARD_LOCATIONS = [ {} ];                                                      // BLIZZARD_LOCATIONS[i] is an object with keys that
                                                                                           // are serials of coords, and values that are arrays
@@ -397,8 +408,6 @@ function movingObstaclesBFS (part, inputStr, DEBUG = false) {
     if (visited.has(state)) continue;
     visited.add(state);
 
-    // if (moves + 1 === BLIZZARD_LOCATIONS.length) updateBlizzardLocations();               // NOTE: UPDATE BLIZZARD LOCATIONS IF NEXT MOVE UNCALCULATED
-
     // key checkpoint: reached the end
     if (y === endRow && x === endCol) {
 
@@ -438,7 +447,12 @@ function movingObstaclesBFS (part, inputStr, DEBUG = false) {
       }
     }
 
-    if (moves + 1 === BLIZZARD_LOCATIONS.length) updateBlizzardLocations();               // NOTE: UPDATE BLIZZARD LOCATIONS IF NEXT MOVE UNCALCULATED
+    // if (moves + 1 === BLIZZARD_LOCATIONS.length) updateBlizzardLocations();               // NOTE: UPDATE BLIZZARD LOCATIONS IF NEXT MOVE UNCALCULATED
+    if (moves + 1 === BLIZZARD_LOCATIONS.length
+        && (moves + 1) < LCMofGridInteriorDimensions
+    ) {
+      updateBlizzardLocations();               // NOTE: UPDATE BLIZZARD LOCATIONS IF NEXT MOVE UNCALCULATED
+    }
 
     // search neighbors if we have not reached triggered the end condition at the end.
     // we will need to know the blizzard locations for the next move, which is why we ran updateBlizzardLocations()
@@ -456,7 +470,8 @@ function movingObstaclesBFS (part, inputStr, DEBUG = false) {
 
           || (0 < newY && newY < H - 1                                                    // scenaio C: neighbor is anywhere else, such that...
               && 0 < newX && newX < W - 1                                                 // ...neighbor is not in the walls, and...
-              && (!(newSerial in BLIZZARD_LOCATIONS[moves + 1])))                         // ...no blizzard exists there on the next turn
+              // && (!(newSerial in BLIZZARD_LOCATIONS[moves + 1])))                         // ...no blizzard exists there on the next turn
+              && (!(newSerial in BLIZZARD_LOCATIONS[(moves + 1) % LCMofGridInteriorDimensions])))                         // ...no blizzard exists there on the next turn
       ) {
         Q.enqueue([
           newY,
