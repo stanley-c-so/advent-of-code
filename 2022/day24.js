@@ -292,7 +292,7 @@ function movingObstaclesBFS (part, inputStr, DEBUG = false) {
     return denom ? GCD(denom, num % denom) : num;                                         // credit to Phrogz (https://stackoverflow.com/questions/4652468/is-there-a-javascript-function-that-reduces-a-fraction)
   }
   function LCM (num1, num2) {
-    return (!num1 || !num2) ? 0 : Math.abs((num1 * num2)) / GCD(num1, num2);              // credit to w3resource (https://www.w3resource.com/javascript-exercises/javascript-math-exercise-10.php)
+    return (!num1 && !num2) ? 0 : Math.abs((num1 * num2)) / GCD(num1, num2);              // credit to w3resource (https://www.w3resource.com/javascript-exercises/javascript-math-exercise-10.php)
   }
   const LCMofGridInteriorDimensions = LCM(H - 2, W - 2);
 
