@@ -128,7 +128,6 @@ const sampleInput2 = parseSampleInput(
 `.^^.^.^^^^`
 );
 
-
 // Test case 1
 input = {
   part: 1,
