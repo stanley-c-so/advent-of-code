@@ -108,6 +108,7 @@ class MinHeap {
 }
 
 module.exports = {
+  Node,
   Queue,
   MinHeap,
 };
