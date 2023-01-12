@@ -65,7 +65,7 @@ const DISPLAY_EXTRA_INFO = true;
 function fillOutGridByPreviousRow (part, inputStr, extraParam, DEBUG = false) {
   
   // CONSTANTS
-  const H = extraParam;
+  const H = extraParam;                                                         // PART 1: ACTUAL GRID HAS 40 ROWS; PART 2: IT HAS 400,000 ROWS
   const W = inputStr.length;
   const GRID = Array.from({length: H}, () => Array(W));
   GRID[0] = inputStr.split('');                                                 // init first row based on inputStr
@@ -75,9 +75,9 @@ function fillOutGridByPreviousRow (part, inputStr, extraParam, DEBUG = false) {
   // ANALYZE: COMPLETE GRID
   const TIME_AT_START = Date.now();
   if (part === 2) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
-  for (let row = 1; row < H; ++row) {
+  for (let row = 1; row < H; ++row) {                                           // NOTE: start at row 1, not 0
     for (let col = 0; col < W; ++col) {
-      const left = col === 0 ? SAFE : GRID[row - 1][col - 1];
+      const left = col === 0 ? SAFE : GRID[row - 1][col - 1];                   // safe if out of bounds, else check corresponding col of previous row
       const right = col === W - 1 ? SAFE : GRID[row - 1][col + 1];
       GRID[row][col] = left !== right ? TRAP : SAFE;                            // if and only if left !== right, we have a trap scenario
                                                                                 // NOTE: we don't even care what the tile above the current one is!
@@ -85,9 +85,7 @@ function fillOutGridByPreviousRow (part, inputStr, extraParam, DEBUG = false) {
   }
 
   if (DISPLAY_EXTRA_INFO && part === 1) {
-    for (const row of GRID) {
-      console.log(row.join(''));
-    }
+    for (const row of GRID) console.log(row.join(''));
   }
 
   // COUNT SAFE TILES
