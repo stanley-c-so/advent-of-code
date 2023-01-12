@@ -46,24 +46,25 @@ function alignDiscs (part, inputStr, DEBUG = false) {
 
   // PARSE INPUT DATA
   const DATA = [];
-  for (let disc = 1; disc <= inputArr.length; ++disc) {
-    const split = inputArr[disc - 1].split(' ');
+  for (let disc = 0; disc < inputArr.length; ++disc) {
+    const split = inputArr[disc].split(' ');
     const numPos = +split[split.indexOf('positions;') - 1];
     const startPos = +split.at(-1).slice(0, -1);
 
-    DATA.push({
-      offset: (numPos - (startPos + disc) % numPos) % numPos,                                   // offset is the min time at which ball would pass through this disc, assuming all previous discs work too
-      numPos,
-    });
+    const timeToReachDisc = disc + 1;
+    const posAtTimeThatDiscIsReached = (startPos + timeToReachDisc) % numPos;                   // need mod in case sum exceeds numPos
+    const minTimeToClearDisc = (numPos - posAtTimeThatDiscIsReached) % numPos;                  // need mod in case posAtTimeThatDiscIsReached is 0
+
+    DATA.push({ minTimeToClearDisc, numPos });
   }
 
   // ANALYZE
   const LIMIT = Number.MAX_SAFE_INTEGER;
-  for (let time = 0; time <= LIMIT; ++time) {
-    if (DATA.every(obj => time >= obj.offset                                                    // IMPORTANT: time must be at least the offset
-                          && (time - obj.offset) % obj.numPos === 0)                            // time must be some multiple of numPos after offset
+  for (let t = 0; t <= LIMIT; ++t) {
+    if (DATA.every(obj => t >= obj.minTimeToClearDisc                                           // IMPORTANT: time must be at least the min time
+                          && (t - obj.minTimeToClearDisc) % obj.numPos === 0)                   // time must be some multiple of numPos after min time
     ) {
-      return time;
+      return t;
     }
   }
   throw 'ERROR: NO SOLUTION FOUND';
