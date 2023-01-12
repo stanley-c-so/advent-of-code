@@ -47,13 +47,13 @@ const DISPLAY_EXTRA_INFO = true;
 function assembunny (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
 
-  // INIT REGISTERS AS 1-LENGTH ARRAYS SO THEY WILL BE COMPLEX VALUES THAT WE CAN EASILY MAP TO WHEN INPUT REFERS TO 'a', 'b', 'c', OR 'd'
+  // DATA STRUCTURE
   const registers = {
-    'a': [ 0 ],
-    'b': [ 0 ],
-    'c': [ part === 1 ? 0                                                             // PART 1: INIT REGISTER C AT 0
-                      : 1 ],                                                          // PART 2: INIT REGISTER C AT 1
-    'd': [ 0 ],
+    'a': 0,
+    'b': 0,
+    'c': part === 1 ? 0                                                               // PART 1: INIT REGISTER C AT 0
+                    : 1,                                                              // PART 2: INIT REGISTER C AT 1
+    'd': 0,
   };
 
   // ANALYZE
@@ -66,17 +66,17 @@ function assembunny (part, inputStr, DEBUG = false) {
     const arg2 = split[2];
 
     if (instruction === 'cpy') {
-      registers[arg2][0] = 'abcd'.includes(arg1)  ? registers[arg1][0]                // if arg1 is a register
-                                                  : +arg1;                            // if arg1 is a literal
+      registers[arg2] = 'abcd'.includes(arg1) ? registers[arg1]                       // if arg1 is a register
+                                              : +arg1;                                // if arg1 is a literal
     }
     else if (instruction === 'inc') {
-      ++registers[arg1][0];
+      ++registers[arg1];
     }
     else if (instruction === 'dec') {
-      --registers[arg1][0];
+      --registers[arg1];
     }
     else if (instruction === 'jnz') {
-      if ('abcd'.includes(arg1) && registers[arg1][0]                                 // if arg1 is a register and non-zero
+      if ('abcd'.includes(arg1) && registers[arg1]                                    // if arg1 is a register and non-zero
           || !'abcd'.includes(arg1) && +arg1                                          // if arg1 is a literal and non-zero
       ) {
         i += (+arg2);
@@ -89,7 +89,7 @@ function assembunny (part, inputStr, DEBUG = false) {
   }
 
   if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
-  return registers['a'][0];
+  return registers['a'];
 }
 
 // TEST CASES
