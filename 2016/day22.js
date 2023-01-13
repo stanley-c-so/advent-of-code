@@ -109,6 +109,8 @@ What is the fewest number of steps required to move your goal data to node-x0-y0
 
 */
 
+const { Queue } = require('./_classes');
+
 // OPTIONAL VARIABLES
 const DISPLAY_EXTRA_INFO = true;
 
@@ -120,12 +122,9 @@ function slidingPuzzle (part, inputStr, DEBUG = false) {
   // nodes that are 'walls' was based on the value used * (used / avail), or used^2 / avail. this value created
   // a clear distinction between the nodes that were obviously meant to be normal vs. the ones that were meant
   // to be walls.
-  // based on inspecting the grid between the sample and actual data, i will treat the following as common properties:
+  // this is the general solution for part 2:
   // - there is only one empty space
-  // - all wall nodes are always on the same row
-  // - the shortest path involves first bringing the empty space to the position left of the goal:
-  // - if the empty space starts below the wall, it has to move all the way left to get to the wall's opening
-  // - in either case, once the empty space has cleared the wall, it needs to go all the way up, then right
+  // - the shortest path involves first bringing the empty space to the position left of the goal
   // - the next step is for the goal to move left, once, filling the empty space
   // - after this, it takes 5 steps each time to get the goal to move left once
 
@@ -214,47 +213,54 @@ function slidingPuzzle (part, inputStr, DEBUG = false) {
     const NODE = '.';
     const WALL = '#';
 
-    // GRID CREATION ONLY NECESSARY IF IT WILL BE PRINTED OUT
-    if (DISPLAY_EXTRA_INFO && part === 2) {
-      const GRID = Array.from({length: H}, () => Array(W));
-      for (let row = 0; row < H; ++row) {
-        for (let col = 0; col < W; ++col) {
-          const serial = `x${col}-y${row}`;
+    // GENERATE GRID
+    const GRID = Array.from({length: H}, () => Array(W));
+    for (let row = 0; row < H; ++row) {
+      for (let col = 0; col < W; ++col) {
+        const serial = `x${col}-y${row}`;
 
-          GRID[row][col] =  serial === `x${maxX}-y${0}`                 ? GOAL :
-                            NODES_DATA[serial].usedTimesRatio === 0     ? EMPTY :
-                            NODES_DATA[serial].usedTimesRatio <= CUTOFF ? NODE :
-                                                                          WALL;
-        }
+        GRID[row][col] =  serial === `x${maxX}-y${0}`                 ? GOAL :
+                          NODES_DATA[serial].usedTimesRatio === 0     ? EMPTY :
+                          NODES_DATA[serial].usedTimesRatio <= CUTOFF ? NODE :
+                                                                        WALL;
       }
+    }
+    if (DISPLAY_EXTRA_INFO && part === 2) {
       for (const row of GRID) console.log(row.join(''));
     }
 
-    let moves = 0;
+    // BFS TO MOVE SPACE TO THE COORDINATES LEFT OF GOAL
+    function getMovesFromSpaceToLeftOfGoal() {
+      const DIRS = [
+        [ +1, 0 ],
+        [ -1, 0 ],
+        [ 0, +1 ],
+        [ 0, -1 ],
+      ];
+      const Q = new Queue([ spaceY, spaceX, 0 ]);
+      const visited = new Set();
+      while (!Q.isEmpty()) {
+        const [ row, col, moves ] = Q.dequeue().val;
+        const serial = `${row},${col}`;
 
-    // get space to clear wall if needed
-    if (spaceY > wallRow) {                                                         // move space all the way left
-      moves += spaceX;
-      spaceX = 0;
+        if (visited.has(serial) || GRID[row][col] === WALL) continue;
+        visited.add(serial);
+
+        if (serial === `${0},${W - 2}`) return moves;
+
+        for (const [ dy, dx ] of DIRS) {
+          const [ newRow, newCol ] = [ row + dy, col + dx ];
+          if (0 <= newRow && newRow < H && 0 <= newCol && newCol < W) {
+            Q.enqueue([ newRow, newCol, moves + 1 ]);
+          }
+        }
+      }
+      throw 'ERROR: NO SOLUTION FOUND';
     }
 
-    // move space to top row
-    moves += spaceY;
-    spaceY = 0;
-
-    // move space to the left of goal
-    moves += (W - 1) - spaceX - 1;
-    spaceX = W - 2;
-
-    // move goal into that space
-    ++moves;
-    ++spaceX;
-
-    // for each time goal needs to move further left to the start, take 5 more steps
-    moves += (W - 1 - 1) * 5;
-
-    return moves;
-
+    return getMovesFromSpaceToLeftOfGoal()                                          // first, move space to coord left of goal
+            + 1                                                                     // then move goal into that space
+            + (W - 1 - 1) * 5;                                                      // then for all remaining spaces left, make 5 moves
   }
 }
 
