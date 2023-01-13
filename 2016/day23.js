@@ -59,7 +59,43 @@ Anyway, what value should actually be sent to the safe?
 const DISPLAY_EXTRA_INFO = true;
 
 function assembunnyRedux (part, inputStr, DEBUG = false) {
-  const inputArr = inputStr.split('\r\n');
+
+  // TO MAKE PART 2 RUN AT A REASONABLE SPEED, THE DOUBLY NESTED LOOPS INVOLVING REGISTERS a, c, AND d NEED TO BE
+  // REINTERPRETED AND REFACTORED TO RUN MULTIPLICATION INSTEAD OF INCREMENTING IN A LOOP ('PEEPHOLE OPTIMIZATION').
+  // THIS WAS A MANUAL PROCESS. AS A RESULT I HAD TO INVENT 2 NEW OPERATIONS, AND ADD CODE TO HANDLE A THIRD ARGUMENT.
+  // MOREOVER, TO PRESERVE THE NUMBER OF INSTRUCTIONS, EACH TIME I REDUCED A BLOCK OF INSTRUCTIONS TO ONLY ONE NEW
+  // INSTRUCTION, I PADDED THE REMAINING LINES WITHIN THAT BLOCK WITH 'tgl Infinity' WHICH IS SURE TO BE IGNORED BECAUSE
+  // INDEX Infinity IS ALWAYS OUT OF BOUNDS
+
+  const REAL_DATA_REINTERPRETED = `cpy a b
+dec b
+cpy a d
+cpy 0 a
+cpy b c
+mul a c d
+tgl Infinity
+tgl Infinity
+tgl Infinity
+tgl Infinity
+dec b
+cpy b c
+cpy c d
+add c d
+tgl Infinity
+tgl Infinity
+tgl c
+cpy -16 c
+jnz 1 c
+cpy 75 c
+jnz 72 d
+mul a c d
+tgl Infinity
+tgl Infinity
+tgl Infinity
+tgl Infinity`.split('\n');
+
+  const inputArr = DEBUG  ? inputStr.split('\r\n')
+                          : REAL_DATA_REINTERPRETED;
 
   // DATA STRUCTURE
   const registers = {
@@ -77,6 +113,7 @@ function assembunnyRedux (part, inputStr, DEBUG = false) {
   for (let i = 0; i < inputArr.length; ) {                                            // NOTE: no ++i at the end
 
     // NOTE: THIS NAIVE SOLUTION FOR PART 2 TAKES ABOUT 12 MINUTES TO RUN!
+    // BUT WITH THE REINTERPRETED INSTRUCTIONS, IT IS LIGHTNING FAST!
     if (DISPLAY_EXTRA_INFO
       && Math.floor((Date.now() - TIME_AT_START)/(1000*60)) === NEXT_MIN_TARGET)
     {
@@ -90,6 +127,7 @@ function assembunnyRedux (part, inputStr, DEBUG = false) {
     const instruction = split[0];
     const arg1 = split[1];
     const arg2 = split[2];
+    const arg3 = split[3];                                                            // NEEDED FOR REINTERPRETED INSTRUCTIONS
 
     if (instruction === 'cpy') {
       if ('abcd'.includes(arg2)) {                                                    // enforce arg2 is a register
@@ -144,6 +182,19 @@ function assembunnyRedux (part, inputStr, DEBUG = false) {
           inputArr[targetIdx] = targetSplit.join(' ');
         }
       }
+    }
+    else if (instruction === 'mul') {                                                 // NEEDED FOR REINTERPRETED INSTRUCTIONS
+      // add to the register in arg1 the absolute value of the product of the arg2 and arg3...
+      // ...then set the registers in arg2 and arg3 to 0
+      registers[arg1] += Math.abs(registers[arg2] * registers[arg3]);
+      registers[arg2] = 0;
+      registers[arg3] = 0;
+    }
+    else if (instruction === 'add') {                                                 // NEEDED FOR REINTERPRETED INSTRUCTIONS
+      // add to the register in arg1 the absolute value of arg2...
+      // ...then set the register in arg2 to 0
+      registers[arg1] += Math.abs(registers[arg2]);
+      registers[arg2] = 0;
     }
     else throw `ERROR: UNRECOGNIZED INSTRUCTION: ${instruction}`;
 
