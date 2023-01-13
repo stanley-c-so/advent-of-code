@@ -79,7 +79,9 @@ function assembunny (part, inputStr, DEBUG = false) {
       if ('abcd'.includes(arg1) && registers[arg1]                                    // if arg1 is a register and non-zero
           || !'abcd'.includes(arg1) && +arg1                                          // if arg1 is a literal and non-zero
       ) {
-        i += (+arg2);
+
+        i += 'abcd'.includes(arg2)  ? registers[arg2]                                 // if arg2 is a register (doesn't happen here, but it will in day 23)
+                                    : +arg2;                                          // if arg2 is a literal
         continue;                                                                     // if executed jnz, skip the ++i
       }
     }
