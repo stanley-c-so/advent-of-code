@@ -122,11 +122,12 @@ function slidingPuzzle (part, inputStr, DEBUG = false) {
   // nodes that are 'walls' was based on the value used * (used / avail), or used^2 / avail. this value created
   // a clear distinction between the nodes that were obviously meant to be normal vs. the ones that were meant
   // to be walls.
+  //
   // this is the general solution for part 2:
   // - there is only one empty space
-  // - the shortest path involves first bringing the empty space to the position left of the goal
+  // - the shortest path involves first bringing that empty space to the position left of the goal (use BFS to find distance)
   // - the next step is for the goal to move left, once, filling the empty space
-  // - after this, it takes 5 steps each time to get the goal to move left once
+  // - after this, it takes 5 steps each time to get the goal to move left one space
 
   // REFERENCE CONSTANTS - see above note. these cutoffs are numbers between the range of usedTimesRatio for the
   // normal nodes vs. the wall nodes. these values were derived from inspecting the actual data, and are thus
@@ -138,7 +139,6 @@ function slidingPuzzle (part, inputStr, DEBUG = false) {
   // VALUES DISCOVERED UPON PARSING INPUT DATA
   let maxX = 0;
   let maxY = 0;
-  let wallRow;
   let spaceX, spaceY;
 
   // DATA STRUCTURE
@@ -178,13 +178,12 @@ function slidingPuzzle (part, inputStr, DEBUG = false) {
       usedTimesRatio,
     }
 
-    // discover special variables
+    // discover location of empty space
     if (usedTimesRatio === 0) [ spaceX, spaceY ] = [ x, y ];
-    else if (wallRow === undefined && usedTimesRatio > CUTOFF) wallRow = y;
   }
 
   // ANALYZE
-  if (part === 1) {
+  if (part === 1) {                                                                 // PART 1: COUNT VIABLE PAIRS
 
     let viablePairs = 0;
     const nodes = Object.keys(NODES_DATA);
@@ -203,7 +202,7 @@ function slidingPuzzle (part, inputStr, DEBUG = false) {
 
     return viablePairs;
 
-  } else {
+  } else {                                                                          // PART 2: FIND MIN MOVES TO MOVE DATA FROM TOP RIGHT CORNER TO TOP LEFT
 
     // GRID CONSTANTS
     const H = maxY + 1;
