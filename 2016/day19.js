@@ -94,19 +94,14 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
   let ptr = null;
   for (let elf = 1; elf <= N; ++elf) {
     const node = new Node(elf);
-    node.prev = prev;                                 // connect to prev node
-    
     if (!ptr) ptr = node;                             // FIRST ITERATION ONLY: set ptr to elf 1
-
+    
+    node.prev = prev;                                 // connect to prev node
     if (prev) prev.next = node;                       // connect prev node to current node
-
     prev = node;                                      // advance prev
-
-    if (elf === N) {                                  // LAST ITERATION ONLY:
-      node.next = ptr;                                // connect last node to first node
-      ptr.prev = node;                                // connect first node to last node
-    }
   }
+  ptr.prev = prev;                                    // connect first node to last node
+  prev.next = ptr;                                    // connect last node to first node
 
   if (part === 1) {                                   // PART 1: EACH ELF ELIMINATES NEXT ELF
 
