@@ -93,12 +93,12 @@ function MD5_BFS_MAZE (part, inputStr, DEBUG = false) {
                         .slice(0, 4);                                       // we only need first four digits
 
     for (let i = 0; i < 4; ++i) {
-      if ('bcdef'.includes(hash[i])) {
-        const [ dy, dx ] = DELTAS[i];
-        const [ newRow, newCol ] = [ row + dy, col + dx ];
-        if (0 <= newRow && newRow < 4 && 0 <= newCol && newCol < 4) {
-          Q.enqueue([ newRow, newCol, path + DIRS[i] ]);
-        }
+      const [ dy, dx ] = DELTAS[i];
+      const [ newRow, newCol ] = [ row + dy, col + dx ];
+      if ('bcdef'.includes(hash[i])                                         // only move if hash character is b, c, d, e, or f...
+          && 0 <= newRow && newRow < 4 && 0 <= newCol && newCol < 4         // ...and move would stay in bounds
+      ) {
+        Q.enqueue([ newRow, newCol, path + DIRS[i] ]);
       }
     }
   }
