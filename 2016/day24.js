@@ -45,6 +45,16 @@ const DISPLAY_EXTRA_INFO = true;
 
 function travelingSalesman (part, inputStr, DEBUG = false) {
 
+  // CONSTANTS
+  const DIRS = [
+    [ +1, 0 ],
+    [ -1, 0 ],
+    [ 0, +1 ],
+    [ 0, -1 ],
+  ];
+  const WALL = '#';
+  const FLOOR = '.';
+
   // DATA STRUCTURES
   const checkpointsDict = {};
 
@@ -57,21 +67,14 @@ function travelingSalesman (part, inputStr, DEBUG = false) {
     for (let col = 0; col < W; ++col) {
       const symbol = inputArr[row][col]
       GRID[row][col] = symbol;
-      if (!isNaN(symbol)) {
+      if (![WALL, FLOOR].includes(symbol)) {
         checkpointsDict[symbol] = [ row, col ];
       }
     }
   }
 
-  // CONSTANTS
+  // DISCOVERED CONSTANTS
   const NUM_CHECKPOINTS = Object.keys(checkpointsDict).length;
-  const DIRS = [
-    [ +1, 0 ],
-    [ -1, 0 ],
-    [ 0, +1 ],
-    [ 0, -1 ],
-  ];
-  const WALL = '#';
 
   // PRE-PROCESSING: RUN BFS FROM ALL CHECKPOINTS TO FIND SHORTEST DISTANCES BETWEEN INDIVIDUAL CHECKPOINTS
   const shortestDistanceBetween = {};
@@ -113,40 +116,42 @@ function travelingSalesman (part, inputStr, DEBUG = false) {
   
   // ANALYZE: FOR EVERY POSSIBLE CHECKPOINT PERMUTATION (ALWAYS BEGIN WITH 0), FIND PATH LENGTH; GET MIN LENGTH
   let shortestPathLength = Infinity;
-  const path = [ 0 ];
+  const path = [ 0 ];                                                         // path always starts with 0
   const visited = new Set(path);
 
   function backtrack() {
 
-    // base case
+    // BASE CASE
     if (path.length === NUM_CHECKPOINTS) {
 
+      // calculate length of path from start to last element
       let pathLength = 0;
-      for (let i = 0; i < path.length - 1; ++i) {                           // skip last element
+      for (let i = 0; i < path.length - 1; ++i) {                             // skip last element
         pathLength += shortestDistanceBetween[ path[i] ][ path[i + 1] ];
       }
 
-      if (part === 2) {                                                     // PART 2: BOT HAS TO RETURN TO 0
-        pathLength += shortestDistanceBetween[path.at(-1)][0];
-      }
+      // PART 2: add trip back to start
+      pathLength += part === 1  ? 0                                           // PART 1: BOT STOPS AFTER REACHING FINAL CHECKPOINT
+                                : shortestDistanceBetween[path.at(-1)][0];    // PART 2: BOT HAS TO RETURN TO CHECKPOINT 0
 
-      shortestPathLength = Math.min(shortestPathLength, pathLength);        // update best variable
-      return;
+      shortestPathLength = Math.min(shortestPathLength, pathLength);          // update best variable
     }
-
-    // recursive case
-    for (let next = 1; next < NUM_CHECKPOINTS; ++next) {                    // try every other checkpoint
-      if (!visited.has(next)) {
-        visited.add(next);
-        path.push(next);
-        backtrack();
-        visited.delete(next);
-        path.pop();
+    
+    // RECURSIVE CASE
+    else {
+      for (let next = 1; next < NUM_CHECKPOINTS; ++next) {                    // try every other checkpoint
+        if (!visited.has(next)) {
+          visited.add(next);
+          path.push(next);
+          backtrack();
+          visited.delete(next);
+          path.pop();
+        }
       }
     }
   }
 
-  backtrack();
+  backtrack();                                                                // kick-start backtrack
   return shortestPathLength;
 }
 
