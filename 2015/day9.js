@@ -41,7 +41,7 @@ What is the distance of the longest route?
 // OPTIONAL VARIABLES
 const DISPLAY_EXTRA_INFO = true;
 
-function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
+function travelingSalesman (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   
   // DATA STRUCTURES
@@ -70,7 +70,7 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
   // ANALYZE EVERY PERMUTATION
   const path = [];                                                    // this is not needed for our solution, but it helps for debugging
   const visited = new Set();
-  
+
   function backtrack(currentLocation) {
 
     // BASE CASE
@@ -118,7 +118,7 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = NAME_OF_FUNC_HERE;
+const func = travelingSalesman;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
