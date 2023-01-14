@@ -39,7 +39,7 @@ function getMD5Hash (part, inputStr, DEBUG = false) {
   if (DISPLAY_EXTRA_INFO) console.log('RUNNING ANALYSIS (PLEASE WAIT)...');
 
   // ANALYZE
-  for (let num = 0; num < LIMIT; ++num) {
+  for (let num = 1; num < LIMIT; ++num) {
     const hash = CRYPTO.createHash('md5')                                                   // get hash based on 'md5' encryption and key; return as hex
                         .update(SECRET_KEY + num)                                           // construct key from secret key concatenated with decimal
                         .digest('hex');
