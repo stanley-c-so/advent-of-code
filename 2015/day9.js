@@ -77,9 +77,7 @@ function travelingSalesman (part, inputStr, DEBUG = false) {
     if (visited.size === LOCATIONS.size) {
 
       if (DISPLAY_EXTRA_INFO && DEBUG) {
-        console.log('PATH:', path.join(' -> '));
-        console.log('distance:', distance);
-        console.log('-----');
+        console.log('distance:', distance, '|', path.join(' -> '));
       }
 
       shortestPath = Math.min(shortestPath, distance);
