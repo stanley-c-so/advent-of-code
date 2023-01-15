@@ -131,7 +131,7 @@ function parseJSON (part, inputStr, DEBUG = false) {
     if (typeof obj === 'object') {
       let total = 0;
       if (Array.isArray(obj)) {                                                               // CASE: ARRAY
-        for (const el of obj) total += count(el);
+        for (const el of obj) total += count(el);                                             // iterate on elements
       }
       else {                                                                                  // CASE: OBJECT
         if (part === 2                                                                        // PART 2: DISREGARD ANY OBJECTS WITH VALUE 'red' AND THEIR CHILDREN
@@ -139,14 +139,12 @@ function parseJSON (part, inputStr, DEBUG = false) {
         ) {
           return 0;
         }
-        for (const key in obj) {
-          total += count(obj[key]);
-        }
+        for (const key in obj) total += count(obj[key]);                                      // iterate on values
       }
       return total;
     }
-    else if (!isNaN(obj)) return obj;                                                         // CASE: NUMBER
-    else return 0;                                                                            // CASE: STRING
+    else if (!isNaN(obj)) return obj;                                                         // CASE: NUMBER - return argument itself
+    else return 0;                                                                            // CASE: STRING - return 0
   }
 
   return count(OBJ);
