@@ -109,7 +109,9 @@ function parseJSON (part, inputStr, DEBUG = false) {
       }
 
       // COMMA: PROCESS ELEMENT
-      else if (c === ',' && !inStr) {
+      else if (c === ',' && !inStr) {                                                         // extra !inStr condition is for the edge case
+                                                                                              // where a string contains a comma (though this
+                                                                                              // does not actually happen here)
         processElement();
       }
 
