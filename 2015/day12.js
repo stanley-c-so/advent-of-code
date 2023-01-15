@@ -124,6 +124,7 @@ function parseJSON (part, inputStr, DEBUG = false) {
 
   // CONVERT INPUT JSON INTO ACTUAL OBJECT
   const OBJ = parse(inputStr);
+  if (DISPLAY_EXTRA_INFO && DEBUG) console.log(OBJ);
 
   // HELPER FUNCTION: ITERATE THROUGH OBJECT AND ADD UP NUMBERS
   function count(obj) {
