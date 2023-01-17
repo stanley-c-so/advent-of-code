@@ -204,6 +204,7 @@ function simulateBattle (part, inputStr, extraParam, DEBUG = false) {
     return null;
   }
 
+  // ANALYZE - BACKTRACKING
   let minGoldSpent = Infinity;
   let maxGoldSpent = 0;
   const PURCHASES = [];
