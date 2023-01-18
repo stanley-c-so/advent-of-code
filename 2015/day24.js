@@ -64,16 +64,18 @@ const DISPLAY_EXTRA_INFO = true;
 function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
 
-  // HELPER FUNCTION - GIVEN A SET OF NUMBERS, SEE IF IT CAN BE DIVIDED INTO TWO GROUPS WITH EQUAL SUMS
-  const MEMO2 = {};
-  function makeTwoGroupsEqualAmount(numbers) {
+  // HELPER FUNCTION - GIVEN A SET OF NUMBERS, SEE IF IT CAN BE DIVIDED INTO N GROUPS WITH EQUAL SUMS
+  const MEMO = {};
+  function makeNGroupsEqualAmount(numbers, N) {
     const serial = numbers.join(',');
-    if (!(serial in MEMO2)) {
+    if (!(N in MEMO)) MEMO[N] = {};
+    if (!(serial in MEMO[N])) {
       const total = numbers.reduce((sum, num) => sum + num);
-      if (total % 2) return false;
-      const goal = total / 2;
+      if (total % N) return false;
+      const goal = total / N;
       const visited = new Set();
       let sum = 0;
+
       function backtrack(i) {
 
         if (DISPLAY_EXTRA_INFO
@@ -87,71 +89,15 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
         }
 
         // BASE CASE FAIL: TOO MANY NUMBERS IN SMALLEST GROUP
-        if (i === Math.floor(total.length / 2)) {
+        if (i === Math.floor(total.length / N)) {
           return false;
         }
 
         // BASE CASE SUCCESS: FOUND A WAY TO MAKE ONE GROUP WITH CORRECT SUM
         else if (sum === goal) {
-          return true;
-        }
-
-        // RECURSIVE CASE
-        else {
-          let res = false;
-          for (let idx = i; idx < numbers.length; ++idx) {
-            const num = numbers[idx];
-            if (!visited.has(num)) {
-              visited.add(num);
-              sum += num;
-              if (backtrack(i + 1)) {
-                res = true;
-                break;
-              }
-              visited.delete(num);
-              sum -= num;
-            }
-          }
-          return res;
-        }
-      }
-      MEMO2[serial] = backtrack(0);
-    }
-    // else console.log('makeTwoGroups CACHE HIT:', serial)
-    return MEMO2[serial];
-  }
-
-  // HELPER FUNCTION - GIVEN A SET OF NUMBERS, SEE IF IT CAN BE DIVIDED INTO TWO GROUPS WITH EQUAL SUMS
-  const MEMO3 = {};
-  function makeThreeGroupsEqualAmount(numbers) {
-    const serial = numbers.join(',');
-    if (!(serial in MEMO3)) {
-      const total = numbers.reduce((sum, num) => sum + num);
-      if (total % 3) return false;
-      const goal = total / 3;
-      const visited = new Set();
-      let sum = 0;
-      function backtrack(i) {
-
-        if (DISPLAY_EXTRA_INFO
-          && Math.floor((Date.now() - TIME_AT_START)/(1000*60)) >= NEXT_MIN_TARGET
-        ) {
-          const MINS_PASSED = Math.floor((Date.now() - TIME_AT_START)/(1000*60));
-          console.log(`... ${
-            MINS_PASSED
-          } mins have passed since beginning this run`);
-          NEXT_MIN_TARGET = MINS_PASSED + 1;
-        }
-
-        // BASE CASE FAIL: TOO MANY NUMBERS IN SMALLEST GROUP
-        if (i === Math.floor(total.length / 3)) {
-          return false;
-        }
-
-        // BASE CASE SUCCESS: FOUND A WAY TO MAKE ONE GROUP WITH CORRECT SUM
-        else if (sum === goal) {
+          if (N === 2) return true;                                                         // recursing would make N be 1, and this would always be true
           const notPicked = numbers.filter(num => !visited.has(num));
-          return makeTwoGroupsEqualAmount(notPicked);
+          return makeNGroupsEqualAmount(notPicked, N - 1);
         }
 
         // RECURSIVE CASE
@@ -173,10 +119,10 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
           return res;
         }
       }
-      MEMO3[serial] = backtrack(0);
+      MEMO[N][serial] = backtrack(0);
     }
-    // else console.log('makeThreeGroups CACHE HIT:', serial)
-    return MEMO3[serial];
+    else if (DISPLAY_EXTRA_INFO) console.log(`MEMO[${N}] CACHE HIT:`, serial);
+    return MEMO[N][serial];
   }
 
   // CONSTANTS
@@ -184,7 +130,7 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
                                                                                             // lead to finding the smallest solutions
                                                                                             // first, which cuts down on minFreq
 
-  const NUMBERS_REVERSED = [ ...NUMBERS ].reverse();                                        // but for the helper functions, where you
+  const NUMBERS_REVERSED = [ ...NUMBERS ].reverse();                                        // but for the helper function, where you
                                                                                             // just need to find any solution quickly,
                                                                                             // it helps to go in increasing order
 
@@ -234,10 +180,10 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
 
       const notPicked = NUMBERS_REVERSED.filter(num => !visited.has(num));                  // optimization: using increasing order tends
                                                                                             // to lead to faster results for purposes of
-                                                                                            // these helper functions
+                                                                                            // the helper function
 
-      const canFormGroupsWithRest = part === 1  ? makeTwoGroupsEqualAmount(notPicked)       // PART 1: MAKE 2 GROUPS WITH THE REST
-                                                : makeThreeGroupsEqualAmount(notPicked);    // PART 2: MAKE 3 GROUPS WITH THE REST
+      const canFormGroupsWithRest = part === 1  ? makeNGroupsEqualAmount(notPicked, 2)      // PART 1: MAKE 2 GROUPS WITH THE REST
+                                                : makeNGroupsEqualAmount(notPicked, 3);     // PART 2: MAKE 3 GROUPS WITH THE REST
       if (canFormGroupsWithRest) {
 
         // if (DISPLAY_EXTRA_INFO && !DEBUG) {
