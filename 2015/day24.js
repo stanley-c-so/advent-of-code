@@ -202,7 +202,8 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
   const RESULTS = {};
   const visited = new Set();
   let sum = 0;
-  let minFreq = Math.floor(NUMBERS.length / NUM_GROUPS);
+  let minFreq = Math.floor(NUMBERS.length / NUM_GROUPS);                                    // optimization: find smallest group possible. never need to
+                                                                                            // exceed minFreq (and update minFreq is smaller is found)
   let product = 1;
   let minFreqQE = Infinity;
 
@@ -223,13 +224,13 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
     // than that of an earlier solution
 
     // BASE CASE FAIL: CURRENT SUM ALREADY TOO HIGH
-    else if (sum > GOAL) return;                                                            // optimization: stop if sum too large
+    else if (sum > GOAL) return;                                                            // optimization: stop if sum already too large
 
     // BASE CASE POSSIBLE SUCCESS
     else if (sum === GOAL) {
 
       // BASE CASE FAIL: CURRENT PRODUCT ALREADY TOO HIGH
-      if (visited.size === minFreq && product > minFreqQE) return;                          // optimization: stop if product too large
+      if (visited.size === minFreq && product > minFreqQE) return;                          // optimization: stop if product already too large
 
       const notPicked = NUMBERS_REVERSED.filter(num => !visited.has(num));                  // optimization: using increasing order tends
                                                                                             // to lead to faster results for purposes of
@@ -258,12 +259,10 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
                                                                                             // one more time, else fail fast
       const remainder = GOAL - sum;
       const idxOfRemainder = NUMBERS.indexOf(remainder);
-      // if (!visited.has(remainder) && NUMBERS.includes(remainder)) {
       if (!visited.has(remainder) && idxOfRemainder !== -1) {
         visited.add(remainder);
         sum += remainder;
         product *= remainder;
-        // backtrack(i + 1);
         backtrack(i + 1, idxOfRemainder);
         visited.delete(remainder);
         sum -= remainder;
