@@ -108,19 +108,21 @@ function simulateBattle (part, inputStr, extraParam, DEBUG = false) {
       case 'Hit Points':
         bossStats.HP = +n;
         break;
-        case 'Damage':
+      case 'Damage':
         bossStats.damage = +n;
         break;
-        case 'Armor':
+      case 'Armor':
         bossStats.armor = +n;
         break;
+      default:
+        throw `ERROR: UNRECOGNIZED PROPERTY ${prop}`;
     }
   }
 
   function getWinnerFromBattle(playerStats, bossStats) {
     let attacker = PLAYER;                                                            // player attacks first
     while (true) {
-      const [ attackerStats, defenderStats ] = attacker ? [ bossStats, playerStats ]  // NOTE: playerStats comes from parameter
+      const [ attackerStats, defenderStats ] = attacker ? [ bossStats, playerStats ]
                                                         : [ playerStats, bossStats ];
 
       if (attackerStats.HP <= 0) {                                                    // if attacker out of HP...
@@ -213,7 +215,8 @@ function simulateBattle (part, inputStr, extraParam, DEBUG = false) {
     // BASE CASE
     if (i === STORE_CATEGORIES.length) {
 
-      const winner = getWinnerFromBattle({
+      const winner = getWinnerFromBattle(
+        {
           HP: PLAYER_HP,
           damage: PURCHASES.reduce((total, item) => total + item.damage, 0),
           armor: PURCHASES.reduce((total, item) => total + item.armor, 0),
