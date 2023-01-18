@@ -250,6 +250,7 @@ function divideGroupsIntoNWithEqualSum (part, inputStr, DEBUG = false) {
         bestResult = result;
       }
     }
+    bestResult.sort((a, b) => a - b);
 
     console.log('BEST RESULT:', bestResult,
                 '| QE:', bestResult.reduce((product, num) => product * num));
