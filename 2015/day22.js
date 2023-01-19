@@ -211,12 +211,12 @@ function simulateWizardBattle (part, inputStr, extraParam, DEBUG = false) {
           manaSpent: STATE.manaSpent,
         }
 
-        // if (playerStats.HP <= 0 && DISPLAY_EXTRA_INFO) {
-        //   console.log('PLAYER DIED TO BOSS ATTACK:', res);
-        // }
+        if (playerStats.HP <= 0 && DISPLAY_EXTRA_INFO && part === 2) {
+          console.log('PLAYER DIED TO BOSS ATTACK:', res);
+        }
         if (bossStats.HP <= 0) {
           minManaSpentOnPlayerWin = Math.min(minManaSpentOnPlayerWin, manaSpent);     // update record variable
-          if (DISPLAY_EXTRA_INFO) {
+          if (DISPLAY_EXTRA_INFO && part === 1) {
             console.log('PLAYER KILLED BOSS ON ATTACK:', res);
           }
         }
@@ -254,7 +254,7 @@ function simulateWizardBattle (part, inputStr, extraParam, DEBUG = false) {
 
         minManaSpentOnPlayerWin = Math.min(minManaSpentOnPlayerWin, manaSpent);       // update record variable
 
-        if (DISPLAY_EXTRA_INFO) {
+        if (DISPLAY_EXTRA_INFO && part === 1) {
           console.log('PLAYER KILLED BOSS WITH POISON:', res);
         }
         
