@@ -141,12 +141,12 @@ function parseNestedObjectsAndGarbage (part, inputStr, DEBUG = false) {
   let score = 0;
   let garbageSize = 0;
   function recurse(group, points) {
-    score += points;
+    score += points;                                                                        // add point value of this group to total score
     for (const el of group) {
       if (Array.isArray(el)) {
-        recurse(el, points + 1);
+        recurse(el, points + 1);                                                            // recurse on this group with 1 more point
       } else {
-        garbageSize += el.length;
+        garbageSize += el.length;                                                           // add length of this garbage string to total garbage size
       }
     }
   }
