@@ -202,7 +202,7 @@ input = {
 expected = 'a2582a3a0e66e6e86e3812dcb672a272';
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
-// Test case 3
+// Test case 4
 input = {
   part: 2,
   inputStr: sampleInput3,
@@ -211,7 +211,7 @@ input = {
 expected = '33efeb34ea91902bb2f59c9920caa6cd';
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
-// Test case 3
+// Test case 5
 input = {
   part: 2,
   inputStr: sampleInput4,
@@ -220,7 +220,7 @@ input = {
 expected = '3efbe78a8d82f29979031a4aa0b16a9d';
 test(func, input, expected, testNum, skippedTests, lowestTest, highestTest);
 
-// Test case 3
+// Test case 6
 input = {
   part: 2,
   inputStr: sampleInput5,
