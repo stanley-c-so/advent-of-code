@@ -151,7 +151,6 @@ const highestTest = 0;
 
 const fs = require('fs');
 const path = require('path');
-const { get } = require('http');
 const DAY_NUM = __filename.split('.js')[0].split('day')[1];
 const INPUT_PATH = path.join(__dirname, `day${DAY_NUM}-input.txt`);
 const actualInput = fs.readFileSync(INPUT_PATH, 'utf8');
