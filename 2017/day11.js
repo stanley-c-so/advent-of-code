@@ -99,8 +99,8 @@ function hexGridTraversal (part, inputStr, DEBUG = false) {
     console.log(`FARTHEST POSITION (y, x): (${farthestY},${farthestX}) | DISTANCE: ${farthestDistance}`);
   }
 
-  return part === 1 ? currentDistance
-                    : farthestDistance;
+  return part === 1 ? currentDistance                                           // PART 1: RETURN DISTANCE AT END OF SIMULATION
+                    : farthestDistance;                                         // PART 2: RETURN FARTHEST DISTANCE
 }
 
 // TEST CASES
