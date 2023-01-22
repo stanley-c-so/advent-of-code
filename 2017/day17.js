@@ -107,7 +107,6 @@ function followNodeInCircularLinkedList (part, inputStr, DEBUG = false) {
         const newNodeVal = ringSize;                                                          // (new node value always matches current ring size)
         output = newNodeVal;                                                                  // you will place new node after zero. this becomes the
                                                                                               // latest candidate for the node after zero in the end.
-                                                                                              // (its value is equal to ringSize)
         if (DISPLAY_EXTRA_INFO) {
           console.log(`NEW NODE PLACED AFTER NODE ZERO: ${newNodeVal}`);
         }
