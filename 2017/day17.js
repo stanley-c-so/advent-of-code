@@ -94,8 +94,7 @@ function followNodeInCircularLinkedList (part, inputStr, DEBUG = false) {
     if (part === 2) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
   
     // INIT
-    let distanceToZero = 0;                                                                   // track distance between current node and node zero
-    let idx = 0;
+    let idx = 0;                                                                              // current position
     let output = 0;                                                                           // update this every time a new node is placed in front
                                                                                               // of node zero. the final time this happens, that new
                                                                                               // node's value will be the answer!
