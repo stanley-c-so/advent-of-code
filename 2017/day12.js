@@ -72,32 +72,43 @@ function graphTraversal (part, inputStr, DEBUG = false) {
   
   // HELPER FUNCTION - RECURSIVELY EXPLORE GROUP BEGINNING AT ENTRY POINT startNode
   function visitAndReturnGroup(startNode) {
+    const group = new Set();
     const stack = [ startNode ];
     while (stack.length) {
       const node = stack.pop();
       if (visited.has(node)) continue;
       visited.add(node);
+      group.add(node);
       for (const neighbor of NODES[node]) {
         stack.push(neighbor);
       }
     }
-    return visited;
+    return group;
   }
 
   // ANALYZE
   if (part === 1) {                                             // PART 1: GET NUMBER OF NODES IN NODE 0's GROUP
 
-    return visitAndReturnGroup('0').size;                       // since we deal a lot with the labels of the NODES
+    const groupZero = visitAndReturnGroup('0');                 // since we deal a lot with the labels of the NODES
                                                                 // object, it's easier to keep all node representations
                                                                 // in string form for purposes of this problem, hence '0'
+
+    if (DISPLAY_EXTRA_INFO && DEBUG) {
+      console.log(groupZero);
+    }
+    return groupZero.size;
 
   } else {                                                      // PART 2: GET TOTAL NUMBER OF GROUPS
 
     let numGroups = 0;
     for (const node in NODES) {
       if (!visited.has(node)) {
-        visitAndReturnGroup(node);
+        const group = visitAndReturnGroup(node);
         ++numGroups;
+
+        if (DISPLAY_EXTRA_INFO && DEBUG) {
+          console.log(group);
+        }
       }
     }
     return numGroups;
