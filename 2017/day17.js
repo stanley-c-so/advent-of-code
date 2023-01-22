@@ -66,7 +66,7 @@ function followNodeInCircularLinkedList (part, inputStr, DEBUG = false) {
 
     // INIT CIRCULAR LINKED LIST
     let node = new Node(0);
-    node.next = node;
+    node.next = node;                                                                         // link node zero to itself to make it circular
 
     for (let ringSize = 1; ringSize <= NUM_ROUNDS; ++ringSize) {
       for (let i = 0; i < STEPS % ringSize; ++i) {                                            // mini-optimization: only move STEPS % ringSize times
