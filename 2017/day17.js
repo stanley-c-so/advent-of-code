@@ -73,7 +73,8 @@ function followNodeInCircularLinkedList (part, inputStr, DEBUG = false) {
         node = node.next;
       }
       const nextNode = node.next;                                                             // save reference to 'next' node after the current one
-      const newNode = new Node(ringSize);                                                     // instantiate new node
+      const newNodeVal = ringSize;                                                            // new node value always matches current ring size
+      const newNode = new Node(newNodeVal);                                                   // instantiate new node
       node.next = newNode;                                                                    // connect current node to new node
       newNode.next = nextNode;                                                                // connect new node to 'next' node
       node = newNode;                                                                         // move pointer to new node
@@ -98,12 +99,17 @@ function followNodeInCircularLinkedList (part, inputStr, DEBUG = false) {
                                         % ringSize;                                           // handle for overflow
       
       if (distanceToZeroAfterSteps === 0) {                                                   // if landing on zero...
-        output = ringSize;                                                                    // you will place new node after zero. this becomes the
+        const newNodeVal = ringSize;                                                          // new node value always matches current ring size
+        output = newNodeVal;                                                                  // you will place new node after zero. this becomes the
                                                                                               // latest candidate for the node after zero in the end.
                                                                                               // (its value is equal to ringSize)
-        distanceToZero = ringSize;                                                            // distance is not 0 - you have to go around ring again
+        if (DISPLAY_EXTRA_INFO) {
+          console.log(`NEW NODE PLACED AFTER NODE ZERO: ${newNodeVal}`);
+        }
       }
-      else distanceToZero = distanceToZeroAfterSteps;
+
+      distanceToZero = distanceToZeroAfterSteps || ringSize;                                  // if 0, set to ringSize (if you landed on node zero,
+                                                                                              // you still have to go around ring again to return)
     }
   
     if (part === 2) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
