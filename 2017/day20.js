@@ -94,7 +94,7 @@ function particlePhysics (part, inputStr, DEBUG = false) {
 
   // ANALYZE
   const TIME_AT_START = Date.now();
-  if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+  if (!DEBUG) console.log('RUNNING ANALYSIS (PLEASE WAIT)...');
   let NEXT_MIN_TARGET = 1;
 
   // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY POSITION AND AXIS (TIES ARE ARBITRARILY BROKEN BY PARTICLE #)
