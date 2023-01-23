@@ -110,7 +110,7 @@ function particlePhysics (part, inputStr, DEBUG = false) {
 
     if (DISPLAY_EXTRA_INFO) {
       console.log(`PARTICLE WITH MIN ACCELERATION: ${particleWithMinAcceleration}`);
-      console.log(`DATA:`, DATA[particleWithMinAcceleration]);
+      console.log(`DATA FOR THAT PARTICLE:`, DATA[particleWithMinAcceleration]);
     }
     return particleWithMinAcceleration;                                                                     // the particle with least acceleration
                                                                                                             // will be closest to origin in the long run
@@ -252,7 +252,7 @@ let input, expected;
 const func = particlePhysics;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
-const skippedTests = new Set([ 1, 2 ]);
+const skippedTests = new Set([  ]);
 const lowestTest = 0;
 const highestTest = 0;
 
