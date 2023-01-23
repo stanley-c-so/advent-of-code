@@ -84,125 +84,101 @@ function particlePhysics (part, inputStr, DEBUG = false) {
       position: split[0].slice(3, -1).split(',').map(n => +n),
       velocity: split[1].slice(3, -1).split(',').map(n => +n),
       acceleration: split[2].slice(3, -1).split(',').map(n => +n),
+      lastDistanceFromOrigin: null,                                                                       // important for part 1 to know when to terminate
+      movingAwayFromOrigin: false,                                                                        // important for part 1 to know when to terminate
     });
   }
 
+  // UTILITY FUNCTION
+  const getDistanceFromOrigin = p => DATA[p].position.reduce((distance, axis) => distance + axis**2, 0);
+
   // ANALYZE
-  if (part === 1) {                                                                                         // PART 1: FIND PARTICLE THAT WILL REMAIN
-                                                                                                            // CLOSEST TO ORIGIN IN THE LONG RUN
-                                                                                                            // (i.e. AFTER THE RELATIVE ORDERING IN TERMS
-                                                                                                            // OF DISTANCE FROM ORIGIN WILL NO LONGER
-                                                                                                            // CHANGE)
+  const TIME_AT_START = Date.now();
+  if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
+  let NEXT_MIN_TARGET = 1;
 
-    // INIT
-    let minAcceleration = Infinity;
-    let particleWithMinAcceleration = null;
+  // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY POSITION AND AXIS (TIES ARE ARBITRARILY BROKEN BY PARTICLE #)
+  function getPositionOrderByAxis() {
+    return [
+      [ ...PARTICLES ].sort((a, b) => DATA[a].position[0] - DATA[b].position[0] || a - b),
+      [ ...PARTICLES ].sort((a, b) => DATA[a].position[1] - DATA[b].position[1] || a - b),
+      [ ...PARTICLES ].sort((a, b) => DATA[a].position[2] - DATA[b].position[2] || a - b),
+    ];
+  }
 
-    // GET MAGNITUDE OF ACCELERATION VECTOR FOR EACH PARTICLE
-    for (let i = 0; i < DATA.length; ++i) {
-      const [ ax, ay, az ] = DATA[i].acceleration;
-      const acceleration = Math.abs(ax) + Math.abs(ay) + Math.abs(az);
-      if (acceleration < minAcceleration) {
-        minAcceleration = acceleration;
-        particleWithMinAcceleration = i;
+  // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY VELOCITY AND AXIS (TIES ARE BROKEN BY ORIGINAL POSITION ORDER)
+  function getVelocityOrderByAxis() {
+    return [
+      [ ...PARTICLES ].sort((a, b) => DATA[a].velocity[0] - DATA[b].velocity[0]
+                                    || LOOKUP_ORIGINAL_POSITION_ORDER[a][0] - LOOKUP_ORIGINAL_POSITION_ORDER[b][0]),
+      [ ...PARTICLES ].sort((a, b) => DATA[a].velocity[1] - DATA[b].velocity[1]
+                                    || LOOKUP_ORIGINAL_POSITION_ORDER[a][1] - LOOKUP_ORIGINAL_POSITION_ORDER[b][1]),
+      [ ...PARTICLES ].sort((a, b) => DATA[a].velocity[2] - DATA[b].velocity[2]
+                                    || LOOKUP_ORIGINAL_POSITION_ORDER[a][2] - LOOKUP_ORIGINAL_POSITION_ORDER[b][2]),
+    ];
+  }
+
+  // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY ACCELERATION AND AXIS (TIES ARE BROKEN BY ORIGINAL VELOCITY ORDER)
+  function getAccelerationOrderByAxis() {
+    return [
+      [ ...PARTICLES ].sort((a, b) => DATA[a].acceleration[0] - DATA[b].acceleration[0]
+                                    || LOOKUP_ORIGINAL_VELOCITY_ORDER[a][0] - LOOKUP_ORIGINAL_VELOCITY_ORDER[b][0]),
+      [ ...PARTICLES ].sort((a, b) => DATA[a].acceleration[1] - DATA[b].acceleration[1]
+                                    || LOOKUP_ORIGINAL_VELOCITY_ORDER[a][1] - LOOKUP_ORIGINAL_VELOCITY_ORDER[b][1]),
+      [ ...PARTICLES ].sort((a, b) => DATA[a].acceleration[2] - DATA[b].acceleration[2]
+                                    || LOOKUP_ORIGINAL_VELOCITY_ORDER[a][2] - LOOKUP_ORIGINAL_VELOCITY_ORDER[b][2]),
+    ];
+  }
+
+  // CONSTANTS
+  const LIMIT = Number.MAX_SAFE_INTEGER;
+  const PARTICLES = new Set( [ ...Array(DATA.length).keys() ] );
+
+  // PRE-PROCESSING - GET ORIGINAL POSITION ORDER
+  const ORIGINAL_POSITION_ORDER_BY_AXIS = getPositionOrderByAxis();
+  const LOOKUP_ORIGINAL_POSITION_ORDER = {};
+  for (let i = 0; i < PARTICLES.size; ++i) {
+    for (let axis = 0; axis < 3; ++axis) {
+      const particle = ORIGINAL_POSITION_ORDER_BY_AXIS[axis][i];
+      if (!(particle in LOOKUP_ORIGINAL_POSITION_ORDER)) {
+        LOOKUP_ORIGINAL_POSITION_ORDER[particle] = Array(3).fill(null);
       }
+      LOOKUP_ORIGINAL_POSITION_ORDER[particle][axis] = i;
     }
+  }
 
-    if (DISPLAY_EXTRA_INFO) {
-      console.log(`PARTICLE WITH MIN ACCELERATION: ${particleWithMinAcceleration}`);
-      console.log(`DATA FOR THAT PARTICLE:`, DATA[particleWithMinAcceleration]);
+  // PRE-PROCESSING - GET ORIGINAL VELOCITY ORDER (NOTE, THIS HAS TO COME AFTER ORIGINAL POSITION ORDER, BECAUSE THE HELPER FUNCTION
+  // IT CALLS RELIES ON ORIGINAL POSITION ORDER HAVING BEEN CALCULATED ALREADY)
+  const ORIGINAL_VELOCITY_ORDER_BY_AXIS = getVelocityOrderByAxis();
+  const LOOKUP_ORIGINAL_VELOCITY_ORDER = {};
+  for (let i = 0; i < PARTICLES.size; ++i) {
+    for (let axis = 0; axis < 3; ++axis) {
+      const particle = ORIGINAL_VELOCITY_ORDER_BY_AXIS[axis][i];
+      if (!(particle in LOOKUP_ORIGINAL_VELOCITY_ORDER)) {
+        LOOKUP_ORIGINAL_VELOCITY_ORDER[particle] = Array(3).fill(null);
+      }
+      LOOKUP_ORIGINAL_VELOCITY_ORDER[particle][axis] = i;
     }
-    return particleWithMinAcceleration;                                                                     // the particle with least acceleration
-                                                                                                            // will be closest to origin in the long run
+  }
 
-  } else {                                                                                                  // PART 2: FIND # PARTICLES REMAINING AFTER
-                                                                                                            // ALL COLLISIONS HAVE HAPPENED
+  // ANALYZE
+  for (let i = 0; i <= LIMIT; ++i) {
 
-    const TIME_AT_START = Date.now();
-    if (!DEBUG) console.log('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...');
-    let NEXT_MIN_TARGET = 1;
-
-    // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY POSITION AND AXIS (TIES ARE ARBITRARILY BROKEN BY PARTICLE #)
-    function getPositionOrderByAxis() {
-      return [
-        [ ...PARTICLES ].sort((a, b) => DATA[a].position[0] - DATA[b].position[0] || a - b),
-        [ ...PARTICLES ].sort((a, b) => DATA[a].position[1] - DATA[b].position[1] || a - b),
-        [ ...PARTICLES ].sort((a, b) => DATA[a].position[2] - DATA[b].position[2] || a - b),
-      ];
-    }
-
-    // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY VELOCITY AND AXIS (TIES ARE BROKEN BY ORIGINAL POSITION ORDER)
-    function getVelocityOrderByAxis() {
-      return [
-        [ ...PARTICLES ].sort((a, b) => DATA[a].velocity[0] - DATA[b].velocity[0]
-                                      || LOOKUP_ORIGINAL_POSITION_ORDER[a][0] - LOOKUP_ORIGINAL_POSITION_ORDER[b][0]),
-        [ ...PARTICLES ].sort((a, b) => DATA[a].velocity[1] - DATA[b].velocity[1]
-                                      || LOOKUP_ORIGINAL_POSITION_ORDER[a][1] - LOOKUP_ORIGINAL_POSITION_ORDER[b][1]),
-        [ ...PARTICLES ].sort((a, b) => DATA[a].velocity[2] - DATA[b].velocity[2]
-                                      || LOOKUP_ORIGINAL_POSITION_ORDER[a][2] - LOOKUP_ORIGINAL_POSITION_ORDER[b][2]),
-      ];
-    }
-
-    // HELPER FUNCTION - GETS RELATIVE ORDER OF ALL EXISTING PARTICLES BY ACCELERATION AND AXIS (TIES ARE BROKEN BY ORIGINAL VELOCITY ORDER)
-    function getAccelerationOrderByAxis() {
-      return [
-        [ ...PARTICLES ].sort((a, b) => DATA[a].acceleration[0] - DATA[b].acceleration[0]
-                                      || LOOKUP_ORIGINAL_VELOCITY_ORDER[a][0] - LOOKUP_ORIGINAL_VELOCITY_ORDER[b][0]),
-        [ ...PARTICLES ].sort((a, b) => DATA[a].acceleration[1] - DATA[b].acceleration[1]
-                                      || LOOKUP_ORIGINAL_VELOCITY_ORDER[a][1] - LOOKUP_ORIGINAL_VELOCITY_ORDER[b][1]),
-        [ ...PARTICLES ].sort((a, b) => DATA[a].acceleration[2] - DATA[b].acceleration[2]
-                                      || LOOKUP_ORIGINAL_VELOCITY_ORDER[a][2] - LOOKUP_ORIGINAL_VELOCITY_ORDER[b][2]),
-      ];
-    }
-
-    // CONSTANTS
-    const LIMIT = Number.MAX_SAFE_INTEGER;
-    const PARTICLES = new Set( [ ...Array(DATA.length).keys() ] );
-
-    // PRE-PROCESSING - GET ORIGINAL POSITION ORDER
-    const ORIGINAL_POSITION_ORDER_BY_AXIS = getPositionOrderByAxis();
-    const LOOKUP_ORIGINAL_POSITION_ORDER = {};
-    for (let i = 0; i < PARTICLES.size; ++i) {
+    // TRACK NEW POSITIONS FOR EVERY REMAINING PARTICLE
+    const POSITIONS = {};
+    for (const particle of PARTICLES) {
+      const data = DATA[particle];
       for (let axis = 0; axis < 3; ++axis) {
-        const particle = ORIGINAL_POSITION_ORDER_BY_AXIS[axis][i];
-        if (!(particle in LOOKUP_ORIGINAL_POSITION_ORDER)) {
-          LOOKUP_ORIGINAL_POSITION_ORDER[particle] = Array(3).fill(null);
-        }
-        LOOKUP_ORIGINAL_POSITION_ORDER[particle][axis] = i;
+        data.velocity[axis] += data.acceleration[axis];
+        data.position[axis] += data.velocity[axis];
       }
+      const position = data.position.join(',');
+      if (!(position in POSITIONS)) POSITIONS[position] = [];
+      POSITIONS[position].push(particle);
     }
-
-    // PRE-PROCESSING - GET ORIGINAL VELOCITY ORDER (NOTE, THIS HAS TO COME AFTER ORIGINAL POSITION ORDER, BECAUSE THE HELPER FUNCTION
-    // IT CALLS RELIES ON ORIGINAL POSITION ORDER HAVING BEEN CALCULATED ALREADY)
-    const ORIGINAL_VELOCITY_ORDER_BY_AXIS = getVelocityOrderByAxis();
-    const LOOKUP_ORIGINAL_VELOCITY_ORDER = {};
-    for (let i = 0; i < PARTICLES.size; ++i) {
-      for (let axis = 0; axis < 3; ++axis) {
-        const particle = ORIGINAL_VELOCITY_ORDER_BY_AXIS[axis][i];
-        if (!(particle in LOOKUP_ORIGINAL_VELOCITY_ORDER)) {
-          LOOKUP_ORIGINAL_VELOCITY_ORDER[particle] = Array(3).fill(null);
-        }
-        LOOKUP_ORIGINAL_VELOCITY_ORDER[particle][axis] = i;
-      }
-    }
-
-    // ANALYZE
-    for (let i = 0; i <= LIMIT; ++i) {
-
-      // TRACK NEW POSITIONS FOR EVERY REMAINING PARTICLE
-      const POSITIONS = {};
-      for (const particle of PARTICLES) {
-        const data = DATA[particle];
-        for (let axis = 0; axis < 3; ++axis) {
-          data.velocity[axis] += data.acceleration[axis];
-          data.position[axis] += data.velocity[axis];
-        }
-        const position = data.position.join(',');
-        if (!(position in POSITIONS)) POSITIONS[position] = [];
-        POSITIONS[position].push(particle);
-      }
-      
-      // DELETE PARTICLES THAT HAVE COLLIDED
+    
+    // PART 2: DELETE PARTICLES THAT HAVE COLLIDED
+    if (part === 2) {
       let deleteCount = 0;
       for (const position in POSITIONS) {
         if (POSITIONS[position].length > 1) {
@@ -215,28 +191,72 @@ function particlePhysics (part, inputStr, DEBUG = false) {
       if (DISPLAY_EXTRA_INFO && deleteCount) {
         console.log(`ON i = ${i}, DELETED ${deleteCount} PARTICLES | ${PARTICLES.size} PARTICLES REMAIN`);
       }
+    }
 
-      // CHECK FOR TERMINATION CONDITION: GET RELATIVE ORDER OF POSITION, VELOCITY, AND ACCELERATION, FOR ALL 3 AXES
-      const positionOrderByAxis = getPositionOrderByAxis().map(axisArr => axisArr.join(''));                // join into string for === comparison
-      const velocityOrderByAxis = getVelocityOrderByAxis().map(axisArr => axisArr.join(''));
-      const accelerationOrderByAxis = getAccelerationOrderByAxis().map(axisArr => axisArr.join(''));
-      if (accelerationOrderByAxis.every((order, i) => {                                                     // if for every axis...
-        return order === positionOrderByAxis[i]                                                             // ...acceleration matches position...
-                && order === velocityOrderByAxis[i];                                                        // ...and it also matches velocity...
-      })) {
-        break;                                                                                              // ...then terminate (no more collisions)
+    // UPDATE WHICH PARTICLES ARE MOVING AWAY FROM ORIGIN
+    // (THIS IS NECESSARY FOR TEST CASE 1, WHICH CAN TERMINATE TOO EARLY IF WE DO NOT WAIT FOR ALL PARTICLES TO BE MOVING AWAY FROM ORIGIN,
+    // BECAUSE IT WILL END IMMEDIATELY WHEN ALL PARTICLES BEGIN MOVING AWAY FROM EACH OTHER AFTER i === 0, BUT BOTH PARTICLES ARE STILL MOVING
+    // TOWARD THE ORIGIN, GIVING A WRONG RESULT)
+    for (const particle of PARTICLES) {
+      const distanceFromOrigin = getDistanceFromOrigin(particle);
+      if (!DATA[particle].movingAwayFromOrigin) {
+        if (DATA[particle].lastDistanceFromOrigin !== null
+            && distanceFromOrigin > DATA[particle].lastDistanceFromOrigin
+        ) {
+          DATA[particle].movingAwayFromOrigin = true;
+        }
       }
+      DATA[particle].lastDistanceFromOrigin = distanceFromOrigin;
+    }
 
-      if (DISPLAY_EXTRA_INFO
-        && Math.floor((Date.now() - TIME_AT_START)/(1000*60)) >= NEXT_MIN_TARGET
-      ) {
-        const MINS_PASSED = Math.floor((Date.now() - TIME_AT_START)/(1000*60));
-        console.log(`... ${
-          MINS_PASSED
-        } mins have passed since beginning this run`);
-        NEXT_MIN_TARGET = MINS_PASSED + 1;
+    // CHECK FOR TERMINATION CONDITION: GET RELATIVE ORDER OF POSITION, VELOCITY, AND ACCELERATION, FOR ALL 3 AXES
+    const positionOrderByAxis = getPositionOrderByAxis().map(axisArr => axisArr.join(''));                // join into string for === comparison
+    const velocityOrderByAxis = getVelocityOrderByAxis().map(axisArr => axisArr.join(''));
+    const accelerationOrderByAxis = getAccelerationOrderByAxis().map(axisArr => axisArr.join(''));
+
+    if (accelerationOrderByAxis.every((order, i) => {                                                     // if for every axis...
+          return order === positionOrderByAxis[i]                                                             // ...acceleration matches position...
+                  && order === velocityOrderByAxis[i];                                                        // ...and it also matches velocity...
+        })
+        && (part === 2 || [ ...PARTICLES ].every(particle => DATA[particle].movingAwayFromOrigin))
+    ) {
+
+      if (DISPLAY_EXTRA_INFO) console.log(`TERMINATING ON i: ${i}`);
+      break;                                                                                              // ...then terminate (no more collisions)
+    }
+
+    if (DISPLAY_EXTRA_INFO
+      && Math.floor((Date.now() - TIME_AT_START)/(1000*60)) >= NEXT_MIN_TARGET
+    ) {
+      const MINS_PASSED = Math.floor((Date.now() - TIME_AT_START)/(1000*60));
+      console.log(`... ${
+        MINS_PASSED
+      } mins have passed since beginning this run`);
+      NEXT_MIN_TARGET = MINS_PASSED + 1;
+    }
+  }
+
+  if (part === 1) {                                                                                       // PART 1: FIND PARTICLE THAT WILL REMAIN
+                                                                                                          // CLOSEST TO ORIGIN IN THE LONG RUN
+                                                                                                          // (i.e. AFTER THE RELATIVE ORDERING IN TERMS
+                                                                                                          // OF DISTANCE FROM ORIGIN WILL NO LONGER
+                                                                                                          // CHANGE)
+
+    let minDistance = Infinity;
+    let particleMinDistance = null;
+    for (const particle of PARTICLES) {
+      const distance = DATA[particle].lastDistanceFromOrigin;
+      if (distance < minDistance) {
+        minDistance = distance;
+        particleMinDistance = particle;
       }
     }
+
+    if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
+    return particleMinDistance;
+
+  } else {                                                                                                // PART 2: FIND # PARTICLES REMAINING AFTER
+                                                                                                          // ALL COLLISIONS HAVE HAPPENED
 
     if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
     return PARTICLES.size;
