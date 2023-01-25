@@ -60,7 +60,7 @@ What is the value of the root node?
 // OPTIONAL VARIABLES
 const DISPLAY_EXTRA_INFO = true;
 
-function backtrackToFindTreeStructure (part, inputStr, DEBUG = false) {
+function recurseToFindTreeStructure (part, inputStr, DEBUG = false) {
   
   // PARSE INPUT DATA
   const NUMBERS = inputStr.split(' ').map(n => +n);
@@ -90,8 +90,8 @@ function backtrackToFindTreeStructure (part, inputStr, DEBUG = false) {
     }
   }
 
-  // ANALYZE BACKTRACKING
-  function backtrack() {
+  // ANALYZE WITH RECURSION
+  function recurse() {
 
     // DATA STRUCTURE
     const node = { children: [], metadata: [] };
@@ -102,7 +102,7 @@ function backtrackToFindTreeStructure (part, inputStr, DEBUG = false) {
 
     // ONLY RECURSIVE CASE HAS CHILDREN
     for (let child = 0; child < numChildren; ++child) {
-      node.children.push(backtrack());
+      node.children.push(recurse());
     }
 
     // BOTH BASE AND RECURSIVE CASES NEED TO PROCESS METADATA
@@ -111,7 +111,7 @@ function backtrackToFindTreeStructure (part, inputStr, DEBUG = false) {
     return node;
   }
   
-  const ROOT = backtrack();
+  const ROOT = recurse();
 
   return part === 1 ? part1MetadataTotal                                                          // PART 1: GET GLOBAL METADATA TOTAL
                     : getValueOfNode(ROOT);                                                       // PART 2: GET VALUE OF ROOT NODE
@@ -122,7 +122,7 @@ function backtrackToFindTreeStructure (part, inputStr, DEBUG = false) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = backtrackToFindTreeStructure;
+const func = recurseToFindTreeStructure;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
