@@ -103,11 +103,11 @@ function analyzeSleepSchedule (part, inputStr, DEBUG = false) {
   });
 
   // PRE-PROCESS INPUT DATA - SORT IT IN TIMESTAMP ORDER
-  DATA.sort((a, b) => a.year - b.year
-                      || a.month - b.month
-                      || a.day - b.day
-                      || a.hour - b.hour
-                      || a.minute - b.minute);
+  DATA.sort((a, b) => a.year - b.year                                                   // sort priority is important! start with year...
+                      || a.month - b.month                                              // ...then break ties with month...
+                      || a.day - b.day                                                  // ...then break ties with day...
+                      || a.hour - b.hour                                                // ...then break ties with hour...
+                      || a.minute - b.minute);                                          // ...and finally, break ties with minute
 
   // PRE-PROCESS INPUT DATA - FILL IN GUARD INFORMATION AFTER SORTING
   let currentGuard = null;
