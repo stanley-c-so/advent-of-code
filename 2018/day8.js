@@ -69,27 +69,6 @@ function recurseToFindTreeStructure (part, inputStr, DEBUG = false) {
   let pointer = 0;
   let part1MetadataTotal = 0;                                                                     // for part 1
 
-  // HELPER FUNCTION - READ METADATA AND ADVANCE GLOBAL POINTER
-  function processMetadata(metadataCount, node) {
-    for (let metadata = 0; metadata < metadataCount; ++metadata) {
-      const num = NUMBERS[pointer++];
-      part1MetadataTotal += num;
-      node.metadata.push(num);
-    }
-  }
-
-  // HELPER FUNCTION - PART 2 ONLY - GET VALUE OF A NODE
-  function getValueOfNode(node) {
-    if (node.children.length) {                                                                   // if node has children...
-      return node.metadata.reduce((sum, idx) => sum + (idx > 0 && idx <= node.children.length
-                                                        ? getValueOfNode(node.children[idx - 1])  // ...get value of in-bounds 1-indexed child nodes
-                                                        : 0)
-                                  , 0);
-    } else {                                                                                      // else if node has no children...
-      return node.metadata.reduce((sum, num) => sum + num, 0);                                    // ...sum up its metadata to get its value
-    }
-  }
-
   // ANALYZE WITH RECURSION
   function recurse() {
 
@@ -106,12 +85,28 @@ function recurseToFindTreeStructure (part, inputStr, DEBUG = false) {
     }
 
     // BOTH BASE AND RECURSIVE CASES NEED TO PROCESS METADATA
-    processMetadata(metadataCount, node);
+    for (let metadata = 0; metadata < metadataCount; ++metadata) {
+      const num = NUMBERS[pointer++];
+      part1MetadataTotal += num;
+      node.metadata.push(num);
+    }
 
     return node;
   }
   
   const ROOT = recurse();
+
+  // PART 2 HELPER FUNCTION - GET VALUE OF A NODE
+  function getValueOfNode(node) {
+    if (node.children.length) {                                                                   // if node has children...
+      return node.metadata.reduce((sum, idx) => sum + (idx > 0 && idx <= node.children.length
+                                                        ? getValueOfNode(node.children[idx - 1])  // ...get value of in-bounds 1-indexed child nodes
+                                                        : 0)
+                                  , 0);
+    } else {                                                                                      // else if node has no children...
+      return node.metadata.reduce((sum, num) => sum + num, 0);                                    // ...sum up its metadata to get its value
+    }
+  }
 
   return part === 1 ? part1MetadataTotal                                                          // PART 1: GET GLOBAL METADATA TOTAL
                     : getValueOfNode(ROOT);                                                       // PART 2: GET VALUE OF ROOT NODE
