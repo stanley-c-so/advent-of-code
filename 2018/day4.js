@@ -109,37 +109,32 @@ function analyzeSleepSchedule (part, inputStr, DEBUG = false) {
                       || a.hour - b.hour                                                // ...then break ties with hour...
                       || a.minute - b.minute);                                          // ...and finally, break ties with minute
 
-  // PRE-PROCESS INPUT DATA - FILL IN GUARD INFORMATION AFTER SORTING
-  let currentGuard = null;
-  for (const entry of DATA) {
-    if (entry.guard === null) entry.guard = currentGuard;
-    else currentGuard = entry.guard;
-  }
-
   // DATA STRUCTURES
   const MINS_ASLEEP_BY_GUARD = {};
   const TOTAL_MINS_ASLEEP_BY_GUARD = {};
 
-  // ANALYZE INPUT DATA TO GET SLEEP TIMES
+  // INIT
   const currentSleepTime = { hour: null, minute: null };
+  let currentGuard = null;
+
+  // ANALYZE INPUT DATA TO GET SLEEP TIMES
   for (const entry of DATA) {
 
-    if (entry.event === SLEEP) {                                                        // EVENT: GUARD FALLS ASLEEP
-      currentGuard = entry.guard;                                                       // for sanity check
+    if (entry.event === BEGIN) {                                                        // EVENT: NEW GUARD BEGINS
+      currentGuard = entry.guard;
+    }
+
+    else if (entry.event === SLEEP) {                                                   // EVENT: GUARD FALLS ASLEEP
       currentSleepTime.hour = entry.hour;
       currentSleepTime.minute = entry.minute;
     }
 
     else if (entry.event === WAKE) {                                                    // EVENT: GUARD WAKES UP
-      if (entry.guard !== currentGuard) {                                               // sanity check
-        throw `ERROR: THIS ENTRY'S GUARD IS ${
-          entry.guard} BUT CURRENT GUARD SHOULD BE ${currentGuard}`;
+      if (!(currentGuard in MINS_ASLEEP_BY_GUARD)) {
+        MINS_ASLEEP_BY_GUARD[currentGuard] = {};
       }
-      if (!(entry.guard in MINS_ASLEEP_BY_GUARD)) {
-        MINS_ASLEEP_BY_GUARD[entry.guard] = {};
-      }
-      if (!(entry.guard in TOTAL_MINS_ASLEEP_BY_GUARD)) {
-        TOTAL_MINS_ASLEEP_BY_GUARD[entry.guard] = 0;
+      if (!(currentGuard in TOTAL_MINS_ASLEEP_BY_GUARD)) {
+        TOTAL_MINS_ASLEEP_BY_GUARD[currentGuard] = 0;
       }
 
       let totalSleepTimeInMins = 0;
@@ -148,12 +143,12 @@ function analyzeSleepSchedule (part, inputStr, DEBUG = false) {
             min = (min + 1) % 60                                                        // support wrapping around to next hour
       ) {
         ++totalSleepTimeInMins;
-        if (!(min in MINS_ASLEEP_BY_GUARD[entry.guard])) {
-          MINS_ASLEEP_BY_GUARD[entry.guard][min] = 0;
+        if (!(min in MINS_ASLEEP_BY_GUARD[currentGuard])) {
+          MINS_ASLEEP_BY_GUARD[currentGuard][min] = 0;
         }
-        ++MINS_ASLEEP_BY_GUARD[entry.guard][min];                                       // update minute data
+        ++MINS_ASLEEP_BY_GUARD[currentGuard][min];                                      // update minute data
       }
-      TOTAL_MINS_ASLEEP_BY_GUARD[entry.guard] += totalSleepTimeInMins;                  // update total sleep time data
+      TOTAL_MINS_ASLEEP_BY_GUARD[currentGuard] += totalSleepTimeInMins;                 // update total sleep time data
     }
   }
 
