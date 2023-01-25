@@ -94,7 +94,7 @@ function recurseToFindTreeStructure (part, inputStr, DEBUG = false) {
     return node;
   }
   
-  const ROOT = recurse();
+  const ROOT = recurse();                                                                         // kick-start recursion
 
   // PART 2 HELPER FUNCTION - GET VALUE OF A NODE
   function getValueOfNode(node) {
