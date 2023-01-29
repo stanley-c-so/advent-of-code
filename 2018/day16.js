@@ -218,8 +218,9 @@ function logicallyConnectNumCodesToOpCodes (part, inputStr, DEBUG = false) {
         while (stack.length) {
           const [ a, b ] = stack.pop();                                                 // a could be code and b num, or vice versa
 
-          if (DEDUCED.has(a)) continue;
+          if (DEDUCED.has(a) || DEDUCED.has(b)) continue;
           DEDUCED.add(a);
+          DEDUCED.add(b);
 
           const [ num, code ] = isNaN(a) ? [ b, a ] : [ a, b ];
           
@@ -258,6 +259,7 @@ function logicallyConnectNumCodesToOpCodes (part, inputStr, DEBUG = false) {
 
     const OP_CODES_BY_NUM_CODE = POSSIBILITIES_BY_NUM_CODE.map(set => [ ...set ][0]);
 
+    // now run the test program since we know what the mappings are
     const REGISTERS = [ 0, 0, 0, 0 ];
     for (const line of TEST_PROGRAM.split('\r\n')) {
       const [ numCode, A, B, C ] = line.split(' ').map(n => +n);
