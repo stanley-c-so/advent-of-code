@@ -494,7 +494,10 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
           return {
             outcome: finalCompletedRound * sumOfHPOfRemainingUnits,
             numElvesDied,
-            TERRAIN,
+            finalCompletedRound,                                                            // for extra info
+            sumOfHPOfRemainingUnits,                                                        // for extra info
+            UNITS,                                                                          // for extra info
+            TERRAIN,                                                                        // for extra info
           };
         };
 
@@ -606,7 +609,7 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
                                                                                             // TO MINIMUM REQUIRED FOR NO ELVES TO DIE
 
     let elfAttackPower = 3;
-    let simulationResults = { outcome: null, numElvesDied: null };
+    let simulationResults = null;
     do {
       ++elfAttackPower;
       simulationResults = SIMULATE(elfAttackPower);
@@ -616,7 +619,9 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
 
     if (DISPLAY_EXTRA_INFO) {
       console.log('OUTCOME OF SUCCESSFUL SIMULATION:', simulationResults.outcome);
-      console.log('NUMBER OF ELVES WHO DIED:', simulationResults.numElvesDied);
+      console.log('FINAL COMPLETED ROUND:', simulationResults.finalCompletedRound);
+      console.log('SUM OF HP OF REMAINING UNITS:', simulationResults.sumOfHPOfRemainingUnits);
+      console.log('UNIT DATA:', simulationResults.UNITS);
       console.log('MAP:');
       for (const row of simulationResults.TERRAIN) console.log(row.join(''));
     }
