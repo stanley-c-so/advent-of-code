@@ -393,8 +393,7 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
     const TERRAIN = [];
     const UNITS = [];
     const REMAINING_UNIT_INDICES = new Set();
-    let elfCount = 0;
-    let goblinCount = 0;
+    const COUNT = { [ELF]: 0, [GOBLIN]: 0 };
     let numElvesDied = 0;
 
     // DISCOVER CAVE AND UNIT DATA
@@ -402,10 +401,10 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
       const terrainRow = [];
       for (let col = 0; col < W; ++col) {
         const c = inputArr[row][col];
-        terrainRow.push(c);                                                   // save terrain data
+        terrainRow.push(c);                                                                 // save terrain data
         if ([ ELF, GOBLIN ].includes(c)) {
-          REMAINING_UNIT_INDICES.add(UNITS.length);                           // add unit to remaining units set
-          UNITS.push({                                                        // save unit data
+          REMAINING_UNIT_INDICES.add(UNITS.length);                                         // add unit to remaining units set
+          UNITS.push({                                                                      // save unit data
             idx: UNITS.length,
             type: c,
             row,
@@ -414,8 +413,7 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
                                       : ELF_ATTACK_POWER,
             HP: 200,
           });
-          if (c === ELF) ++elfCount;                                          // update global unit count data
-          if (c === GOBLIN) ++goblinCount;
+          ++COUNT[c];                                                                       // update global unit count data
         }
       }
       TERRAIN.push(terrainRow);
@@ -426,30 +424,23 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
       return coords.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
     }
 
-    // HELPER FUNCTION - TAKES IN COORDINATES, A REFERENCE TYPE, AND AN OCCUPIED STATE; OUTPUTS A DATA OBJECT
-    // THAT INCLUDES A BOOL FOR WHETHER THAT SQUARE IS NEXT TO A LIVING UNIT OF THE OPPOSITE TYPE *AND() IS OF
-    // OCCUPIED STATE MATCHING THE PARAMETER; ALSO INCLUDES AN ARRAY OF ALL ENEMIES ADJACENT TO THAT COORDINATE
-    // (BUT WILL ALWAYS BE EMPTY IF OCCUPIED STATE IS OF THE WRONG TYPE)
-    function isSquareOfOccupiedStateNextToEnemy(row, col, unitType, occupied) {
-      const data = {
-        bool: false,
-        enemies: [],
-      };
-
-      const isOpen = TERRAIN[row][col] === OPEN;
-      if (occupied === isOpen) return data;
-
-      const enemyType = unitType === ELF ? GOBLIN : ELF;
+    // HELPER FUNCTION - TAKES IN COORDINATES, AND A REFERENCE TYPE; OUTPUTS A DATA OBJECT THAT INCLUDES A BOOL
+    // FOR WHETHER THAT SQUARE IS NEXT TO A LIVING UNIT OF THE OPPOSITE TYPE; ALSO INCLUDES AN ARRAY OF ALL ENEMIES
+    // ADJACENT TO THAT COORDINATE
+    function isSquareOfOccupiedStateNextToEnemy(row, col, type) {
+      const enemyType = type === ELF ? GOBLIN : ELF;
+      const enemies = [];
+      let bool = false;
       for (const [ dy, dx ] of DELTAS) {
         const [ newRow, newCol ] = [ row + dy, col + dx ];
         if (0 <= newRow && newRow < H && 0 <= newCol && newCol < W
             && TERRAIN[newRow][newCol] === enemyType
         ) {
-          data.bool = true;
-          data.enemies.push(UNITS.findIndex(unit => unit.row === newRow && unit.col === newCol));
+          bool = true;
+          enemies.push(UNITS.findIndex(unit => unit.row === newRow && unit.col === newCol));
         }
       }
-      return data;
+      return { bool, enemies };
     }
 
     // SIMULATE BATTLE
@@ -473,19 +464,23 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
 
       const REMAINING_UNITS = [ ...REMAINING_UNIT_INDICES ]
                                 .sort((a, b) => REMAINING_UNITS_COORDS
-                                                  .findIndex(coords => UNITS[a].row === coords[0] && UNITS[a].col === coords[1])
+                                                  .findIndex(coords => UNITS[a].row === coords[0]
+                                                                        && UNITS[a].col === coords[1])
                                                     - REMAINING_UNITS_COORDS
-                                                      .findIndex(coords => UNITS[b].row === coords[0] && UNITS[b].col === coords[1]));
+                                                      .findIndex(coords => UNITS[b].row === coords[0]
+                                                                            && UNITS[b].col === coords[1]));
 
       // ITERATE THROUGH EVERY UNIT
       for (let i = 0; i < REMAINING_UNITS.length; ++i) {
 
-        const unitIdx = REMAINING_UNITS[i];
-        if (!REMAINING_UNIT_INDICES.has(unitIdx)) continue;                                 // skip eliminated units
-        const { type, row, col, attackPower } = UNITS[unitIdx];
-
-        // CHECK FOR TERMINATE AT THE START OF EVERY INDIVIDUAL UNIT'S TURN
-        if (elfCount === 0 || goblinCount === 0) {
+        // CHECK FOR END OF COMBAT AT THE START OF EVERY INDIVIDUAL UNIT'S TURN, PER THE INSTRUCTIONS.
+        // NOTE: YOU CANNOT JUST PUT THIS AT THE START OF THE ROUND OR THE END OF THE ROUND.
+        // IF YOU PUT IT AT THE START OF THE ROUND - WHAT IF IN THE PREVIOUS ROUND COMBAT SHOULD HAVE
+        // ENDED? BUT NOW YOU DON'T SEE THAT UNTIL THE ROUND IS 1 TOO HIGH.
+        // IF YOU PUT IT AT THE END OF THE ROUND - WHAT IF THE LAST MOVING UNIT KILLS ITS LAST ENEMY?
+        // THEN YOU DETECT THE TERMINATE CONDITION IN THIS ROUND, 1 TOO LOW - IT SHOULD NOT HAVE BEEN
+        // DETECTED UNTIL THE START OF THE NEXT ROUND WHEN THE FIRST UNIT CHECKS WHETHER COMBAT IS OVER.
+        if (COUNT[ELF] === 0 || COUNT[GOBLIN] === 0) {
           
           const finalCompletedRound = round - 1;                                            // this round is not a complete round
           const sumOfHPOfRemainingUnits = [ ...REMAINING_UNIT_INDICES ]
@@ -501,14 +496,22 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
           };
         };
 
+        // GET UNIT INFORMATION
+        const unitIdx = REMAINING_UNITS[i];
+        if (!REMAINING_UNIT_INDICES.has(unitIdx)) continue;                                 // skip eliminated units
+        const { type, row, col, attackPower } = UNITS[unitIdx];
+
         // MOVE
+        
+        // first, check if we even need to move
         let needToMove = true;
-        if (isSquareOfOccupiedStateNextToEnemy(row, col, type, true).bool                   // if we are already in range...
+        if (isSquareOfOccupiedStateNextToEnemy(row, col, type).bool                         // if we are already in range...
             || [ ...REMAINING_UNIT_INDICES ]                                                // ...or every enemy is already surrounded...
                   .filter(i => UNITS[i].type !== type)
                   .every(enemy => DELTAS.every(delta => {
                     const [ dy, dx ] = delta;
-                    const [ newRow, newCol ] = [ UNITS[enemy].row + dy, UNITS[enemy].col + dx ];
+                    const [ newRow, newCol ] = [  UNITS[enemy].row + dy,
+                                                  UNITS[enemy].col + dx ];
                     return newRow < 0 || newRow === H || newCol < 0 || newCol === W
                             || TERRAIN[newRow][newCol] !== OPEN
                   }))
@@ -519,9 +522,9 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
         // otherwise, if neither of the above is true, we must move in the best way to the best square that is closest
         if (needToMove) {
 
-          // flood fill, and as soon as we find 1 eligible square, keep going until we exhaust all moves
-          // that take the same number of steps
-          const candidateFirstMoves = {};
+          // BFS flood fill, and as soon as we find 1 eligible square,
+          // keep going until we exhaust all moves that take the same number of steps
+          const candidateFirstMovesByEndSq = {};
           const Q = new Queue([ row, col, 0, null ]);
           const MEMO = {};
           let shortestPathLength = null;
@@ -535,27 +538,32 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
             if (!(serial in MEMO) || moves < MEMO[serial]) MEMO[serial] = moves;
             else if (moves >= MEMO[serial]) continue;
 
-            if (isSquareOfOccupiedStateNextToEnemy(r, c, type, false).bool) {
-              if (shortestPathLength === null || moves < shortestPathLength) {
-                shortestPathLength = moves;
-                for (const key in candidateFirstMoves) delete candidateFirstMoves[key];
+            if (TERRAIN[r][c] === OPEN                                                      // if we find an open spot next to an enemy...
+                && isSquareOfOccupiedStateNextToEnemy(r, c, type).bool
+            ) {
+              shortestPathLength = moves;                                                   // set shortest path length
+              const endSquare = `${r},${c}`;
+              if (!(endSquare in candidateFirstMovesByEndSq)) {
+                candidateFirstMovesByEndSq[endSquare] = new Set();
               }
-              const candidateSquare = `${r},${c}`;
-              if (!(candidateSquare in candidateFirstMoves)) {
-                candidateFirstMoves[candidateSquare] = new Set();
-              }
-              candidateFirstMoves[candidateSquare].add(firstCoord);
+              candidateFirstMovesByEndSq[endSquare].add(firstCoord);
             }
-            for (const [ dy, dx ] of DELTAS) {
-              Q.enqueue([ r + dy, c + dx, moves + 1, firstCoord || `${r + dy},${c + dx}` ]);
+            else {                                                                          // else, take next step at 4 neighbors
+              for (const [ dy, dx ] of DELTAS) {
+                Q.enqueue([ r + dy,
+                            c + dx,
+                            moves + 1,
+                            firstCoord || `${r + dy},${c + dx}` ]);
+              }
             }
           }
 
           // if we found any candidate squares to move toward...
-          const candidateSquares = Object.keys(candidateFirstMoves).map(serial => serial.split(',').map(n => +n));
-          if (candidateSquares.length) {
-            const moveTarget = getReadingOrder(candidateSquares)[0];                        // ...choose the best target by reading order...
-            const firstCoordsToMoveTarget = [ ...candidateFirstMoves[moveTarget] ]
+          const endSquares = Object.keys(candidateFirstMovesByEndSq)
+                              .map(serial => serial.split(',').map(n => +n));
+          if (endSquares.length) {
+            const moveTarget = getReadingOrder(endSquares)[0];                              // ...choose the best target by reading order...
+            const firstCoordsToMoveTarget = [ ...candidateFirstMovesByEndSq[moveTarget] ]
                                               .map(serial => serial.split(',').map(n => +n));
 
             const [ newRow, newCol ] = getReadingOrder(firstCoordsToMoveTarget)[0];         // ...then choose the best starter move by reading order
@@ -566,30 +574,28 @@ function simulateTurnBasedCombat (part, inputStr, DEBUG = false) {
         }
 
         // ATTACK
-        const [ currRow, currCol ] = [ UNITS[unitIdx].row, UNITS[unitIdx].col ];            // keep in mind this may have changed
-        const destinationSquareInRangeData = isSquareOfOccupiedStateNextToEnemy(currRow, currCol, type, true);
+        const destinationSquareInRangeData = isSquareOfOccupiedStateNextToEnemy(UNITS[unitIdx].row,     // location may have changed if unit moved
+                                                                                UNITS[unitIdx].col,
+                                                                                type);
         if (destinationSquareInRangeData.bool) {
 
           const enemiesInRange = destinationSquareInRangeData.enemies;
-          const lowestHP = enemiesInRange.map(i => UNITS[i].HP).sort((a, b) => a - b)[0];
-          const enemyPositionsWithLowestHP = enemiesInRange.filter(i => UNITS[i].HP === lowestHP)
+          const lowestHP = enemiesInRange.map(i => UNITS[i].HP).sort((a, b) => a - b)[0];               // find lowest HP
+          const enemyPositionsWithLowestHP = enemiesInRange.filter(i => UNITS[i].HP === lowestHP)       // get positions of all enemies with that HP
                                                             .map(i => [ UNITS[i].row, UNITS[i].col ])
 
-          const [ targetRow, targetCol ] = getReadingOrder(enemyPositionsWithLowestHP)[0];
+          const [ targetRow, targetCol ] = getReadingOrder(enemyPositionsWithLowestHP)[0];              // pick enemy based on reading order
           
-          const targetIdx = UNITS.findIndex(unit => unit.row === targetRow && unit.col === targetCol);
-          
-          UNITS[targetIdx].HP -= attackPower;
-          if (UNITS[targetIdx].HP <= 0) {
-            UNITS[targetIdx].row = -1;
-            UNITS[targetIdx].col = -1;
+          const targetIdx = UNITS.findIndex(unit => unit.row === targetRow && unit.col === targetCol);  // get index of enemy
+
+          UNITS[targetIdx].HP -= attackPower;                                                           // lower enemy's HP
+          if (UNITS[targetIdx].HP <= 0) {                                                               // if enemy dies...
+            [ UNITS[targetIdx].row, UNITS[targetIdx].col ] = [ -1, -1 ];                                // 'send' it to -1, -1 (IMPORTANT: so that
+                                                                                                        // code doesn't 'detect' a dead unit in map)
             REMAINING_UNIT_INDICES.delete(targetIdx);
             TERRAIN[targetRow][targetCol] = OPEN;
-            if (type === ELF) --goblinCount;
-            if (type === GOBLIN) {
-              --elfCount;
-              ++numElvesDied;
-            }
+            --COUNT[type === ELF ? GOBLIN : ELF];
+            if (type === GOBLIN) ++numElvesDied;
           }
         }
       }
