@@ -76,7 +76,6 @@ function peepholeOptimizationVM (part, inputStr, DEBUG = false) {
                       0 ];
 
   // INIT
-  // let IP_BINDING = null;
   const IP_BINDING = +inputArr[0].split(' ')[1];
   let IP_VALUE = 0;
 
