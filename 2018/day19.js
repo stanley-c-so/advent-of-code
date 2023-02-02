@@ -89,7 +89,6 @@ function peepholeOptimizationVM (part, inputStr, DEBUG = false) {
     const C = +split[3];
     INSTRUCTIONS.push([ opCode, A, B, C ]);
   }
-  // console.log(INSTRUCTIONS)
 
   function runOpCode(REGISTERS, opCode, A, B, C) {
     if (opCode === ADDR) {
@@ -141,7 +140,6 @@ function peepholeOptimizationVM (part, inputStr, DEBUG = false) {
       REGISTERS[C] = REGISTERS[A] === REGISTERS[B] ? 1 : 0;
     }
     else throw `ERROR: UNRECOGNIZED OP CODE ${opCode}`;
-    // return REGISTERS;
   }
 
   // WRAP PROGRAM IN A HELPER FUNCTION SO WE DON'T HAVE TO CALL IT IN PART 2 IF WE DON'T WANT TO
