@@ -62,8 +62,8 @@ function peepholeOptimizationVM (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
   
   // CONSTANTS
-  const [ ADDR, ADDI, MULR, MULI, BANR, BANI, BORR, BORI, SETR, SETI, GTIR, GTRI, GTRR, EQIR, EQRI, EQRR, IP ] =
-    [ 'addr', 'addi', 'mulr', 'muli', 'banr', 'bani', 'borr', 'bori', 'setr', 'seti', 'gtir', 'gtri', 'gtrr', 'eqir', 'eqri', 'eqrr', '#ip' ];
+  const [ ADDR, ADDI, MULR, MULI, BANR, BANI, BORR, BORI, SETR, SETI, GTIR, GTRI, GTRR, EQIR, EQRI, EQRR ] =
+    [ 'addr', 'addi', 'mulr', 'muli', 'banr', 'bani', 'borr', 'bori', 'setr', 'seti', 'gtir', 'gtri', 'gtrr', 'eqir', 'eqri', 'eqrr' ];
 
   // DATA STRUCTURES
   const INSTRUCTIONS = [];
@@ -85,14 +85,10 @@ function peepholeOptimizationVM (part, inputStr, DEBUG = false) {
     const line = inputArr[i];
     const split = line.split(' ');
     const opCode = split[0];
-    if (opCode === IP) {
-      IP_BINDING = +split[1];
-    } else {
-      const A = +split[1];
-      const B = +split[2];
-      const C = +split[3];
-      INSTRUCTIONS.push([ opCode, A, B, C ]);
-    }
+    const A = +split[1];
+    const B = +split[2];
+    const C = +split[3];
+    INSTRUCTIONS.push([ opCode, A, B, C ]);
   }
   // console.log(INSTRUCTIONS)
 
