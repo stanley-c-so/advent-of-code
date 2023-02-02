@@ -90,6 +90,7 @@ function peepholeOptimizationVM (part, inputStr, DEBUG = false) {
     INSTRUCTIONS.push([ opCode, A, B, C ]);
   }
 
+  // HELPER FUNCTION - RUNS A SINGLE LINE OF THE VM
   function runOpCode(REGISTERS, opCode, A, B, C) {
     if (opCode === ADDR) {
       REGISTERS[C] = REGISTERS[A] + REGISTERS[B];
