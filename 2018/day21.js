@@ -36,7 +36,7 @@ What is the lowest non-negative integer value for register 0 that causes the pro
 // OPTIONAL VARIABLES
 const DISPLAY_EXTRA_INFO = true;
 
-function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
+function makeTheProgramHalt (part, inputStr, DEBUG = false) {
   const inputArr = inputStr.split('\r\n');
 
   // CONSTANTS
@@ -203,7 +203,7 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
 const test = require('./_test');
 const testNum = [1];
 let input, expected;
-const func = NAME_OF_FUNC_HERE;
+const func = makeTheProgramHalt;
 const sortedFunc = (...args) => func(...args).sort();                   // used when the order of the output does not matter
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
