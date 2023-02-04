@@ -430,9 +430,10 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
     const SWITCH_TIME = 7;
 
     // INIT
-    const Q = new Queue([ 0, 0, TORCH, 0, 0 ]);
+    const Q = new Queue([ 0, 0, TORCH, 0, 0, 0 ]);
     const visited = {};
     let lowestMoves = null;
+    let lowestNumSwitchesOnLowestMoves = Infinity;
     let upperBoundMoves = null;
     let lowestTime = Infinity;
     let movesForLowestTimeSolution = null;                                                    // for extra info only
@@ -451,11 +452,21 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
         NEXT_MIN_TARGET = MINS_PASSED + 1;
       }
 
-      const [ row, col, equipped, time, moves ] = Q.dequeue().val;
+      const [ row, col, equipped, time, moves, numSwitches ] = Q.dequeue().val;
 
       // END BFS
-      if (lowestMoves !== null && moves >= upperBoundMoves) break;                            // once you know lowestMoves, you get an upper bound for
-                                                                                              // the number of moves for the time-optimal solution
+      if (lowestMoves !== null && upperBoundMoves === null && moves > lowestMoves) {
+        upperBoundMoves = lowestMoves + (lowestNumSwitchesOnLowestMoves * SWITCH_TIME);       // perhaps there is another path that takes more moves
+                                                                                              // than lowestMoves, but never involves switching.
+                                                                                              // then find the number of moves that would take the same
+                                                                                              // amount of time as the solution with the lowest moves,
+                                                                                              // given its number of switches, and this represents an
+                                                                                              // upper bound.
+        console.log(`EXPECTING UPPER BOUND FOR MOVES TO BE ${
+          upperBoundMoves}, BASED ON ${lowestNumSwitchesOnLowestMoves} SWITCHES`);
+      }
+      if (upperBoundMoves !== null && moves >= upperBoundMoves) break;                        // once known, compare moves with theoretical upper bound
+                                                                                              // for the number of moves for the time-optimal solution
 
       // TIME TOO HIGH
       if (time >= lowestTime) continue;                                                       // optimization
@@ -470,15 +481,14 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
       if (row === TARGET_Y && col === TARGET_X) {
         if (lowestMoves === null) {
           lowestMoves = moves;
-          upperBoundMoves = ((lowestMoves + 1) * SWITCH_TIME);                                // in extreme case, lowestMoves method may have involved
-                                                                                              // switching with every move. perhaps there is another
-                                                                                              // path that takes more moves but never involves switching.
-                                                                                              // then find the number of moves that would take the same
-                                                                                              // amount of time as the solution with the lowest moves,
-                                                                                              // and this represents an upper bound.
           console.log(`FIRST SOLUTION FOUND AFTER ${moves} MOVES!`);
-          console.log(`EXPECTING UPPER BOUND FOR MOVES TO BE ${lowestMoves * SWITCH_TIME}`);
         }
+
+        if (moves === lowestMoves) {
+          lowestNumSwitchesOnLowestMoves = Math.min(lowestNumSwitchesOnLowestMoves,
+                                                    numSwitches);
+        }
+
         const currentTime = time + (equipped === TORCH ? 0 : SWITCH_TIME);                    // don't forget to equip torch at the end if necessary
         if (currentTime < lowestTime) movesForLowestTimeSolution = moves;                     // for extra info only
         lowestTime = Math.min(lowestTime, currentTime);
@@ -495,12 +505,14 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
 
               // GEAR (CURRENTLY ROCKY OR WET)
               if ([ ROCKY, WET ].includes(currentType)) {
-                Q.enqueue([ newRow, newCol, GEAR, time + 1 + (equipped === GEAR ? 0 : SWITCH_TIME), moves + 1 ]);
+                const needToSwitch = equipped === GEAR;
+                Q.enqueue([ newRow, newCol, GEAR, time + 1 + (needToSwitch ? 0 : SWITCH_TIME), moves + 1, numSwitches + (needToSwitch ? 0 : 1) ]);
               }
 
               // TORCH (CURRENTLY ROCKY OR NARROW)
               if ([ ROCKY, NARROW ].includes(currentType)) {
-                Q.enqueue([ newRow, newCol, TORCH, time + 1 + (equipped === TORCH ? 0 : SWITCH_TIME), moves + 1 ]);
+                const needToSwitch = equipped === TORCH;
+                Q.enqueue([ newRow, newCol, TORCH, time + 1 + (needToSwitch ? 0 : SWITCH_TIME), moves + 1, numSwitches + (needToSwitch ? 0 : 1) ]);
               }
             }
 
@@ -508,12 +520,14 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
 
               // GEAR (CURRENTLY ROCKY OR WET)
               if ([ ROCKY, WET ].includes(currentType)) {
-                Q.enqueue([ newRow, newCol, GEAR, time + 1 + (equipped === GEAR ? 0 : SWITCH_TIME), moves + 1 ]);
+                const needToSwitch = equipped === GEAR;
+                Q.enqueue([ newRow, newCol, GEAR, time + 1 + (needToSwitch ? 0 : SWITCH_TIME), moves + 1, numSwitches + (needToSwitch ? 0 : 1) ]);
               }
 
               // NEITHER (CURRENTLY WET OR NARROW)
               if ([ WET, NARROW ].includes(currentType)) {
-                Q.enqueue([ newRow, newCol, NEITHER, time + 1 + (equipped === NEITHER ? 0 : SWITCH_TIME), moves + 1 ]);
+                const needToSwitch = equipped === NEITHER;
+                Q.enqueue([ newRow, newCol, NEITHER, time + 1 + (needToSwitch ? 0 : SWITCH_TIME), moves + 1, numSwitches + (needToSwitch ? 0 : 1) ]);
               }
             }
 
@@ -521,12 +535,14 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
 
               // TORCH (CURRENTLY ROCKY OR NARROW)
               if ([ ROCKY, NARROW ].includes(currentType)) {
-                Q.enqueue([ newRow, newCol, TORCH, time + 1 + (equipped === TORCH ? 0 : SWITCH_TIME), moves + 1 ]);
+                const needToSwitch = equipped === TORCH;
+                Q.enqueue([ newRow, newCol, TORCH, time + 1 + (needToSwitch ? 0 : SWITCH_TIME), moves + 1, numSwitches + (needToSwitch ? 0 : 1) ]);
               }
 
               // NEITHER (CURRENTLY WET OR NARROW)
               if ([ WET, NARROW ].includes(currentType)) {
-                Q.enqueue([ newRow, newCol, NEITHER, time + 1 + (equipped === NEITHER ? 0 : SWITCH_TIME), moves + 1 ]);
+                const needToSwitch = equipped === NEITHER;
+                Q.enqueue([ newRow, newCol, NEITHER, time + 1 + (needToSwitch ? 0 : SWITCH_TIME), moves + 1, numSwitches + (needToSwitch ? 0 : 1) ]);
               }
             }
 
