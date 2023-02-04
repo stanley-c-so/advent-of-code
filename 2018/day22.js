@@ -553,7 +553,8 @@ function terrainTypeBFS (part, inputStr, DEBUG = false) {
       }
     }
 
-    if (DISPLAY_EXTRA_INFO) console.log(`LOWEST TIME SOLUTION TOOK ${movesForLowestTimeSolution} MOVES`);
+    if (DISPLAY_EXTRA_INFO) console.log(`LOWEST TIME SOLUTION TOOK ${movesForLowestTimeSolution
+      } MOVES, WITH ${(lowestTime - movesForLowestTimeSolution) / SWITCH_TIME} SWITCHES`);
 
     if (!DEBUG) console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
     return lowestTime;
