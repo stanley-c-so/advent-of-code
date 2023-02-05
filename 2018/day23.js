@@ -259,6 +259,10 @@ function findCoordCoincidingWithMostOctahedra (part, inputStr, DEBUG = false) {
 
     }
 
+    if (DISPLAY_EXTRA_INFO) {
+      console.log(`THE BEST COORDINATE IS: (${lowerBoundX}, ${lowerBoundY}, ${lowerBoundZ})`);
+    }
+
     console.log(`(RUN TOOK ${(Date.now() - TIME_AT_START)/1000} SECS)`);
     return getManhattanDistance(lowerBoundX, lowerBoundY, lowerBoundZ, 0, 0, 0);
 
