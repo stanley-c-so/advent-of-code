@@ -122,6 +122,7 @@ function intcode2 (part, inputStr, DEBUG = false) {
       const arg3 = i < REGISTERS.length - 3 ? REGISTERS[i + 3] : null;
 
       if (opcode === '01') {
+        
         const operandA = arg1 === null ? null : opcodeData[OPCODE_LEN - 3] === '1' ? arg1 : REGISTERS[arg1];
         const operandB = arg2 === null ? null : opcodeData[OPCODE_LEN - 4] === '1' ? arg2 : REGISTERS[arg2];
         const writeIdx = arg3;
@@ -137,6 +138,7 @@ function intcode2 (part, inputStr, DEBUG = false) {
       }
 
       else if (opcode === '02') {
+
         const operandA = arg1 === null ? null : opcodeData[OPCODE_LEN - 3] === '1' ? arg1 : REGISTERS[arg1];
         const operandB = arg2 === null ? null : opcodeData[OPCODE_LEN - 4] === '1' ? arg2 : REGISTERS[arg2];
         const writeIdx = arg3;
@@ -215,6 +217,7 @@ function intcode2 (part, inputStr, DEBUG = false) {
       }
 
       else if (opcode === '07') {
+
         const operandA = arg1 === null ? null : opcodeData[OPCODE_LEN - 3] === '1' ? arg1 : REGISTERS[arg1];
         const operandB = arg2 === null ? null : opcodeData[OPCODE_LEN - 4] === '1' ? arg2 : REGISTERS[arg2];
         const writeIdx = arg3;
@@ -229,6 +232,7 @@ function intcode2 (part, inputStr, DEBUG = false) {
       }
 
       else if (opcode === '08') {
+
         const operandA = arg1 === null ? null : opcodeData[OPCODE_LEN - 3] === '1' ? arg1 : REGISTERS[arg1];
         const operandB = arg2 === null ? null : opcodeData[OPCODE_LEN - 4] === '1' ? arg2 : REGISTERS[arg2];
         const writeIdx = arg3;
