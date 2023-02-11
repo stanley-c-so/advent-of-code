@@ -210,6 +210,9 @@ function intcode4 (part, inputStr, DEBUG = false) {
           throw `ERROR AT INDEX ${i}: ARGUMENTS CONTAIN null: ${readValue}`;
         }
 
+        // OUTPUT IS CONTEXTUAL!
+        // in this problem, we are told to push output to an array
+        
         OUTPUT.push(readValue);
 
         i += 2;

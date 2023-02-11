@@ -181,6 +181,9 @@ function intcode3 (part, inputStr, DEBUG = false) {
           throw `ERROR AT INDEX ${i}: ARGUMENTS CONTAIN null: ${readValue}`;
         }
 
+        // OUTPUT IS CONTEXTUAL!
+        // in this problem, we are told to treat use the output as the output signal of the amp
+
         outputSignal = readValue;
 
         if (part === 1 && ampNum === 4) {                                                                       // PART 1: on ampNum 4, this is the final output
