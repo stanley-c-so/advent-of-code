@@ -251,12 +251,8 @@ function intcode5 (part, inputStr, DEBUG = false) {
         } else {
 
           paint = null;
-          if (readValue === 0) {
-            dir = (dir + 4 - 1) % 4;
-          }
-          else if (readValue === 1) {
-            dir = (dir + 1) % 4;
-          }
+          if (readValue === 0) dir = (dir + 4 - 1) % 4;
+          else if (readValue === 1) dir = (dir + 1) % 4;
           else throw `ERROR: INVALID PAINT OUTPUT ${paint}`;
           
           const [ dy, dx ] = DELTAS[dir];
