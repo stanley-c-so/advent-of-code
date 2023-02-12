@@ -197,7 +197,7 @@ function asteroidLineOfSight (part, inputStr, extraParam, DEBUG = false) {
   }
 
   // ANALYZE
-  if (part === 1) {
+  if (part === 1) {                                                 // PART 1: FIND THE NUMBER OF VISIBLE ASTEROIDS FROM THE ASTEROID THAT CAN SEE THE MOST
 
     // INIT
     let maxAsteroids = 0;
@@ -233,7 +233,7 @@ function asteroidLineOfSight (part, inputStr, extraParam, DEBUG = false) {
 
     return maxAsteroids;
 
-  } else {
+  } else {                                                          // PART 2: SHOOT DOWN THE ASTEROIDS WITH SPINNING LASER AND DETERMINE THE 200th ONE
 
     const [ LASER_Y, LASER_X ] = extraParam.laserCoords;
     const idxOfLaser = ASTEROIDS.findIndex(asteroid => asteroid[0] === LASER_Y && asteroid[1] === LASER_X);

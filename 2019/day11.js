@@ -369,7 +369,7 @@ function intcode5 (part, inputStr, DEBUG = false) {
   // INIT
   let [ y, x ] = [ 0, 0 ];
   let dir = 0;
-  if (part === 2) WHITE.add('0,0');
+  if (part === 2) WHITE.add('0,0');                                       // PART 2: THE START PANEL IS WHITE
 
   // RUN INTCODE COMPUTER
   runIntcode();
