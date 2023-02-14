@@ -84,6 +84,8 @@ function intcode6 (part, inputStr, DEBUG = false) {
       GRID[STATE.paddle.y][STATE.paddle.x] = '_';
 
       for (const row of GRID) console.log(row.join(' '));
+      console.log(`SCORE: ${STATE.score}`);
+      console.log('');
     }
 
     // UTILITY FUNCTION THAT TAKES A NUM AND STANDARDIZES ITS FORMAT BY PADDING ITS START AND KEEPING ITS NEGATIVE SIGN
@@ -178,7 +180,7 @@ function intcode6 (part, inputStr, DEBUG = false) {
       block: new Set(),
       paddle: { x: null, y: null },
       ball: { x: null, y: null },
-      score: null,
+      score: 0,
     };
 
     while (i < REGISTERS.length) {
@@ -265,6 +267,7 @@ function intcode6 (part, inputStr, DEBUG = false) {
           if (OUTPUT_TEMP[0] === -1) {
             if (OUTPUT_TEMP[1] === 0) {
               STATE.score = OUTPUT_TEMP[2];
+              drawState();                                                                // draw state whenever score changes
             }
             else throw `ERROR: X IS -1 BUT Y IS NOT 0 - ${OUTPUT_TEMP[1]}`;
           }
@@ -362,7 +365,7 @@ function intcode6 (part, inputStr, DEBUG = false) {
       }
 
       else if (opcode === '99') {
-        drawState();                                                                      // try putting this in other places too for fun
+        drawState();                                                                      // final position; try putting this in other places too for fun
         break;
       }
 
@@ -402,7 +405,7 @@ const sortedFunc = (...args) => func(...args).sort();                   // used 
 const modFunc = (...args) => func(...args) % 1000000007;                // used when the output is very large
 const skippedTests = new Set([  ]);
 const lowestTest = 0;
-const highestTest = 1;
+const highestTest = 0;
 
 const fs = require('fs');
 const path = require('path');
