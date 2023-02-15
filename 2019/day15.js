@@ -281,9 +281,6 @@ function intcode7 (part, inputStr, DEBUG = false) {
         const DIR_TO_INPUT_DIRECTION_MAPPING = [ 1, 4, 2, 3 ];
         const input = DIR_TO_INPUT_DIRECTION_MAPPING[dir];
 
-        // console.log(`INPUT: ${input}`)
-        // console.log(`now at: ${y}, ${x}`)
-
         writeToRegisters(writeIdx, input);
         
         i += 2;
@@ -302,8 +299,6 @@ function intcode7 (part, inputStr, DEBUG = false) {
         // in this problem, we are told to use output information to determine if we hit a wall or not.
         const [ dy, dx ] = DELTAS[dir];
         if (readValue === 0) {
-          // console.log(`at ${y}, ${x}, dir ${dir} | hit wall!`)
-          // OUTPUT.push(readValue);
           WALLS.add(`${y + dy},${x + dx}`);
           updateExtrema(y + dy, x + dx);
           if (hugLeftWall) {
@@ -454,11 +449,6 @@ function intcode7 (part, inputStr, DEBUG = false) {
   if (oxygenTankX !== doubleCheckOxygenTankX) {
     throw `ERROR: TANK X COORDS DO NOT MATCH - ${oxygenTankX} vs ${doubleCheckOxygenTankX}`;
   }
-  // console.log(oxygenTankY, oxygenTankX);
-  // console.log(doubleCheckOxygenTankY, doubleCheckOxygenTankX);
-  // console.log(minY, maxY);
-  // console.log(minX, maxX);
-
   // BUILD GRID - OPTIONAL
   const H = maxY - minY + 1;
   const W = maxX - minX + 1;
