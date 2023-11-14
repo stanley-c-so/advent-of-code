@@ -27,7 +27,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
   #   
   #   
 
-  # TIME_AT_START = time.time()
+  TIME_AT_START = time.time()
 
   # ANALYZE
   if part == 1:
