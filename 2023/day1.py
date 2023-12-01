@@ -68,7 +68,28 @@ def find_first_and_last_nums_and_add(part, input_str, DEBUG = False):
 
   # CONSTANTS
 
-  DIGITS = {
+  PART_1_DIGITS = {
+    '1': 1,
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5': 5,
+    '6': 6,
+    '7': 7,
+    '8': 8,
+    '9': 9,
+  }
+
+  PART_2_DIGITS = {
+    '1': 1,
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5': 5,
+    '6': 6,
+    '7': 7,
+    '8': 8,
+    '9': 9,
     'one': 1,
     'two': 2,
     'three': 3,
@@ -79,6 +100,8 @@ def find_first_and_last_nums_and_add(part, input_str, DEBUG = False):
     'eight': 8,
     'nine': 9,
   }
+
+  DIGITS = PART_1_DIGITS if part == 1 else PART_2_DIGITS
 
 
   # ANALYZE
@@ -92,35 +115,25 @@ def find_first_and_last_nums_and_add(part, input_str, DEBUG = False):
     # going forward
     for i in range(len(s)):
 
-      # check for digit
-      if s[i].isdigit():
-        tens = int(s[i])
-        break
+      for digit in DIGITS:
+        if s[i : i + len(digit)] == digit:
+          tens = DIGITS[digit]
+          break
 
-      # PART 2 ONLY: check for string
-      if part == 2:
-        for digit in DIGITS:
-          if s[i:i+len(digit)] == digit:
-            tens = DIGITS[digit]
-            break        
-        if tens != None: break
+      if tens != None: break
+
 
     # going backward
     for i in range(len(s) - 1, -1, -1):
 
-      # check for digit
-      if s[i].isdigit():
-        ones = int(s[i])
-        break
+      for digit in DIGITS:
+        if s[i : i + len(digit)] == digit:
+          ones = DIGITS[digit]
+          break
 
-      # PART 2 ONLY: check for string
-      if part == 2:
-        for digit in DIGITS:
-          if s[i:i+len(digit)] == digit:
-            ones = DIGITS[digit]
-            break
-        if ones != None: break
+      if ones != None: break
 
+    # found tens and ones; now form the number and add to sum
     sum += tens * 10 + ones
 
   return sum
