@@ -19,6 +19,9 @@ DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
 def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
+
+  # PARSE INPUT DATA
+
   input_arr = input_str.split('\n')
   # input_arr = [ block.split('\n') for block in input_str.split('\n\n') ]
   print(input_arr)
@@ -29,7 +32,9 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
 
   TIME_AT_START = time.time()
 
+
   # ANALYZE
+
   if part == 1:
 
     pass
@@ -43,6 +48,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
     # return
 
     pass
+
 
 # TEST CASES
 
