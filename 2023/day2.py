@@ -75,21 +75,31 @@ def deduce_max_color_counts(part, input_str, DEBUG = False):
   data = { }
 
 
+  # CONSTANTS
+
+  RED, GREEN, BLUE = 'red', 'green', 'blue'
+  PART_1_LIMITS = {
+    RED: 12,
+    GREEN: 13,
+    BLUE: 14,
+  }
+
+
   # PARSE INPUT DATA
 
   input_arr = input_str.split('\n')
 
-  for line in input_arr:
+  for line in input_arr:                                        # e.g. 'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'
 
     # init dictionary
-    max_count = { 'blue': 0, 'red': 0, 'green': 0 }
+    max_count = { RED: 0, GREEN: 0, BLUE: 0 }
 
     # parse text
-    [ game_num, game_data ] = line.split(': ')
-    id = int(game_num.split(' ')[1])
-    for draw_data in game_data.split('; '):
-      for color_result in draw_data.split(', '):
-        [ count, color ] = color_result.split(' ')
+    [ game_num, game_data ] = line.split(': ')                  # e.g. [ 'Game 1', '3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green' ]
+    id = int(game_num.split(' ')[1])                            # e.g. 1
+    for draw_data in game_data.split('; '):                     # e.g. for draw_data in [ '3 blue, 4 red', '1 red, 2 green, 6 blue', '2 green' ]
+      for color_result in draw_data.split(', '):                # e.g. for color_result in [ '3 blue', '4 red' ]
+        [ count, color ] = color_result.split(' ')              # e.g. [ '3', 'blue' ]
         max_count[color] = max(max_count[color], int(count))
 
     data[id] = max_count
@@ -103,11 +113,13 @@ def deduce_max_color_counts(part, input_str, DEBUG = False):
   for id in data:
 
     # PART 1
-    if data[id]['red'] <= 12 and data[id]['green'] <= 13 and data[id]['blue'] <= 14:
+    if data[id][RED] <= PART_1_LIMITS[RED] and \
+      data[id][GREEN] <= PART_1_LIMITS[GREEN] and \
+      data[id][BLUE] <= PART_1_LIMITS[BLUE]:
       id_sum += id
 
     # PART 2
-    power_sum += data[id]['red'] * data[id]['green'] * data[id]['blue']
+    power_sum += data[id][RED] * data[id][GREEN] * data[id][BLUE]
 
   return id_sum if part == 1 else power_sum
 
