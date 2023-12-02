@@ -84,7 +84,7 @@ def deduce_max_color_counts(part, input_str, DEBUG = False):
     # init dictionary
     max_count = { 'blue': 0, 'red': 0, 'green': 0 }
 
-
+    # parse text
     [ game_num, game_data ] = line.split(': ')
     id = int(game_num.split(' ')[1])
     for draw_data in game_data.split('; '):
