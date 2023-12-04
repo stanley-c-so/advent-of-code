@@ -103,6 +103,7 @@ def analyze_symbols_near_numbers(part, input_str, DEBUG = False):
           'num': int(line[start_idx : (i + 1 if is_digit else i)]),
         })
         start_idx = None
+    assert start_idx == None
 
 
   # CONSTANTS

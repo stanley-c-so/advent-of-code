@@ -134,6 +134,8 @@ def find_first_and_last_nums_and_add(part, input_str, DEBUG = False):
       if ones != None: break
 
     # found tens and ones; now form the number and add to sum
+    assert tens != None
+    assert ones != None
     sum += tens * 10 + ones
 
   return sum

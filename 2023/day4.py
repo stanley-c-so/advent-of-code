@@ -95,17 +95,18 @@ def find_matches_between_datasets(part, input_str, DEBUG = False):
 
   input_arr = input_str.split('\n')
 
+  # Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
   for line in input_arr:
-    [ card_num_data, num_data ] = line.split(': ')
-    card_num = int(card_num_data.split()[1])
-    [ winning_nums, your_nums ] = num_data.split(' | ')
-    winning_nums_set = set(winning_nums.split())
-    your_nums_set = set(your_nums.split())
+    [ card_num_data, num_data ] = line.split(': ')                    # e.g. [ 'Card 1', '41 48 83 86 17 | 83 86  6 31 17  9 48 53' ]
+    card_num = int(card_num_data.split()[1])                          # e.g. 1
+    [ winning_nums, card_nums ] = num_data.split(' | ')               # e.g. [ '41 48 83 86 17', '83 86  6 31 17  9 48 53' ]
+    winning_nums_set = set([ int(n) for n in winning_nums.split() ])  # e.g. { '41', '48', '83', '86', '17' }
+    card_nums_set = set([ int(n) for n in card_nums.split() ])        # e.g. { '83', '86', '6', '31', '17', '9', '48', '53' }
 
     card_matches[card_num] = 0
 
-    for num in your_nums_set:
-      if num in winning_nums_set:
+    for num in winning_nums_set:
+      if num in card_nums_set:
         card_matches[card_num] += 1
 
 
