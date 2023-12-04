@@ -150,25 +150,32 @@ def analyze_symbols_near_numbers(part, input_str, DEBUG = False):
     check_start_idx = max(start_idx - 1, 0)
     check_end_idx = min(end_idx + 1, W - 1)
 
+    output = []
+
     # check line above
     if row > 0:
       for i in range(check_start_idx, check_end_idx + 1):
         if input_arr[row - 1][i] == GEAR:
-          return (row - 1, i)
+          output.append((row - 1, i))
 
     # check same line, before and after
     if check_start_idx > 0 and input_arr[row][check_start_idx] == GEAR:
-      return (row, check_start_idx)
+      output.append((row, check_start_idx))
     if check_end_idx < W - 1 and input_arr[row][check_end_idx] == GEAR:
-      return (row, check_end_idx)
+      output.append((row, check_end_idx))
 
     # check line below
     if row < H - 1:
       for i in range(check_start_idx, check_end_idx + 1):
         if input_arr[row + 1][i] == GEAR:
-          return (row + 1, i)
+          output.append((row + 1, i))
 
-    return None
+    # NOTE: THE PROBLEM NEVER PROMISES THAT A NUMBER WILL BE ADJACENT TO AT MOST ONE GEAR.
+    # MY SOLUTION SUPPORTS THE POSSIBILITY THAT A NUMBER CAN BE NEXT TO MULTIPLE GEARS.
+    # HOWEVER, OUT OF CURIOSITY I PUT IN THIS ASSERT AND I SEE THAT A NUMBER IS NEVER ADJACENT TO MORE THAN ONE GEAR.
+    assert len(output) <= 1
+
+    return output
 
 
   # ANALYZE
@@ -186,8 +193,7 @@ def analyze_symbols_near_numbers(part, input_str, DEBUG = False):
 
     # STEP 1: gather data on adjacent gears
     for data in numbers_data:                                       # run through all numbers
-      gear_loc = get_pos_of_adjacent_gear(data)
-      if gear_loc != None:                                          # if a gear is found...
+      for gear_loc in get_pos_of_adjacent_gear(data):
         if gear_loc not in gears_data: gears_data[gear_loc] = []
         gears_data[gear_loc].append(data['num'])                    # ...file the current number under that gear's location
 
