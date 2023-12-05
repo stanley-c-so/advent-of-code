@@ -386,7 +386,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
     # FINAL RESULTS
 
     seeds_ranges.reverse()
-    if DEBUG:
+    if DISPLAY_EXTRA_INFO:
       print(f'~~~~~ FINAL RESULTS: {seeds_ranges}')
     return seeds_ranges[0][0]
 
