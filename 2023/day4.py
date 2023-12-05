@@ -76,6 +76,7 @@ Process all of the original and copied scratchcards until no more scratchcards a
 import time
 import pathlib
 import os
+import math
 
 # MODULES
 from _test import test
