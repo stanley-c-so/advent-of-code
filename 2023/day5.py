@@ -134,7 +134,7 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
+def map_ranges(part, input_str, DEBUG = False):
 
   # DATA STRUCTURES
 
@@ -161,6 +161,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
   input_blocks = input_str.split('\n\n')
 
   seeds_data = [ int(n) for n in input_blocks[0].split(': ')[1].split(' ') ]
+
   seed_to_soil_data = [ [ int(n) for n in s.split(' ') ] for s in input_blocks[1].split('\n')[1:] ]
   for line in seed_to_soil_data:
     [dest, src, rangelen] = line
@@ -172,26 +173,31 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
     [dest, src, rangelen] = line
     soil_to_fertilizer_ranges.append({ 'range': [src, src + rangelen - 1], 'delta': dest - src })
     soil_to_fertilizer_ranges.sort(key=lambda data: data['range'][0], reverse=True)
+
   fertilizer_to_water_data = [ [ int(n) for n in s.split(' ') ] for s in input_blocks[3].split('\n')[1:] ]
   for line in fertilizer_to_water_data:
     [dest, src, rangelen] = line
     fertilizer_to_water_ranges.append({ 'range': [src, src + rangelen - 1], 'delta': dest - src })
     fertilizer_to_water_ranges.sort(key=lambda data: data['range'][0], reverse=True)
+
   water_to_light_data = [ [ int(n) for n in s.split(' ') ] for s in input_blocks[4].split('\n')[1:] ]
   for line in water_to_light_data:
     [dest, src, rangelen] = line
     water_to_light_ranges.append({ 'range': [src, src + rangelen - 1], 'delta': dest - src })
     water_to_light_ranges.sort(key=lambda data: data['range'][0], reverse=True)
+
   light_to_temperature_data = [ [ int(n) for n in s.split(' ') ] for s in input_blocks[5].split('\n')[1:] ]
   for line in light_to_temperature_data:
     [dest, src, rangelen] = line
     light_to_temperature_ranges.append({ 'range': [src, src + rangelen - 1], 'delta': dest - src })
     light_to_temperature_ranges.sort(key=lambda data: data['range'][0], reverse=True)
+
   temperature_to_humidity_data = [ [ int(n) for n in s.split(' ') ] for s in input_blocks[6].split('\n')[1:] ]
   for line in temperature_to_humidity_data:
     [dest, src, rangelen] = line
     temperature_to_humidity_ranges.append({ 'range': [src, src + rangelen - 1], 'delta': dest - src })
     temperature_to_humidity_ranges.sort(key=lambda data: data['range'][0], reverse=True)
+
   humidity_to_location_data = [ [ int(n) for n in s.split(' ') ] for s in input_blocks[7].split('\n')[1:] ]
   for line in humidity_to_location_data:
     [dest, src, rangelen] = line
@@ -334,6 +340,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
 
             # pop conversion interval
             ALL_RANGES[RANGE].pop()
+
           # current conversion interval ends before end of current seed interval
           elif ALL_RANGES[RANGE][-1]['range'][1] < seeds_ranges[-1][1]:
             if DEBUG: print('case B-ii (PARTIAL OVERLAP, CONVERSION INTERVAL ENDS EARLIER)')
@@ -396,7 +403,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
 test_num = [1]
 test_input = None
 test_expected = None
-func = NAME_OF_FUNC_HERE
+func = map_ranges
 skipped_tests = set([ 2, 3, 4 ])
 skipped_tests = set([ 3, 4 ])
 skipped_tests = set([ 4 ])
