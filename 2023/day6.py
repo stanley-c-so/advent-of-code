@@ -113,7 +113,7 @@ def count_ways_to_win_race(part, input_str, DEBUG = False):
       time_limit = TIMES[race]
       distance_to_beat = DISTANCES[race]
       ways_to_win = 0
-      for charge_time in range(1, time_limit):        # note: no need to test 0, or time_limit, since those go 0 distance
+      for charge_time in range(1, time_limit):              # note: no need to test 0, or time_limit, since those go 0 distance
         remaining_time = time_limit - charge_time
         speed = charge_time
         distance = speed * remaining_time
@@ -138,7 +138,7 @@ def count_ways_to_win_race(part, input_str, DEBUG = False):
 
     ways_to_win = 0
 
-    for charge_time in range(1, time_limit):
+    for charge_time in range(1, time_limit):                # note: no need to test 0, or time_limit, since those go 0 distance
       remaining_time = time_limit - charge_time
       speed = charge_time
       distance = speed * remaining_time
