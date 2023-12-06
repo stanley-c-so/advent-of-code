@@ -125,7 +125,8 @@ Consider all of the initial seed numbers listed in the ranges on the first line 
 import time
 import pathlib
 import os
-import math
+from math import *
+from functools import *
 
 # MODULES
 from _test import test

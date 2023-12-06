@@ -10,7 +10,8 @@ COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
 import time
 import pathlib
 import os
-import math
+from math import *
+from functools import *
 
 # MODULES
 from _test import test
@@ -31,10 +32,9 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
   #   
   #   
 
-  TIME_AT_START = time.time()
-
-
   # ANALYZE
+
+  TIME_AT_START = time.time()
 
   if part == 1:
 
@@ -45,7 +45,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
     # if not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
 
 
-    # if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)/1000} SECS)")
+    # if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
     # return
 
     pass

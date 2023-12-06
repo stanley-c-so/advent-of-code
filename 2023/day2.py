@@ -60,7 +60,8 @@ For each game, find the minimum set of cubes that must have been present. What i
 import time
 import pathlib
 import os
-import math
+from math import *
+from functools import *
 
 # MODULES
 from _test import test
