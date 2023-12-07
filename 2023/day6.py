@@ -87,65 +87,83 @@ def count_ways_to_win_race(part, input_str, DEBUG = False):
 
   input_arr = input_str.split('\n')
 
+  if part == 1:
+
+    TIMES = [ int(n) for n in input_arr[0].split()[1:] ]
+    DISTANCES = [ int(n) for n in input_arr[1].split()[1:] ]
+
+  else:
+
+    JOINED_TIME = ''.join(input_arr[0].split()[1:])
+    JOINED_DISTANCE = ''.join(input_arr[1].split()[1:])
+    TIMES = [ int(JOINED_TIME) ]
+    DISTANCES = [ int(JOINED_DISTANCE) ]
+
+
+  # CONSTANT
+
+  NUM_RACES = len(TIMES)
+
+
+  # INIT
+
+  ways_to_win_list = []
+
+
+  # # SOLUTION 1: BRUTE FORCE
+
+  # # ANALYZE
+
+  # TIME_AT_START = time.time()
+
+  # if not DEBUG and part == 2: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
+
+  # for race in range(NUM_RACES):
+  #   time_limit = TIMES[race]
+  #   distance_to_beat = DISTANCES[race]
+  #   ways_to_win = 0
+  #   for charge_time in range(1, time_limit):              # note: no need to test 0, or time_limit, since those go 0 distance
+  #     remaining_time = time_limit - charge_time
+  #     speed = charge_time
+  #     distance = speed * remaining_time
+  #     if distance > distance_to_beat: ways_to_win += 1
+  #   ways_to_win_list.append(ways_to_win)
+
+  # print(ways_to_win_list)
+
+  # if not DEBUG and part == 2: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
+  # return reduce((lambda a, b: a * b), ways_to_win_list)
+
+
+  # SOLUTION 2: QUADRATIC FORMULA
+
+  # Let x = charge time = speed
+  # distance_to_beat = (time_limit - x) * (x)
+  # => -x^2 + time_limit * x - distance_to_beat = 0
+  # => solutions for x: (-(time_limit) +/- sqrt(time_limit^2 - 4*distance_to_beat)) / -2
 
   # ANALYZE
 
   TIME_AT_START = time.time()
 
-  if part == 1:
+  if not DEBUG and part == 2: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
 
-    # PARSE INPUT DATA
+  for race in range(NUM_RACES):
+    time_limit = TIMES[race]
+    distance_to_beat = DISTANCES[race]
 
-    TIMES = [ int(n) for n in input_arr[0].split()[1:] ]
-    DISTANCES = [ int(n) for n in input_arr[1].split()[1:] ]
+    lowest_charge_time = (-time_limit + sqrt(time_limit**2 - 4*distance_to_beat)) / -2
+    if lowest_charge_time == ceil(lowest_charge_time): lowest_charge_time = int(lowest_charge_time) + 1         # you must BEAT distance_to_beat
+    else: lowest_charge_time = ceil(lowest_charge_time)
 
+    highest_charge_time = (-time_limit - sqrt(time_limit**2 - 4*distance_to_beat)) / -2
+    if highest_charge_time == floor(highest_charge_time): highest_charge_time = int(highest_charge_time) - 1    # you must BEAT distance_to_beat
+    else: highest_charge_time = floor(highest_charge_time)
 
-    # CONSTANTS
-
-    NUM_RACES = len(TIMES)
-
-
-    # ANALYZE
-
-    ways_to_win_list = []
-
-    for race in range(NUM_RACES):
-      time_limit = TIMES[race]
-      distance_to_beat = DISTANCES[race]
-      ways_to_win = 0
-      for charge_time in range(1, time_limit):              # note: no need to test 0, or time_limit, since those go 0 distance
-        remaining_time = time_limit - charge_time
-        speed = charge_time
-        distance = speed * remaining_time
-        if distance > distance_to_beat: ways_to_win += 1
-      ways_to_win_list.append(ways_to_win)
-
-    return reduce((lambda a, b: a * b), ways_to_win_list)
-
-  else:
-
-    if not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
-
-    # PARSE INPUT DATA
-
-    TIMES = input_arr[0].split()[1:]
-    DISTANCES = input_arr[1].split()[1:]
-    time_limit = int(''.join(TIMES))
-    distance_to_beat = int(''.join(DISTANCES))
-
-
-    # ANALYZE
-
-    ways_to_win = 0
-
-    for charge_time in range(1, time_limit):                # note: no need to test 0, or time_limit, since those go 0 distance
-      remaining_time = time_limit - charge_time
-      speed = charge_time
-      distance = speed * remaining_time
-      if distance > distance_to_beat: ways_to_win += 1
-
-    if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
-    return ways_to_win
+    ways_to_win_list.append(highest_charge_time - lowest_charge_time + 1)
+  
+  if not DEBUG and part == 2: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
+  return reduce((lambda a, b: a * b), ways_to_win_list)
 
 
 # TEST CASES
