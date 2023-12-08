@@ -174,18 +174,18 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
     
     if DISPLAY_EXTRA_INFO: print(periods)
 
-    # UTILITY FUNCTIONS
+    # # UTILITY FUNCTIONS - ALTHOUGH WE DON'T NEED THIS BECAUSE math ALREADY HAS lcm FUNCTION!
 
-    # uses Euclidean algorithm (https://en.wikipedia.org/wiki/Euclidean_algorithm)
-    # credit to Phrogz (https://stackoverflow.com/questions/4652468/is-there-a-javascript-function-that-reduces-a-fraction)
-    def GCD(num, denom):
-      num = abs(num)
-      denom = abs(denom)
-      return GCD(denom, num % denom) if denom else num
+    # # uses Euclidean algorithm (https://en.wikipedia.org/wiki/Euclidean_algorithm)
+    # # credit to Phrogz (https://stackoverflow.com/questions/4652468/is-there-a-javascript-function-that-reduces-a-fraction)
+    # def GCD(num, denom):
+    #   num = abs(num)
+    #   denom = abs(denom)
+    #   return GCD(denom, num % denom) if denom else num
 
-    # credit to w3resource (https://www.w3resource.com/javascript-exercises/javascript-math-exercise-10.php)
-    def LCM(num1, num2):
-      return 0 if (not num1 or not num2) else abs((num1 * num2) // GCD(num1, num2))
+    # # credit to w3resource (https://www.w3resource.com/javascript-exercises/javascript-math-exercise-10.php)
+    # def LCM(num1, num2):
+    #   return 0 if (not num1 or not num2) else abs((num1 * num2) // GCD(num1, num2))
 
 
     # FIND LCM OF ALL PERIODS
@@ -195,7 +195,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
       for i in range(len(node_list)):
         print(f"{node_list[i]}: {steps_list[i]} steps")
 
-    return reduce(lambda x, y: LCM(x, y), steps_list)
+    return reduce(lambda x, y: lcm(x, y), steps_list)
 
 
 # TEST CASES
