@@ -188,9 +188,9 @@ def sort_by_hand_strength(part, input_str, DEBUG = False):
 
     # SOLUTION 2: SET JOKER TO WHATEVER PIP HAS THE HIGHEST FREQUENCY
 
-    keys = list(filter(lambda k: k != 'J', freq.keys()))
-    keys.sort(key=lambda k: freq[k], reverse=True)
-    most_frequent_pip = keys[0]
+    keys_without_jokers = list(filter(lambda k: k != 'J', freq.keys()))
+    keys_without_jokers.sort(key=lambda k: freq[k], reverse=True)
+    most_frequent_pip = keys_without_jokers[0]
     hand_copy_list = [ c for c in hand ]
     hand_copy_list[first_idx] = most_frequent_pip
     hand_copy_list[last_idx] = most_frequent_pip
