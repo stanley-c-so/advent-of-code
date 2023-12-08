@@ -160,27 +160,41 @@ def sort_by_hand_strength(part, input_str, DEBUG = False):
       if values[1] == 2: return 7                       # five of a kind
       return 6                                          # four of a kind
 
-    # for all other scenarios, we have to try every possibility for the 1-2 jokers
     first_idx = hand.find('J')
     last_idx = hand.rfind('J')
-    if freq['J'] == 2:
-      best_rank = 1
-      for card1 in ALL_CARDS:
-        for card2 in ALL_CARDS:
-          hand_copy_list = [ c for c in hand ]
-          hand_copy_list[first_idx] = card1
-          hand_copy_list[last_idx] = card2
-          hand_copy = ''.join(hand_copy_list)
-          best_rank = max(best_rank, rank(hand_copy))
-      return best_rank
-    if freq['J'] == 1:
-      best_rank = 1
-      for card in ALL_CARDS:
-        hand_copy_list = [ c for c in hand ]
-        hand_copy_list[first_idx] = card
-        hand_copy = ''.join(hand_copy_list)
-        best_rank = max(best_rank, rank(hand_copy))
-      return best_rank
+
+    # # SOLUTION 1: TRY EVERY POSSIBILITY FOR JOKERS
+
+    # # for all other scenarios, we have to try every possibility for the 1-2 jokers
+    # if freq['J'] == 2:
+    #   best_rank = 1
+    #   for card1 in ALL_CARDS:
+    #     for card2 in ALL_CARDS:
+    #       hand_copy_list = [ c for c in hand ]
+    #       hand_copy_list[first_idx] = card1
+    #       hand_copy_list[last_idx] = card2
+    #       hand_copy = ''.join(hand_copy_list)
+    #       best_rank = max(best_rank, rank(hand_copy))
+    #   return best_rank
+    # if freq['J'] == 1:
+    #   best_rank = 1
+    #   for card in ALL_CARDS:
+    #     hand_copy_list = [ c for c in hand ]
+    #     hand_copy_list[first_idx] = card
+    #     hand_copy = ''.join(hand_copy_list)
+    #     best_rank = max(best_rank, rank(hand_copy))
+    #   return best_rank
+
+    # SOLUTION 2: SET JOKER TO WHATEVER PIP HAS THE HIGHEST FREQUENCY
+
+    keys = list(filter(lambda k: k != 'J', freq.keys()))
+    keys.sort(key=lambda k: freq[k], reverse=True)
+    most_frequent_pip = keys[0]
+    hand_copy_list = [ c for c in hand ]
+    hand_copy_list[first_idx] = most_frequent_pip
+    hand_copy_list[last_idx] = most_frequent_pip
+    hand_copy = ''.join(hand_copy_list)
+    return rank(hand_copy)
     
     # sanity check
     assert(False)
