@@ -116,36 +116,44 @@ DISPLAY_EXTRA_INFO = True
 
 def complete_the_sequence(part, input_str, DEBUG = False):
 
-  # PARSE INPUT DATA
-
-  input_arr = input_str.split('\n')
+  # INIT
 
   sum = 0
 
-  # ANALYZE
 
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
   for line in input_arr:
     nums = [ int(n) for n in line.split(' ') ]
+
+    # DATA STRUCTURE
     sequences = [ nums ]
     while not(all([ x == 0 for x in sequences[-1] ])):
       new_row = []
       for i in range(1, len(sequences[-1])):
         new_row.append(sequences[-1][i] - sequences[-1][i - 1])
       sequences.append(new_row)
+
+    # Add the new number (we can simply append, whether we are really supposed to be adding the 0 to the front or back)
     sequences[-1].append(0)
 
+    # PART 1: Work back through the sequences, figuring out the new end number
     if part == 1:
     
       for i in range(len(sequences) - 2, -1, -1):
-        last_num_of_prev_sequence = sequences[i + 1][-1]
-        sequences[i].append(sequences[i][-1] + last_num_of_prev_sequence)
+        last_num_of_sequence_below = sequences[i + 1][-1]
+        sequences[i].append(sequences[i][-1] + last_num_of_sequence_below)
+
       sum += sequences[0][-1]
 
+    # PART 2: Work back through the sequences, figuring out the new first number
     else:
 
       for i in range(len(sequences) - 2, -1, -1):
-        first_num_of_prev_sequence = sequences[i + 1][0]
-        sequences[i].insert(0, sequences[i][0] - first_num_of_prev_sequence)
+        first_num_of_sequence_below = sequences[i + 1][0]
+        sequences[i].insert(0, sequences[i][0] - first_num_of_sequence_below)
+        
       sum += sequences[0][0]
 
   return sum
