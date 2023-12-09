@@ -89,7 +89,7 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
+def find_sync_point_of_all_cycles(part, input_str, DEBUG = False):
 
   # DATA STRUCTURE
 
@@ -203,7 +203,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False):
 test_num = [1]
 test_input = None
 test_expected = None
-func = NAME_OF_FUNC_HERE
+func = find_sync_point_of_all_cycles
 skipped_tests = set([ 2, 3, 4 ])
 skipped_tests = set([ 3, 4 ])
 skipped_tests = set([ 4 ])
