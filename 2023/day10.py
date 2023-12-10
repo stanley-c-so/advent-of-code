@@ -504,11 +504,10 @@ test_num = [1]
 test_input = None
 test_expected = None
 func = analyze_contiguous_lines_and_regions
-skipped_tests = set([ 2, 3, 4 ])
-skipped_tests = set([ 3, 4 ])
-skipped_tests = set([ 1, 2, 3, 4, 5, 6 ])
+skipped_tests = set([ 3, 4, 5, 6, 7 ])
+skipped_tests = set([ 4, 5, 6, 7 ])
+skipped_tests = set([ 7 ])
 skipped_tests = set([  ])
-# skipped_tests = set([ 1, 2, 3, 5, 6, 7 ])
 lowest_test = 0
 highest_test = 0
 
@@ -525,7 +524,13 @@ sample_input = """.....
 .L-J.
 ....."""
 
-sample_input2 = """...........
+sample_input2 = """..F7.
+.FJ|.
+SJ.L7
+|F--J
+LJ..."""
+
+sample_input3 = """...........
 .S-------7.
 .|F-----7|.
 .||.....||.
@@ -535,7 +540,7 @@ sample_input2 = """...........
 .L--J.L--J.
 ..........."""
 
-sample_input3 = """..........
+sample_input4 = """..........
 .S------7.
 .|F----7|.
 .||....||.
@@ -545,7 +550,7 @@ sample_input3 = """..........
 .L--JL--J.
 .........."""
 
-sample_input4 = """.F----7F7F7F7F-7....
+sample_input5 = """.F----7F7F7F7F-7....
 .|F--7||||||||FJ....
 .||.FJ||||||||L7....
 FJL7L7LJLJ||LJ.L-7..
@@ -556,7 +561,7 @@ L--J.L7...LJS7F-7L7.
 ....FJL-7.||.||||...
 ....L---J.LJ.LJLJ..."""
 
-sample_input5 = """FF7FSF7F7F7F7F7F---7
+sample_input6 = """FF7FSF7F7F7F7F7F---7
 L|LJ||||||||||||F--J
 FL-7LJLJ||||||LJL-77
 F--JF--7||LJLJ7F7FJ-
@@ -579,18 +584,18 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 # Test case 2
 test_input = {
   'part': 1,
-  'input_str': actual_input,
+  'input_str': sample_input2,
+  'DEBUG': True,
 }
-test_expected = 6815
+test_expected = 8
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
 # Test case 3
 test_input = {
-  'part': 2,
-  'input_str': sample_input2,
-  'DEBUG': True,
+  'part': 1,
+  'input_str': actual_input,
 }
-test_expected = 4
+test_expected = 6815
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
 # Test case 4
@@ -608,7 +613,7 @@ test_input = {
   'input_str': sample_input4,
   'DEBUG': True,
 }
-test_expected = 8
+test_expected = 4
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
 # Test case 6
@@ -617,10 +622,19 @@ test_input = {
   'input_str': sample_input5,
   'DEBUG': True,
 }
-test_expected = 10
+test_expected = 8
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
 # Test case 7
+test_input = {
+  'part': 2,
+  'input_str': sample_input6,
+  'DEBUG': True,
+}
+test_expected = 10
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 8
 test_input = {
   'part': 2,
   'input_str': actual_input,
