@@ -225,6 +225,9 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
+
+# SOLUTION 1: FOR PART 2, DOUBLE THE RESOLUTION AND FLOOD FILL
+
 def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
 
   # PARSE INPUT DATA
@@ -236,6 +239,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
 
   H = len(input_arr)
   W = len(input_arr[0])
+  SPACE = '.'
 
   DELTAS_BY_DIR = {
     'U': (-1, 0),
@@ -251,7 +255,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
     'J': ['U', 'L'],
     '7': ['D', 'L'],
     'F': ['D', 'R'],
-    '.': [],
+    SPACE: [],
   }
 
 
@@ -421,7 +425,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
 
     # NEW DATA STRUCTURE
 
-    EXPANDED_MAP = [['.'] * EXPANDED_W for _ in range(EXPANDED_H)]
+    EXPANDED_MAP = [[SPACE] * EXPANDED_W for _ in range(EXPANDED_H)]
 
 
     # FIND AND MARK ORIGINAL PIPES, AND FILL IN GAPS
@@ -488,7 +492,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
         if r % 2 == 0 and c % 2 == 0 and EXPANDED_MAP[r][c] != X:           # i.e. if these coords map to an original set of coords
           count += 1
           if PRINT_PART2_MAP:
-            MAP[r // 2][c // 2] = '.'                                       # clear the corresponding coords in the original MAP
+            MAP[r // 2][c // 2] = SPACE                                     # clear the corresponding coords in the original MAP
 
     if PRINT_PART2_MAP:
       print('FILLED ORIGINAL MAP:')
@@ -498,12 +502,154 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
     return count
 
 
+# SOLUTION 2: FOR PART 2, USE PARITY TO DETERMINE WHETHER REGION IS INSIDE OR OUTSIDE
+
+def analyze_contiguous_lines_and_regions2(part, input_str, DEBUG = False):
+
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
+
+
+  # CONSTANTS
+
+  H = len(input_arr)
+  W = len(input_arr[0])
+  SPACE = '.'
+
+  DELTAS_BY_DIR = {
+    'U': (-1, 0),
+    'D': (+1, 0),
+    'L': (0, -1),
+    'R': (0, +1),
+  }
+
+  DELTAS_BY_PIPE_TYPE = {
+    '|': ['U', 'D'],
+    '-': ['L', 'R'],
+    'L': ['U', 'R'],
+    'J': ['U', 'L'],
+    '7': ['D', 'L'],
+    'F': ['D', 'R'],
+    SPACE: [],
+  }
+
+
+  # DATA STRUCTURE
+
+  MAP = [[None] * W for _ in range(H)]
+
+
+  # FIND STARTING POINT AND TYPE, POPULATE MAP DATA STRUCTURE
+
+  start_row = None
+  start_col = None
+  starting_type = None
+  for row in range(H):
+    MAP[row] = [ c for c in input_arr[row] ]
+    if start_row == None:
+      for col in range(W):
+        if MAP[row][col] == 'S':
+          start_row = row
+          start_col = col
+          break
+
+  connects_up = 'D' in DELTAS_BY_PIPE_TYPE[input_arr[start_row - 1][start_col]]
+  connects_down = 'U' in DELTAS_BY_PIPE_TYPE[input_arr[start_row + 1][start_col]]
+  connects_left = 'R' in DELTAS_BY_PIPE_TYPE[input_arr[start_row][start_col - 1]]
+  connects_right = 'L' in DELTAS_BY_PIPE_TYPE[input_arr[start_row][start_col + 1]]
+
+  if connects_up and connects_down:       starting_type = '|'
+  elif connects_up and connects_left:     starting_type = 'J'
+  elif connects_up and connects_right:    starting_type = 'L'
+  elif connects_down and connects_left:   starting_type = '7'
+  elif connects_down and connects_right:  starting_type = 'F'
+  elif connects_left and connects_right:  starting_type = '-'
+  else:                                   assert(False)
+
+  MAP[start_row][start_col] = starting_type
+
+
+  # ANALYZE
+
+  if part == 1:
+
+    return analyze_contiguous_lines_and_regions(part, input_str, DEBUG)     # COPY SOLUTION 1
+
+  else:
+
+    # CLEAR NON-PIPE COORDS WITH EMPTY SPACE
+
+    visited = {}
+    Q = deque()
+    Q.append((start_row, start_col, 0))
+    while len(Q):
+      (row, col, moves) = Q.popleft()
+      if (row, col) in visited: continue
+      visited[(row, col)] = moves
+      pipe_type = MAP[row][col]
+      for dir in DELTAS_BY_PIPE_TYPE[pipe_type]:
+        (dy, dx) = DELTAS_BY_DIR[dir]
+        Q.append((row + dy, col + dx, moves + 1))
+
+    for r in range(H):
+      for c in range(W):
+        if (r, c) not in visited:
+          MAP[r][c] = SPACE                                                 # clear all sections that are not from the pipe
+
+    if DISPLAY_EXTRA_INFO:
+      for r in MAP:
+        print(''.join(r))
+
+
+    """
+    We will go row by row, and keep track of a bool `inside` to determine whether we are currently inside or outside of the pipe area.
+    For each row we always start with `inside` set to False. The idea is that if we pick an arbitrary direction (left is convenient, since we naturally
+    scan from left to right), and we count how many pipes we cross to get to the edge of the diagram, whether the count is odd/even should tell us whether
+    we are inside/outside because that is how many times we have crossed a boundary.
+
+    There are some pitfalls, however. Consider the following shape, from the point of view of 'x':
+
+    ..|......
+    ..L---7.x
+    ......|..
+
+    Note that we should not count the horizontal pipes (-).
+
+    Should we count both the L and the 7? If so, then we get an even number, even though it should really be odd.
+
+    So it turns out the solution will work if we only count vertical pipes (|), and half the corners (say, L and J, OR F and 7).
+    Note that L and 7, or F and J will not work. The diagram I drew above illustrates L---7 and why that is crossing a boundary
+    but should not be even. Similarly:
+
+    ......|..
+    ..F---J.x
+    ..|......
+
+    Here, going left would eventually cross the boundary once, but would pass over an even number of corners.
+
+    """
+
+    PIPES_THAT_FLIP_BOOL = { '|', 'J', 'L' }                                # pick either this set...
+    PIPES_THAT_FLIP_BOOL = { '|', 'F', '7' }                                # ...or this set
+
+    count = 0
+    for r in range(H):
+      inside = False
+      for c in range(W):
+        if MAP[r][c] == SPACE and inside:
+          count += 1
+        elif MAP[r][c] in PIPES_THAT_FLIP_BOOL:
+          inside = not inside
+
+    return count
+
 # TEST CASES
 
 test_num = [1]
 test_input = None
 test_expected = None
-func = analyze_contiguous_lines_and_regions
+func = analyze_contiguous_lines_and_regions2
 skipped_tests = set([ 3, 4, 5, 6, 7 ])
 skipped_tests = set([ 4, 5, 6, 7 ])
 skipped_tests = set([ 7 ])
