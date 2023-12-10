@@ -485,7 +485,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
 
     for r in range(EXPANDED_H):
       for c in range(EXPANDED_W):
-        if r % 2 == 0 and c % 2 == 0 and EXPANDED_MAP[r][c] != X:
+        if r % 2 == 0 and c % 2 == 0 and EXPANDED_MAP[r][c] != X:           # i.e. if these coords map to an original set of coords
           count += 1
           if PRINT_PART2_MAP:
             MAP[r // 2][c // 2] = '.'                                       # clear the corresponding coords in the original MAP
