@@ -180,6 +180,9 @@ def count_ways_to_divide_data_into_segments_with_dp(part, input_str, DEBUG = Fal
 
   # ANALYZE
 
+  TIME_AT_START = time.time()
+  if part == 2: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
+
   for line in input_arr:
 
     [data, nums_str] = line.split(' ')
@@ -196,6 +199,7 @@ def count_ways_to_divide_data_into_segments_with_dp(part, input_str, DEBUG = Fal
     if DISPLAY_EXTRA_INFO: possible_arrangements.append(res)
 
   if DISPLAY_EXTRA_INFO: print(f'RESULTS: {possible_arrangements}')
+  if part == 2: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
   return possible_arrangements_count
 
 
