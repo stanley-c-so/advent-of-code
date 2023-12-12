@@ -135,37 +135,38 @@ def count_ways_to_divide_data_into_segments_with_dp(part, input_str, DEBUG = Fal
 
   # DATA STRUCTURES
 
-  if DEBUG: possible_arrangements = []
+  if DISPLAY_EXTRA_INFO: possible_arrangements = []
   possible_arrangements_count = 0
 
 
   # HELPER FUNCTION - USES MEMOIZATION
 
-  def solve(i, nums, dp):
+  def solve(nums, i, nums_i, dp):
 
-    serial = (i, *tuple(nums))
+    serial = (i, nums_i)
 
     if serial not in dp:
 
       nums_remaining = len(data) - i
 
       # BASE CASE: used up all nums - if there are any remaining # then it's invalid, else it's valid
-      if not nums:
+      if nums_i == len(nums):
         dp[serial] = 0 if DAMAGED in data[i : ] else 1
 
       # BASE CASE: not enough space remaining for the next num - invalid
-      elif nums_remaining < nums[0]:
+      elif nums_remaining < nums[nums_i]:
         dp[serial] = 0
 
-      # RECURSIVE CASE: can we fill the next segment of length num (nums[0]) starting at current i with all DAMAGED, or can we NOT fill at this position?
+      # RECURSIVE CASE: can we fill the next segment of length num (nums[nums_i]) starting at current i with all DAMAGED, or can we NOT fill at this position?
       else:
-        OK_in_slice_to_be_filled = OK in data[i : i + nums[0]]                                                    # can't fill here because we know some gears are OK
-        DAMAGED_immediately_after_slice_to_be_filled = nums_remaining > nums[0] and data[i + nums[0]] == DAMAGED  # can't fill here because no gap before next DAMAGED
+        OK_in_slice_to_be_filled = OK in data[i : i + nums[nums_i]]                                       # can't fill here because we know some gears are OK
+        DAMAGED_immediately_after_slice_to_be_filled = nums_remaining > nums[nums_i] and \
+                                                        data[i + nums[nums_i]] == DAMAGED                 # can't fill here because no gap before next DAMAGED
         ways_if_fill = 0 if (OK_in_slice_to_be_filled or DAMAGED_immediately_after_slice_to_be_filled) \
-                        else solve(i + nums[0] + 1, nums[1:], dp)                                                 # only if can fill, recurse with new params
+                        else solve(nums, i + nums[nums_i] + 1, nums_i + 1, dp)                            # only if can fill, recurse with new params
 
-        must_fill_here_because_it_is_DAMAGED = data[i] == DAMAGED                                                 # can't not fill here because this position is DAMAGED
-        ways_if_no_fill = 0 if must_fill_here_because_it_is_DAMAGED else solve(i + 1, nums, dp)
+        must_fill_here_because_it_is_DAMAGED = data[i] == DAMAGED                                         # can't not fill here because this position is DAMAGED
+        ways_if_no_fill = 0 if must_fill_here_because_it_is_DAMAGED else solve(nums, i + 1, nums_i, dp)
 
         dp[serial] = ways_if_fill + ways_if_no_fill
 
@@ -189,12 +190,12 @@ def count_ways_to_divide_data_into_segments_with_dp(part, input_str, DEBUG = Fal
 
     nums = [ int(n) for n in nums_str.split(',') ]
 
-    res = solve(0, nums, {})
+    res = solve(nums, 0, 0, {})
 
     possible_arrangements_count += res
-    if DEBUG: possible_arrangements.append(res)
+    if DISPLAY_EXTRA_INFO: possible_arrangements.append(res)
 
-  if DEBUG: print(possible_arrangements)
+  if DISPLAY_EXTRA_INFO: print(f'RESULTS: {possible_arrangements}')
   return possible_arrangements_count
 
 
