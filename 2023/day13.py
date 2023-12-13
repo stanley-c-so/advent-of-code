@@ -176,6 +176,7 @@ def find_line_of_symmetry(part, input_str, DEBUG = False):
       for i in range(min(c + 1, W - 1 - c)):
         if columns[c - i] != columns[c + 1 + i]:
           symmetrical = False
+          break
       if symmetrical:
         output.append(c + 1)
 
@@ -185,6 +186,7 @@ def find_line_of_symmetry(part, input_str, DEBUG = False):
       for i in range(min(r + 1, H - 1 - r)):
         if rows[r - i] != rows[r + 1 + i]:
           symmetrical = False
+          break
       if symmetrical:
         output.append(100 * (r + 1))
 
