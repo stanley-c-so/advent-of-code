@@ -116,13 +116,13 @@ def deduce_max_color_counts(part, input_str, DEBUG = False):
 
   for id in data:
 
-    # PART 1
+    # PART 1: GET SUM OF GAME IDs
     if data[id][RED] <= PART_1_LIMITS[RED] and \
       data[id][GREEN] <= PART_1_LIMITS[GREEN] and \
       data[id][BLUE] <= PART_1_LIMITS[BLUE]:
       id_sum += id
 
-    # PART 2
+    # PART 2: GET SUM OF "POWER" OF GAMES
     power_sum += data[id][RED] * data[id][GREEN] * data[id][BLUE]
 
   return id_sum if part == 1 else power_sum

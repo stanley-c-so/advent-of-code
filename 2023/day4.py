@@ -116,7 +116,7 @@ def find_matches_between_datasets(part, input_str, DEBUG = False):
 
   # ANALYZE
 
-  if part == 1:
+  if part == 1:                                                       # PART 1: COUNT POINTS WON FROM EACH CARD
 
     points = 0
 
@@ -126,7 +126,7 @@ def find_matches_between_datasets(part, input_str, DEBUG = False):
 
     return points
 
-  else:
+  else:                                                               # PART 2: COUNT TOTAL CARDS IN POSSESSION, IF CARDS WIN YOU MORE CARDS
 
     card_count = { card_num: 1 for card_num in card_matches }
 

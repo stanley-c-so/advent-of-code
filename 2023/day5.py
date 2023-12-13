@@ -208,7 +208,7 @@ def map_ranges(part, input_str, DEBUG = False):
     humidity_to_location_ranges.sort(key=lambda data: data['range'][0], reverse=True)
 
 
-  if part == 1:
+  if part == 1:                                                   # PART 1: THE SEEDS DATA ARE ALL SEPARATE SEEDS
 
     # HELPER FUNCTIONS
 
@@ -286,7 +286,7 @@ def map_ranges(part, input_str, DEBUG = False):
 
     return lowest_location
 
-  else:
+  else:                                                           # PART 2: THE SEEDS DATA ARE ALSO RANGES AS WELL
 
     # PARSE SEEDS DATA UNDER NEW INTERPRETATION
 

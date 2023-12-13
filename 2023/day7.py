@@ -223,7 +223,10 @@ def sort_by_hand_strength(part, input_str, DEBUG = False):
 
   # ANALYZE
 
-  hands.sort(key=cmp_to_key(compare if part == 1 else compare_with_jokers))
+
+  if part == 1: hands.sort(key=cmp_to_key(compare))                 # PART 1: Js ARE JACKS
+  else:         hands.sort(key=cmp_to_key(compare_with_jokers))     # PART 2: Js ARE JOKERS
+
   total = 0
   for i in range(len(hands)):
     multiplier = i + 1

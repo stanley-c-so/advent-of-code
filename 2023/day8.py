@@ -112,7 +112,7 @@ def find_sync_point_of_all_cycles(part, input_str, DEBUG = False):
 
   LIMIT = maxsize
 
-  if part == 1:
+  if part == 1:                                   # PART 1: GO FROM 'AAA' TO 'ZZZ'
 
     steps = 0
     idx = 0
@@ -126,7 +126,7 @@ def find_sync_point_of_all_cycles(part, input_str, DEBUG = False):
     print('STEPS EXCEEDED LIMIT')
     assert(False)
 
-  else:
+  else:                                           # PART 2: SEND MULTIPLE THREADS ALONG ALL '*A' TO '*Z' AND FIND POINT IN TIME WHERE CYCLES MATCH
 
     # find all start nodes
 

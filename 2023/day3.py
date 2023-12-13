@@ -184,7 +184,7 @@ def analyze_symbols_near_numbers(part, input_str, DEBUG = False):
 
   # ANALYZE
 
-  if part == 1:
+  if part == 1:                                                     # PART 1: FIND NUMBERS ADJACENT TO ANY SYMBOL
 
     # add up data for numbers that are adjacent to at least 1 symbol
     sum = 0
@@ -193,7 +193,7 @@ def analyze_symbols_near_numbers(part, input_str, DEBUG = False):
         sum += data['num']
     return sum
 
-  else:
+  else:                                                             # PART 2: FIND GEARS ADJACENT TO EXACTLY 2 NUMBERS
 
     # STEP 1: gather data on adjacent gears
     for data in numbers_data:                                       # run through all numbers

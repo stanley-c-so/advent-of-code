@@ -89,12 +89,12 @@ def count_ways_to_win_race(part, input_str, DEBUG = False):
 
   input_arr = input_str.split('\n')
 
-  if part == 1:
+  if part == 1:                                                   # PART 1: SEPARATE TIME/DISTANCE VALUES FOR MULTIPLE RACES
 
     TIMES = [ int(n) for n in input_arr[0].split()[1:] ]
     DISTANCES = [ int(n) for n in input_arr[1].split()[1:] ]
 
-  else:
+  else:                                                           # PART 2: JOIN THE VALUES TOGETHER TO REPRESENT ONE RACE
 
     JOINED_TIME = ''.join(input_arr[0].split()[1:])
     JOINED_DISTANCE = ''.join(input_arr[1].split()[1:])

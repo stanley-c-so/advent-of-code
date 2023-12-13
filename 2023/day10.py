@@ -296,7 +296,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
 
   # ANALYZE
 
-  if part == 1:
+  if part == 1:                                                             # PART 1: RETURN DISTANCE OF FARTHEST POINT ALONG PIPE
 
     visited = {}
     Q = deque()
@@ -314,7 +314,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
 
     return highest_moves
 
-  else:
+  else:                                                                     # PART 2: RETURN INERIOR AREA SURROUNDED BY PIPE
 
     """
     The idea here is to double the size of our map. Every original coordinate (r,c) is mapped to the expanded map coordinate (2*r, 2*c).
@@ -572,11 +572,11 @@ def analyze_contiguous_lines_and_regions2(part, input_str, DEBUG = False):
 
   # ANALYZE
 
-  if part == 1:
+  if part == 1:                                                             # PART 1: RETURN DISTANCE OF FARTHEST POINT ALONG PIPE
 
     return analyze_contiguous_lines_and_regions(part, input_str, DEBUG)     # COPY SOLUTION 1
 
-  else:
+  else:                                                                     # PART 2: RETURN INERIOR AREA SURROUNDED BY PIPE
 
     # CLEAR NON-PIPE COORDS WITH EMPTY SPACE
 
