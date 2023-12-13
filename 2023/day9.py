@@ -114,53 +114,57 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
+# SOLUTION 1: DO EXACTLY AS THE PROBLEM SAYS
+
 def complete_the_sequence(part, input_str, DEBUG = False):
 
-  # # SOLUTION 1: DO EXACTLY AS THE PROBLEM SAYS
+  # INIT
 
-  # # INIT
-
-  # sum = 0
+  sum = 0
 
 
-  # # PARSE INPUT DATA
+  # PARSE INPUT DATA
 
-  # input_arr = input_str.split('\n')
-  # for line in input_arr:
-  #   nums = [ int(n) for n in line.split(' ') ]
+  input_arr = input_str.split('\n')
+  for line in input_arr:
+    nums = [ int(n) for n in line.split(' ') ]
 
-  #   # DATA STRUCTURE
-  #   sequences = [ nums ]
-  #   while not(all([ x == 0 for x in sequences[-1] ])):
-  #     new_row = []
-  #     for i in range(1, len(sequences[-1])):
-  #       new_row.append(sequences[-1][i] - sequences[-1][i - 1])
-  #     sequences.append(new_row)
+    # DATA STRUCTURE
+    sequences = [ nums ]
+    while not(all([ x == 0 for x in sequences[-1] ])):
+      new_row = []
+      for i in range(1, len(sequences[-1])):
+        new_row.append(sequences[-1][i] - sequences[-1][i - 1])
+      sequences.append(new_row)
 
-  #   # Add the new number (we can simply append, whether we are really supposed to be adding the 0 to the front or back)
-  #   sequences[-1].append(0)
+    # Add the new number (we can simply append, whether we are really supposed to be adding the 0 to the front or back)
+    sequences[-1].append(0)
 
-  #   # PART 1: Work back through the sequences, figuring out the new end number
-  #   if part == 1:
+    # PART 1: Work back through the sequences, figuring out the new end number
+    if part == 1:
     
-  #     for i in range(len(sequences) - 2, -1, -1):
-  #       last_num_of_sequence_below = sequences[i + 1][-1]
-  #       sequences[i].append(sequences[i][-1] + last_num_of_sequence_below)
+      for i in range(len(sequences) - 2, -1, -1):
+        last_num_of_sequence_below = sequences[i + 1][-1]
+        sequences[i].append(sequences[i][-1] + last_num_of_sequence_below)
 
-  #     sum += sequences[0][-1]
+      sum += sequences[0][-1]
 
-  #   # PART 2: Work back through the sequences, figuring out the new first number
-  #   else:
+    # PART 2: Work back through the sequences, figuring out the new first number
+    else:
 
-  #     for i in range(len(sequences) - 2, -1, -1):
-  #       first_num_of_sequence_below = sequences[i + 1][0]
-  #       sequences[i].insert(0, sequences[i][0] - first_num_of_sequence_below)
+      for i in range(len(sequences) - 2, -1, -1):
+        first_num_of_sequence_below = sequences[i + 1][0]
+        sequences[i].insert(0, sequences[i][0] - first_num_of_sequence_below)
 
-  #     sum += sequences[0][0]
+      sum += sequences[0][0]
+
+  return sum
 
 
-  # SOLUTION 2: FOR PART 2, JUST REVERSE THE INITIAL LINE OF NUMBERS FROM THE INPUT DATA.
-  # YOU WOULD EFFECTIVELY BE DOING THE SAME THING!
+# SOLUTION 2: FOR PART 2, JUST REVERSE THE INITIAL LINE OF NUMBERS FROM THE INPUT DATA.
+# YOU WOULD EFFECTIVELY BE DOING THE SAME THING!
+
+def complete_the_sequence2(part, input_str, DEBUG = False):
 
   # INIT
 
@@ -200,7 +204,7 @@ def complete_the_sequence(part, input_str, DEBUG = False):
 test_num = [1]
 test_input = None
 test_expected = None
-func = complete_the_sequence
+func = complete_the_sequence2
 skipped_tests = set([ 2, 3, 4 ])
 skipped_tests = set([ 3, 4 ])
 skipped_tests = set([ 4 ])
