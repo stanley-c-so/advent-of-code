@@ -135,93 +135,87 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
 
   # DATA STRUCTURES
 
-  MEMO = {}                                                             # keys are serialized positions, vals are the index of first appearance
-  RES = {}                                                              # keys are indices, vals are load values
+  MEMO = {}                                                               # keys are serialized positions, vals are the index of first appearance
+  LOAD_VALUE = {}                                                                # keys are indices, vals are load values
 
 
   # CONSTANTS
 
   H, W = len(MAP), len(MAP[0])
   ROCK, CUBE, EMPTY = 'O', '#', '.'
-  n, e, s, w = 'N', 'E', 'S', 'W'                                       # CAREFUL! W (capital) is already being used
+  n, e, s, w = 'N', 'E', 'S', 'W'                                         # CAREFUL! W (capital) is already being used
+
+
+  PARAMS = {
+    n: {
+      'r_range': range(1, H),
+      'c_range': range(W),
+      'deltas': (-1, 0),
+    },
+    w: {
+      'r_range': range(H),
+      'c_range': range(1, W),
+      'deltas': (0, -1),
+    },
+    s: {
+      'r_range': range(H - 1, -1, -1),
+      'c_range': range(W),
+      'deltas': (+1, 0),
+    },
+    e: {
+      'r_range': range(H),
+      'c_range': range(W - 1, -1, -1),
+      'deltas': (0, +1),
+    },
+  }
 
 
   # HELPER FUNCTIONS
 
   def roll(dir):
 
-    # north
-    if dir == n:
-      for r in range(1, H):
-        for c in range(W):
-          if MAP[r][c] == ROCK:
-            new_r = r
-            while new_r > 0 and MAP[new_r - 1][c] == EMPTY:
-              new_r -= 1
-            MAP[r][c] = EMPTY
-            MAP[new_r][c] = ROCK
+    assert dir in (n, w, e, s)
+    params = PARAMS[dir]
 
-    # west
-    elif dir == w:
-      for c in range(1, W):
-        for r in range(H):
-          if MAP[r][c] == ROCK:
-            new_c = c
-            while new_c > 0 and MAP[r][new_c - 1] == EMPTY:
-              new_c -= 1
-            MAP[r][c] = EMPTY
-            MAP[r][new_c] = ROCK
-
-    # south
-    elif dir == s:
-      for r in range(H - 1, -1, -1):
-        for c in range(W):
-          if MAP[r][c] == ROCK:
-            new_r = r
-            while new_r < H - 1 and MAP[new_r + 1][c] == EMPTY:
-              new_r += 1
-            MAP[r][c] = EMPTY
-            MAP[new_r][c] = ROCK
-
-    # east
-    elif dir == e:
-      for c in range(W - 1, -1, -1):
-        for r in range(H):
-          if MAP[r][c] == ROCK:
-            new_c = c
-            while new_c < W - 1 and MAP[r][new_c + 1] == EMPTY:
-              new_c += 1
-            MAP[r][c] = EMPTY
-            MAP[r][new_c] = ROCK
-    
-    else:
-      assert False
+    for r in params['r_range']:                                           # iterate through the relevant rows...
+      for c in params['c_range']:                                         # ...and cols...
+        if MAP[r][c] == ROCK:
+          dy, dx = params['deltas']                                       # (of course, one of these will be 0)
+          new_r, new_c = r, c                                             # new_r, new_c represents potential destination to which a rock will roll
+          while 0 <= (new_r + dy) and (new_r + dy) < H \
+                and 0 <= (new_c + dx) and (new_c + dx) < H \
+                and MAP[new_r + dy][new_c + dx] == EMPTY:                 # check if destination would be in bounds and empty
+            new_r += dy
+            new_c += dx
+          MAP[r][c] = EMPTY                                               # once the while loop is done, empty the original rock location...
+          MAP[new_r][new_c] = ROCK                                        # ...and place the rock at the new location (which may be the same location)
 
   def serialize():
-    return ''.join([ ''.join(row) for row in MAP ])
+    return ''.join([ ''.join(row) for row in MAP ])                       # convert entire board position into one big string
 
   def roll_cycle(i):
 
-    if DEBUG and 0 < i and i <= 3 and DISPLAY_EXTRA_INFO:
-      show_map(i)
+    if DEBUG and 0 < i and i <= 3 and DISPLAY_EXTRA_INFO:                 # for part 2 sample test, show the results after the first 3 cycles
+      print(f"MAP AFTER {i} CYCLE(S):")
+      for row in MAP:
+        print(''.join(row))
+      print('')
 
     # Check for repeated position
     serial = serialize()
     if serial in MEMO:
-      return (True, serial)
+      return (True, serial)                                               # output[0] is whether a cycle was found; output[1] is the serialized board position
 
     # Cache current position
     MEMO[serial] = i
-    RES[i] = get_load()
+    LOAD_VALUE[i] = get_load()
 
-    # Perform spin cycle
+    # Perform spin cycle, then return False to finish the iteration
     roll(n)
     roll(w)
     roll(s)
     roll(e)
-
-    return (False, None)
-
+    return (False, serial)
 
   def get_load():
     output = 0
@@ -229,23 +223,17 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
       output += sum(map(lambda x: (H - r) if x == ROCK else 0, MAP[r]))
     return output
 
-  def show_map(i):
-    print(f"MAP AFTER {i} CYCLE(S):")
-    for row in MAP:
-      print(''.join(row))
-    print('')
-
 
   # ANALYZE
 
   TIME_AT_START = time.time()
 
-  if part == 1:                                                         # PART 1: DO A SINGLE ROLL NORTH
+  if part == 1:                                                           # PART 1: DO A SINGLE ROLL NORTH
 
     roll(n)
     return get_load()
 
-  else:                                                                 # PART 2: DO 1,000,000,000 FULL CYCLES (n, w, s, e)
+  else:                                                                   # PART 2: DO 1,000,000,000 FULL CYCLES (n, w, s, e)
 
     if not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
 
@@ -257,7 +245,7 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
         period = i - MEMO[serial]
         initial_lead = MEMO[serial]
         MOD = (NUM_CYCLES - initial_lead) % period
-        output = RES[initial_lead + MOD]
+        output = LOAD_VALUE[initial_lead + MOD]
         if DISPLAY_EXTRA_INFO:
           print(f"Current position after {i} rolls (i.e. before the roll on i == {i}) is a repeat of same on i == {MEMO[serial]}.")
           print(f"Therefore, period is {i} - {MEMO[serial]} = {period}.")
@@ -265,9 +253,11 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
           print(f"After the initial lead of {initial_lead}, if we skip all segments of {period}, a remainder of {MOD} will be left over before we reach {NUM_CYCLES}.")
           print(f"Thus, the result after {NUM_CYCLES} cycles is equal to the result after only {initial_lead} + {MOD} = {initial_lead + MOD} cycles.")
           print(f"Therefore, the answer is equal to the result at i == {initial_lead + MOD}.")
-          print(f"RES[{initial_lead + MOD}] == {output}.")
+          print(f"LOAD_VALUE[{initial_lead + MOD}] == {output}.")
         break
 
+    assert output
+    
     if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
     return output
 
