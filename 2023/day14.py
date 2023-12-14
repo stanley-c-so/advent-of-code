@@ -145,7 +145,6 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
   ROCK, CUBE, EMPTY = 'O', '#', '.'
   n, e, s, w = 'N', 'E', 'S', 'W'                                         # CAREFUL! W (capital) is already being used
 
-
   PARAMS = {
     n: {
       'r_range': range(1, H),
@@ -257,7 +256,7 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
         break
 
     assert output
-    
+
     if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
     return output
 
