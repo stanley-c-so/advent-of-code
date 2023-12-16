@@ -140,7 +140,7 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
 
   # HELPER FUNCTION
 
-  def fire_beam(start_row, start_col, start_dir):
+  def fire_beam(start_row, start_col, start_dir, max_tiles):
 
     # Verify that the beam is being fired from an edge
     assert start_row == 0 \
@@ -228,6 +228,16 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
           elif direction in (L, R):                               # beam passes through
             process(stack, r, c, direction)
 
+    if DISPLAY_EXTRA_INFO and len(visited_coords) > max_tiles:
+      BEAM = '#'
+      print(f"Energized tiles: {len(visited_coords)}")
+      for r in range(H):
+        output = ''
+        for c in range(W):
+          output += BEAM if (r, c) in visited_coords else SPACE
+        print(output)
+      print('')
+
     return len(visited_coords)
 
 
@@ -235,40 +245,40 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
 
   TIME_AT_START = time.time()
 
+  max_tiles = 0
+
   if part == 1:
 
-    return fire_beam(0, 0, R)
+    return fire_beam(0, 0, R, max_tiles)
 
   else:
 
     if not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
 
-    max_tiles = 0
-
     # try top edge going D
     for c in range(W):
-      res = fire_beam(0, c, D)
+      res = fire_beam(0, c, D, max_tiles)
       if res > max_tiles:
         max_tiles = res
         print(f"NEW RECORD: {res} BY FIRING DOWN AT {0}, {c}")
 
     # try bottom edge going U
     for c in range(W):
-      res = fire_beam(H - 1, c, U)
+      res = fire_beam(H - 1, c, U, max_tiles)
       if res > max_tiles:
         max_tiles = res
         print(f"NEW RECORD: {res} BY FIRING UP AT {H - 1}, {c}")
 
     # try left edge going R
     for r in range(H):
-      res = fire_beam(r, 0, R)
+      res = fire_beam(r, 0, R, max_tiles)
       if res > max_tiles:
         max_tiles = res
         print(f"NEW RECORD: {res} BY FIRING RIGHT AT {r}, {0}")
 
     # try right edge going L
     for r in range(H):
-      res = fire_beam(r, W - 1, L)
+      res = fire_beam(r, W - 1, L, max_tiles)
       if res > max_tiles:
         max_tiles = res
         print(f"NEW RECORD: {res} BY FIRING LEFT AT {W - 1}, {0}")
