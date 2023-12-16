@@ -138,10 +138,7 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
   }
 
 
-  # HELPER FUNCTIONS
-
-  def in_bounds(r, c):
-    return 0 <= r and r < H and 0 <= c and c < W
+  # HELPER FUNCTION
 
   def fire_beam(start_row, start_col, start_dir):
 
@@ -167,25 +164,26 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
     #
     # Therefore we will also keep track of a separate set, `visited_coords`, which only stores coords. The size of this set is the output.
 
-    visited_states = set()                              # elements are (r, c, dir)
-    visited_coords = set()                              # elements are (r, c)
+    visited_states = set()                                        # elements are (r, c, dir)
+    visited_coords = set()                                        # elements are (r, c)
 
     # Helper function
     def process(stack, r, c, new_dir):
       dy, dx = DELTAS[new_dir]
       new_r, new_c = r + dy, c + dx
-      if in_bounds(new_r, new_c):
+      if 0 <= new_r and new_r < H and 0 <= new_c and new_c < W:
         stack.append( (new_r, new_c, new_dir) )
 
     # DFS
     stack = [ (start_row, start_col, start_dir) ]
     while stack:
 
+      # extract data from node and make validations
       r, c, direction = stack.pop()
-
       assert direction in (U, D, L, R)
       assert MAP[r][c] in (SPACE, SLASH, BACKSLASH, PIPE, DASH)
 
+      # serialize and check against memo
       serial = (r, c, direction)
       if (serial in visited_states): continue
       visited_states.add(serial)
@@ -193,41 +191,41 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
 
       match MAP[r][c]:
 
-        case '.':
+        case '.':                                                 # beam passes through
           process(stack, r, c, direction)
 
         case '/':
-          if direction == U:
+          if direction == U:                                      # beam redirected U --> R
             process(stack, r, c, R)
-          elif direction == D:
+          elif direction == D:                                    # beam redirected D --> L
             process(stack, r, c, L)
-          elif direction == L:
+          elif direction == L:                                    # beam redirected L --> D
             process(stack, r, c, D)
-          elif direction == R:
+          elif direction == R:                                    # beam redirected R --> U
             process(stack, r, c, U)
 
         case '\\':
-          if direction == U:
+          if direction == U:                                      # beam redirected U --> L
             process(stack, r, c, L)
-          elif direction == D:
+          elif direction == D:                                    # beam redirected D --> R
             process(stack, r, c, R)
-          elif direction == L:
+          elif direction == L:                                    # beam redirected L --> U
             process(stack, r, c, U)
-          elif direction == R:
+          elif direction == R:                                    # beam redirected R --> D
             process(stack, r, c, D)
 
         case '|':
-          if direction in (U, D):
+          if direction in (U, D):                                 # beam passes through
             process(stack, r, c, direction)
-          elif direction in (L, R):
+          elif direction in (L, R):                               # beam gets split
             process(stack, r, c, U)
             process(stack, r, c, D)
 
         case '-':
-          if direction in (U, D):
+          if direction in (U, D):                                 # beam gets split
             process(stack, r, c, L)
             process(stack, r, c, R)
-          elif direction in (L, R):
+          elif direction in (L, R):                               # beam passes through
             process(stack, r, c, direction)
 
     return len(visited_coords)
