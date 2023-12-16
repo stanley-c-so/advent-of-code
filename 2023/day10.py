@@ -458,7 +458,7 @@ def analyze_contiguous_lines_and_regions(part, input_str, DEBUG = False):
         for (dy, dx) in ORTHOGONAL_DELTAS:
           nr = r + dy
           nc = c + dx
-          if 0 <= nr and nr < EXPANDED_H and 0 <= nc and nc < EXPANDED_W:
+          if 0 <= nr < EXPANDED_H and 0 <= nc < EXPANDED_W:
             stack.append((nr, nc))
 
 
@@ -649,7 +649,7 @@ def analyze_contiguous_lines_and_regions2(part, input_str, DEBUG = False):
 test_num = [1]
 test_input = None
 test_expected = None
-func = analyze_contiguous_lines_and_regions2
+func = analyze_contiguous_lines_and_regions
 skipped_tests = set([ 3, 4, 5, 6, 7 ])
 skipped_tests = set([ 4, 5, 6, 7 ])
 skipped_tests = set([ 7 ])

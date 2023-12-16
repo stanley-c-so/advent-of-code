@@ -181,8 +181,8 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
         if MAP[r][c] == ROCK:
           dy, dx = params['deltas']                                       # (of course, one of these will be 0)
           new_r, new_c = r, c                                             # new_r, new_c represents potential destination to which a rock will roll
-          while 0 <= (new_r + dy) and (new_r + dy) < H \
-                and 0 <= (new_c + dx) and (new_c + dx) < H \
+          while 0 <= (new_r + dy) < H \
+                and 0 <= (new_c + dx) < H \
                 and MAP[new_r + dy][new_c + dx] == EMPTY:                 # check if destination would be in bounds and empty
             new_r += dy
             new_c += dx
@@ -194,7 +194,7 @@ def roll_rocks_in_cardinal_direction(part, input_str, DEBUG = False):
 
   def roll_cycle(i):
 
-    if DEBUG and 0 < i and i <= 3 and DISPLAY_EXTRA_INFO:                 # for part 2 sample test, show the results after the first 3 cycles
+    if DEBUG and 0 < i <= 3 and DISPLAY_EXTRA_INFO:                       # for part 2 sample test, show the results after the first 3 cycles
       print(f"MAP AFTER {i} CYCLE(S):")
       for row in MAP:
         print(''.join(row))

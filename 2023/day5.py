@@ -215,49 +215,49 @@ def map_ranges(part, input_str, DEBUG = False):
     def convert_seed_to_soil(input):
       for line in seed_to_soil_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 
     def convert_soil_to_fertilizer(input):
       for line in soil_to_fertilizer_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 
     def convert_fertilizer_to_water(input):
       for line in fertilizer_to_water_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 
     def convert_water_to_light(input):
       for line in water_to_light_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 
     def convert_light_to_temperature(input):
       for line in light_to_temperature_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 
     def convert_temperature_to_humidity(input):
       for line in temperature_to_humidity_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 
     def convert_humidity_to_location(input):
       for line in humidity_to_location_data:
         [dest, src, rangelen] = line
-        if src <= input and input < src + rangelen:
+        if src <= input < src + rangelen:
           return input + (dest - src)
       return input
 

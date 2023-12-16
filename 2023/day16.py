@@ -171,7 +171,7 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
     def process(stack, r, c, new_dir):
       dy, dx = DELTAS[new_dir]
       new_r, new_c = r + dy, c + dx
-      if 0 <= new_r and new_r < H and 0 <= new_c and new_c < W:
+      if 0 <= new_r < H and 0 <= new_c < W:
         stack.append( (new_r, new_c, new_dir) )
 
     # DFS

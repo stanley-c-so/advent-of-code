@@ -184,10 +184,10 @@ def manhattan_distance_with_expanding_empty_space(part, input_str, DEBUG = False
 
       # Account for expansion of empty rows and cols
       for r in EMPTY_ROWS:
-        if r1 < r and r < r2:                             # NOTE: r1 < r2, since galaxies were discovered in row order
+        if r1 < r < r2:                                   # NOTE: r1 < r2, since galaxies were discovered in row order
           total += (factor - 1)                           # don't forget to subtract 1!
       for c in EMPTY_COLS:
-        if min(c1, c2) < c and c < max(c1, c2):           # NOTE: c1 may not be less than c2
+        if min(c1, c2) < c < max(c1, c2):                 # NOTE: c1 may not be less than c2
           total += (factor - 1)                           # don't forget to subtract 1!
 
   return total
