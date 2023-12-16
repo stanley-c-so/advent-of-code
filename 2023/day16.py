@@ -178,12 +178,12 @@ def run_a_laser_through_grid_of_mirrors(part, input_str, DEBUG = False):
     stack = [ (start_row, start_col, start_dir) ]
     while stack:
 
-      # extract data from node and make validations
+      # Extract data from node and make validations
       r, c, direction = stack.pop()
       assert direction in (U, D, L, R)
       assert MAP[r][c] in (SPACE, SLASH, BACKSLASH, PIPE, DASH)
 
-      # serialize and check against memo
+      # Serialize and check against memo
       serial = (r, c, direction)
       if (serial in visited_states): continue
       visited_states.add(serial)
