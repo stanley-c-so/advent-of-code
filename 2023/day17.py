@@ -133,6 +133,9 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
   H, W = len(MAP), len(MAP[0])
 
+  START_ROW, START_COL = 0, 0
+  END_ROW, END_COL = H - 1, W - 1
+
   U, D, L, R = 'U', 'D', 'L', 'R'
 
   DELTAS = {
@@ -186,8 +189,11 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
   # INIT
 
   PQ = PriorityQueue()
-  PQ.put( (0, (0, 0, D, 0, None)) )                                                     # try both starting by moving down...
-  PQ.put( (0, (0, 0, R, 0, None)) )                                                     # ...as well as by moving right
+  PQ.put( (0, (START_ROW, START_COL, D, 0, None)) )                                     # try both starting by moving down...
+  PQ.put( (0, (START_ROW, START_COL, R, 0, None)) )                                     # ...as well as by moving right
+  
+  PQ.put( (0, (START_ROW, START_COL, U, 0, None)) )                                     # (include U to support any start location)
+  PQ.put( (0, (START_ROW, START_COL, L, 0, None)) )                                     # (include L to support any start location)
 
   min_heat_loss = float('inf')
   min_heat_loss_state = None                                                            # NOTE: this is only required for printing diagram
@@ -214,7 +220,7 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
       MEMO[state]['prev_state'] = prev_state                                            # (also save prev_state if you want to print diagram)
 
     # If reached end, update min_heat_loss
-    if (r == H - 1 and c == W - 1) and (streak >= MIN_STREAK):                          # PART 2: THERE IS A MINIMUM STREAK BEFORE YOU CAN STOP
+    if (r == END_ROW and c == END_COL) and (streak >= MIN_STREAK):                      # PART 2: THERE IS A MINIMUM STREAK BEFORE YOU CAN STOP
 
       if heat_loss < min_heat_loss:
         min_heat_loss = heat_loss
@@ -235,10 +241,14 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
       if streak < MAX_STREAK:                                                           # can't go straight if you're at maximum streak
         process(PQ, direction, heat_loss, streak + 1, state)                            # increment the streak
 
+  if min_heat_loss_state == None:
+    print('ERROR: NO SOLUTION FOUND')
+    return None
+
   if DISPLAY_EXTRA_INFO:
     r, c, direction, streak = min_heat_loss_state
     path = [ (r, c, direction) ]
-    while not (r == 0 and c == 0):
+    while not (r == START_ROW and c == START_COL):
       r, c, direction, streak = MEMO[(r, c, direction, streak)]['prev_state']
       path.append((r, c, direction))
     ARROWS = { U: '^', D: 'v', L: '<', R: '>' }
