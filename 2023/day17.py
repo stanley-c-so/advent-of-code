@@ -169,15 +169,24 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
     [
       {
         direction: {
-          streak: float('inf') for streak in range(1, MAX_STREAK + 1)                   # e.g. if 2x2: [
-                                                                                        #                [
-                                                                                        #                  'U': {1: inf, 2: inf, 3: inf},
-                                                                                        #                  'D': {...},
-                                                                                        #                  'L': {...},
-                                                                                        #                  'R': {...}
-                                                                                        #                ],
-                                                                                        #                [ ... ]
-                                                                                        #              ]
+
+          streak: {
+            'heat_loss': float('inf'),
+            'prev_state': None
+          } for streak in range(1, MAX_STREAK + 1)      # e.g. if 2x2: [
+                                                        #                [
+                                                        #                  'U': {
+                                                        #                         1: { 'heat_loss': inf, 'prev_state': (...) },
+                                                        #                         2: { 'heat_loss': inf, 'prev_state': (...) },
+                                                        #                         3: { 'heat_loss': inf, 'prev_state': (...) },
+                                                        #                       },
+                                                        #                  'D': {...},
+                                                        #                  'L': {...},
+                                                        #                  'R': {...}
+                                                        #                ],
+                                                        #                [ ... ]
+                                                        #              ]
+
         } for direction in (U, D, L, R)
       } for _ in range(W)
     ] for _ in range(H)
@@ -186,14 +195,14 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
   # HELPER FUNCTION
 
-  def process(PQ, new_dir, heat_loss, new_streak):
+  def process(PQ, new_dir, heat_loss, new_streak, prev_state):
     dy, dx = DELTAS[new_dir]
     new_r, new_c = r + dy, c + dx
     if 0 <= new_r < H and 0 <= new_c < W:
       PQ.put(
         (
           heat_loss + MAP[new_r][new_c],                                                # priority: heat_loss to reach coords
-          (new_r, new_c, new_dir, new_streak)                                           # data: state (coords, direction, streak)
+          (new_r, new_c, new_dir, new_streak, prev_state)                               # data: state (coords, direction, streak), and prev_state
         )
       )
 
@@ -201,12 +210,11 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
   # INIT
 
   PQ = PriorityQueue()
-  # PQ.put( (0, (0, 0, D, 0)) )                                                           # try both starting by moving down...
-  # PQ.put( (0, (0, 0, R, 0)) )                                                           # ...as well as by moving right
-  PQ.put( (0, (0, 0, D, 0, None)) )                                                           # try both starting by moving down...
-  PQ.put( (0, (0, 0, R, 0, None)) )                                                           # ...as well as by moving right
+  PQ.put( (0, (0, 0, D, 0, None)) )                                                     # try both starting by moving down...
+  PQ.put( (0, (0, 0, R, 0, None)) )                                                     # ...as well as by moving right
 
   min_heat_loss = float('inf')
+  min_heat_loss_state = None                                                            # NOTE: this is only required for printing diagram
 
 
   # ANALYZE
@@ -218,33 +226,55 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
     # Extract data
     (heat_loss, data) = PQ.get()
-    # r, c, direction, streak = data
-    r, c, direction, streak, (old_r, old_c) = data
+    r, c, direction, streak, prev_state = data                                          # NOTE: prev_state is only required for printing diagram
+    state = r, c, direction, streak                                                     # NOTE: state is only required for printing diagram
 
     # Memo - state includes: coords, direction, and streak
     if streak:                                                                          # the first node is the only time when streak == 0
-      if MEMO[r][c][direction][streak] <= heat_loss: continue                           # if heat_loss is not better than memo, discontinue
-      MEMO[r][c][direction][streak] = heat_loss                                         # else, save new record
+      if MEMO[r][c][direction][streak]['heat_loss'] <= heat_loss: continue              # if heat_loss is not better than memo, discontinue
+      MEMO[r][c][direction][streak]['heat_loss'] = heat_loss                            # else, save new record
+      MEMO[r][c][direction][streak]['prev_state'] = prev_state                          # (also save prev_state if you want to print diagram)
 
     # If reached end, update min_heat_loss
     if (r == H - 1 and c == W - 1) and (streak >= MIN_STREAK):                          # PART 2: THERE IS A MINIMUM STREAK BEFORE YOU CAN STOP
 
-      min_heat_loss = min(min_heat_loss, heat_loss)
+      if heat_loss < min_heat_loss:
+        min_heat_loss = heat_loss
+        min_heat_loss_state = state
 
     # Else, consider the next move
     else:
 
       # Turn left
       if streak >= MIN_STREAK:                                                          # PART 2: THERE IS A MINIMUM STREAK BEFORE YOU CAN TURN
-        process(PQ, TURN_LEFT[direction], heat_loss, 1)                                 # since you're turning, reset the streak to 1
+        process(PQ, TURN_LEFT[direction], heat_loss, 1, state)                          # since you're turning, reset the streak to 1
 
       # Turn right
       if streak >= MIN_STREAK:                                                          # PART 2: THERE IS A MINIMUM STREAK BEFORE YOU CAN TURN
-        process(PQ, TURN_RIGHT[direction], heat_loss, 1)                                # since you're turning, reset the streak to 1
+        process(PQ, TURN_RIGHT[direction], heat_loss, 1, state)                         # since you're turning, reset the streak to 1
 
       # Go straight
       if streak < MAX_STREAK:                                                           # can't go straight if you're at maximum streak
-        process(PQ, direction, heat_loss, streak + 1)                                   # increment the streak
+        process(PQ, direction, heat_loss, streak + 1, state)                            # increment the streak
+
+  if DISPLAY_EXTRA_INFO:
+    r, c, direction, streak = min_heat_loss_state
+    path = [ (r, c, direction) ]
+    while not (r == 0 and c == 0):
+      r, c, direction, streak = MEMO[r][c][direction][streak]['prev_state']
+      path.append((r, c, direction))
+    ARROWS = { U: '^', D: 'v', L: '<', R: '>' }
+    for (r, c, direction) in path:
+      MAP[r][c] = ARROWS[direction]
+    for row in MAP:
+      row_to_print = []
+      for c in row:
+        if type(c) == type(1):
+          row_to_print.append(str(c))
+        else:
+          row_to_print.append( '\033[93m' + c + '\033[0m' )
+      print(''.join(row_to_print))
+    print('')
 
   if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
   return min_heat_loss
