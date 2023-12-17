@@ -159,7 +159,7 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
   MAX_STREAK = 3 if part == 1 else 10                                                   # PART 1: MUST TURN AFTER STREAK 3
                                                                                         # PART 2: MUST TURN AFTER STREAK 10
 
-  MIN_STREAK = 0 if part == 1 else 4                                                    # PART 1: NO MINIMUM STREAK - CAN STOP ANY TIME
+  MIN_STREAK = 1 if part == 1 else 4                                                    # PART 1: NO MINIMUM STREAK - CAN STOP ANY TIME
                                                                                         # PART 2: STREAK MUST BE AT LEAST 4 TO STOP
 
 
