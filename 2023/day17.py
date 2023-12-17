@@ -190,14 +190,21 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
     dy, dx = DELTAS[new_dir]
     new_r, new_c = r + dy, c + dx
     if 0 <= new_r < H and 0 <= new_c < W:
-      PQ.put(( heat_loss + MAP[new_r][new_c], (new_r, new_c, new_dir, new_streak) ))
+      PQ.put(
+        (
+          heat_loss + MAP[new_r][new_c],                                                # priority: heat_loss to reach coords
+          (new_r, new_c, new_dir, new_streak)                                           # data: state (coords, direction, streak)
+        )
+      )
 
 
   # INIT
 
   PQ = PriorityQueue()
-  PQ.put( (0, (0, 0, D, 0)) )                                                           # try both starting by moving down...
-  PQ.put( (0, (0, 0, R, 0)) )                                                           # ...as well as by moving right
+  # PQ.put( (0, (0, 0, D, 0)) )                                                           # try both starting by moving down...
+  # PQ.put( (0, (0, 0, R, 0)) )                                                           # ...as well as by moving right
+  PQ.put( (0, (0, 0, D, 0, None)) )                                                           # try both starting by moving down...
+  PQ.put( (0, (0, 0, R, 0, None)) )                                                           # ...as well as by moving right
 
   min_heat_loss = float('inf')
 
@@ -211,11 +218,12 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
     # Extract data
     (heat_loss, data) = PQ.get()
-    r, c, direction, streak = data
+    # r, c, direction, streak = data
+    r, c, direction, streak, (old_r, old_c) = data
 
     # Memo - state includes: coords, direction, and streak
     if streak:                                                                          # the first node is the only time when streak == 0
-      if MEMO[r][c][direction][streak] <= heat_loss: continue                           # given the current state, if heat_loss is not better, discontinue
+      if MEMO[r][c][direction][streak] <= heat_loss: continue                           # if heat_loss is not better than memo, discontinue
       MEMO[r][c][direction][streak] = heat_loss                                         # else, save new record
 
     # If reached end, update min_heat_loss
@@ -236,7 +244,7 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
       # Go straight
       if streak < MAX_STREAK:                                                           # can't go straight if you're at maximum streak
-        process(PQ, direction, heat_loss, streak + 1)
+        process(PQ, direction, heat_loss, streak + 1)                                   # increment the streak
 
   if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
   return min_heat_loss
