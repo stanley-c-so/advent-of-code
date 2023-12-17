@@ -165,32 +165,8 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
   # DATA STRUCTURE
 
-  MEMO = [
-    [
-      {
-        direction: {
-
-          streak: {
-            'heat_loss': float('inf'),
-            'prev_state': None
-          } for streak in range(1, MAX_STREAK + 1)      # e.g. if 2x2: [
-                                                        #                [
-                                                        #                  'U': {
-                                                        #                         1: { 'heat_loss': inf, 'prev_state': (...) },
-                                                        #                         2: { 'heat_loss': inf, 'prev_state': (...) },
-                                                        #                         3: { 'heat_loss': inf, 'prev_state': (...) },
-                                                        #                       },
-                                                        #                  'D': {...},
-                                                        #                  'L': {...},
-                                                        #                  'R': {...}
-                                                        #                ],
-                                                        #                [ ... ]
-                                                        #              ]
-
-        } for direction in (U, D, L, R)
-      } for _ in range(W)
-    ] for _ in range(H)
-  ]
+  MEMO = {}                                                                             # keys are states which include (r, c, direction, streak)
+                                                                                        # values are the lowest heat_loss to reach that state
 
 
   # HELPER FUNCTION
@@ -202,7 +178,7 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
       PQ.put(
         (
           heat_loss + MAP[new_r][new_c],                                                # priority: heat_loss to reach coords
-          (new_r, new_c, new_dir, new_streak, prev_state)                               # data: state (coords, direction, streak), and prev_state
+          (new_r, new_c, new_dir, new_streak, prev_state)                               # data: state (r, c, direction, streak), AND prev_state
         )
       )
 
@@ -227,13 +203,15 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
     # Extract data
     (heat_loss, data) = PQ.get()
     r, c, direction, streak, prev_state = data                                          # NOTE: prev_state is only required for printing diagram
-    state = r, c, direction, streak                                                     # NOTE: state is only required for printing diagram
+    state = r, c, direction, streak
 
-    # Memo - state includes: coords, direction, and streak
+    # Memo - serialized state includes: coords, direction, and streak
     if streak:                                                                          # the first node is the only time when streak == 0
-      if MEMO[r][c][direction][streak]['heat_loss'] <= heat_loss: continue              # if heat_loss is not better than memo, discontinue
-      MEMO[r][c][direction][streak]['heat_loss'] = heat_loss                            # else, save new record
-      MEMO[r][c][direction][streak]['prev_state'] = prev_state                          # (also save prev_state if you want to print diagram)
+      if state not in MEMO:
+        MEMO[state] = { 'heat_loss': float('inf'), 'prev_state': None }
+      if MEMO[state]['heat_loss'] <= heat_loss: continue                                # if heat_loss is not better than memo, discontinue
+      MEMO[state]['heat_loss'] = heat_loss                                              # else, save new record
+      MEMO[state]['prev_state'] = prev_state                                            # (also save prev_state if you want to print diagram)
 
     # If reached end, update min_heat_loss
     if (r == H - 1 and c == W - 1) and (streak >= MIN_STREAK):                          # PART 2: THERE IS A MINIMUM STREAK BEFORE YOU CAN STOP
@@ -261,7 +239,7 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
     r, c, direction, streak = min_heat_loss_state
     path = [ (r, c, direction) ]
     while not (r == 0 and c == 0):
-      r, c, direction, streak = MEMO[r][c][direction][streak]['prev_state']
+      r, c, direction, streak = MEMO[(r, c, direction, streak)]['prev_state']
       path.append((r, c, direction))
     ARROWS = { U: '^', D: 'v', L: '<', R: '>' }
     for (r, c, direction) in path:
