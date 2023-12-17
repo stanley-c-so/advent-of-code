@@ -72,6 +72,7 @@ from math import *
 from functools import *
 from sys import *
 from collections import *
+from queue import *
 
 # MODULES
 from _test import test
