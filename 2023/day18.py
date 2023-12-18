@@ -116,6 +116,8 @@ def get_interior_area(part, input_str, DEBUG = False):
   # CONSTANTS
 
   U, D, L, R = 'U', 'D', 'L', 'R'
+  UP, DOWN, LEFT, RIGHT = '^', 'v', '<', '>'
+  EMPTY, FILLED = '.', '#'
 
   DELTAS = {
     U: (+1, 0),
@@ -124,19 +126,12 @@ def get_interior_area(part, input_str, DEBUG = False):
     R: (0, +1),
   }
 
-  SYMBOLS = {
-    U: '^',
-    D: 'v',
-    L: '<',
-    R: '>',
-  }
+  SYMBOLS = { U: UP, D: DOWN, L: LEFT, R: RIGHT }
 
 
   # DATA STRUCTURES
 
   visited = {}
-  F_SET = set()
-  SEVEN_SET = set()
 
 
   # INIT
@@ -154,14 +149,6 @@ def get_interior_area(part, input_str, DEBUG = False):
     n = int(n_str)
     dy, dx = DELTAS[direction]
 
-    if (x, y) in visited:
-      if (visited[(x, y)] == '^' and SYMBOLS[direction] == '>') or \
-        (visited[(x, y)] == '<' and SYMBOLS[direction] == 'v'):
-        F_SET.add((x, y))
-      if (visited[(x, y)] == '>' and SYMBOLS[direction] == 'v') or \
-        (visited[(x, y)] == '^' and SYMBOLS[direction] == '<'):
-        SEVEN_SET.add((x, y))
-
     for _ in range(n):
       x += dx
       y += dy
@@ -170,18 +157,6 @@ def get_interior_area(part, input_str, DEBUG = False):
       min_y = min(min_y, y)
       max_y = max(max_y, y)
       visited[(x, y)] = SYMBOLS[direction]
-
-
-  # ANALYZE START SQUARE ONE LAST TIME TO SEE IF IT SHOULD BE ADDED TO F OR 7
-  for line in [ input_arr[0] ]:
-    direction, n_str, hex_code = line.split(' ')
-    n = int(n_str)
-    if (visited[(0, 0)] == '^' and SYMBOLS[direction] == '>') or \
-      (visited[(0, 0)] == '<' and SYMBOLS[direction] == 'v'):
-      F_SET.add((0, 0))
-    if (visited[(0, 0)] == '>' and SYMBOLS[direction] == 'v') or \
-      (visited[(0, 0)] == '^' and SYMBOLS[direction] == '<'):
-      SEVEN_SET.add((x, y))
 
 
   # ANALYZE
@@ -197,44 +172,69 @@ def get_interior_area(part, input_str, DEBUG = False):
     H = max_y - min_y + 1
     W = max_x - min_x + 1
 
-    MAP = [ ['.'] * W for _ in range(H) ]
+    MAP = [ [FILLED] * W for _ in range(H) ]                                              # we will flood fill the outside to empty later
 
     offset_x = min_x
     offset_y = max_y
 
     for curr_x in range(min_x, max_x + 1):
       for curr_y in range(min_y, max_y + 1):
-        map_x = curr_x - offset_x
-        map_y = offset_y - curr_y
+        map_x = curr_x - offset_x                                                         # since offset_x (constant) = curr_x - map_x
+        map_y = offset_y - curr_y                                                         # since offset_y (constant) = curr_y + map_y
         if (curr_x, curr_y) in visited:
           MAP[map_y][map_x] = visited[(curr_x, curr_y)]
-        else:
-          MAP[map_y][map_x] = '.'
-
-    if DISPLAY_EXTRA_INFO:
-      for row in MAP:
-        print(''.join(row))
 
     # Flood fill
     outside_count = 0
     stack = [ (0, 0) ]
-    visited_outside = set()
     while stack:
       r, c = stack.pop()
       if not (0 <= r < H and 0 <= c < W): continue
-      if MAP[r][c] != '.': continue
-      if (r, c) in visited_outside: continue
-      visited_outside.add((r, c))
+      if MAP[r][c] != FILLED: continue
+      MAP[r][c] = EMPTY
+      outside_count += 1
       for dy, dx in DELTAS.values():
         stack.append((r + dy, c + dx))
 
-    return H * W - len(visited_outside)
+    if DISPLAY_EXTRA_INFO and 1:
+      for row in MAP:
+        row_to_print = []
+        for c in row:
+          if c in (UP, DOWN, LEFT, RIGHT):
+            row_to_print.append( '\033[1m' + '\033[93m' + c + '\033[0m' )
+          elif c == FILLED:
+            row_to_print.append( '\033[92m' + c + '\033[0m' )
+          else:
+            row_to_print.append(c)
+        print(''.join(row_to_print))
+      print('')
+
+    return H * W - outside_count
 
 
-# SOLUTION 2 - SHOELACE ALGORITHM
-# https://www.101computing.net/the-shoelace-algorithm/
+# SOLUTION 2 - SHOELACE ALGORITHM (https://www.101computing.net/the-shoelace-algorithm/)
+#
+# The difficulty here, however, is dealing with discrete lines.
+#
+# The key to converting this into a general shoelace problem with point coordinates is to look at the pixel (discrete) corner squares,
+# and figure out which of the 4 corners of the corner square is the coordinate that counts.
+#
+# Two variables go into this decision: (1) Is the corner square part of an F, 7, J, or L? (2) Are we going CW or CCW around the shape?
+#
+# If we select the correct direction, we are grabbing the total area, including that of the dig lines (which is what the problem wants).
+# Notably, however, if we select the incorrect direction, we are grabbing the INTERIOR area, which EXCLUDES that of the dig lines.
+# However: interior area + area of dig lines = total area.
+#
+# We can run the shoelace algorithm for both CW and CCW and simply return whichever is larger.
+# However, we can also verify our logic is correct by calculating the dig lines area, and adding it to the smaller result, and checking if
+# it maches the larger result!
+
 
 def get_interior_area2(part, input_str, DEBUG = False):
+
+  if part == 1: return get_interior_area(part, input_str, DEBUG)                          # OPTIONAL: run solution 1 for part 1.
+                                                                                          # solution 2 works for part 1 as well,
+                                                                                          # but part 1 can print out a visualization.
 
   # CONSTANTS
   
@@ -250,7 +250,8 @@ def get_interior_area2(part, input_str, DEBUG = False):
 
   # DATA STRUCTURES
 
-  COORDS = []
+  CW_COORDS = []                                                                          # point coords if we are moving CW around the shape
+  CCW_COORDS = []                                                                         # point coords if we are moving CCW around the shape
   TRUE_N = []
   TRUE_DIRECTION = []
 
@@ -267,13 +268,15 @@ def get_interior_area2(part, input_str, DEBUG = False):
     hex_num_in_dec = int(hex_code[2:-2], 16)
     hex_dir = (R, D, L, U)[int(hex_code[-2])]
 
-    TRUE_N.append(n if part == 1 else hex_num_in_dec)
-    TRUE_DIRECTION.append(direction if part == 1 else hex_dir)
+    TRUE_N.append(n if part == 1 else hex_num_in_dec)                                     # PART 1: n is directly given; PART 2: n comes from hex
+    TRUE_DIRECTION.append(direction if part == 1 else hex_dir)                            # PART 2: dir is directly given; PART 2: dir comes from hex
 
 
   # Step 2: Get coords of corners
 
   x, y = 0, 0
+
+  visited_count = 0                                                                       # for verification at the end
 
   for i in range(len(input_arr)):
 
@@ -286,31 +289,62 @@ def get_interior_area2(part, input_str, DEBUG = False):
 
     true_next_direction = TRUE_DIRECTION[0 if i == len(input_arr) - 1 else i + 1]
 
+    visited_count += true_n
+
     # Account for off-by-one precise outside corner points relative to the grid coords
-    if (true_direction, true_next_direction) in ((R, D), (D, R)):
-      COORDS.append((x + 1, y))
-    elif (true_direction, true_next_direction) in ((D, L), (L, D)):
-      COORDS.append((x + 1, y - 1))
-    elif (true_direction, true_next_direction) in ((L, U), (U, L)):
-      COORDS.append((x, y - 1))
-    elif (true_direction, true_next_direction) in ((U, R), (R, U)):
-      COORDS.append((x, y))
+
+    # Offsets if going clockwise
+    if (true_direction, true_next_direction) in ((R, D), (D, R)):                         # top right corner of pixel
+      CW_COORDS.append((x + 1, y))
+    elif (true_direction, true_next_direction) in ((D, L), (L, D)):                       # bottom right corner of pixel
+      CW_COORDS.append((x + 1, y - 1))
+    elif (true_direction, true_next_direction) in ((L, U), (U, L)):                       # bottom left corner of pixel
+      CW_COORDS.append((x, y - 1))
+    elif (true_direction, true_next_direction) in ((U, R), (R, U)):                       # top left corner of pixel
+      CW_COORDS.append((x, y))
+    else:
+      assert False
+
+    # Offsets if going counter-clockwise
+    if (true_direction, true_next_direction) in ((R, D), (D, R)):                         # bottom left corner of pixel
+      CCW_COORDS.append((x, y - 1))
+    elif (true_direction, true_next_direction) in ((D, L), (L, D)):                       # top left corner of pixel
+      CCW_COORDS.append((x, y))
+    elif (true_direction, true_next_direction) in ((L, U), (U, L)):                       # top right corner of pixel
+      CCW_COORDS.append((x + 1, y))
+    elif (true_direction, true_next_direction) in ((U, R), (R, U)):                       # bottom right corner of pixel
+      CCW_COORDS.append((x + 1, y - 1))
     else:
       assert False
 
 
-  # ANALYZE: CROSS-MULTIPLY THE COORDS, FIND ABSOLUTE VALUE, AND RETURN HALF
+  # ANALYZE: CROSS-MULTIPLY THE COORDS, FIND ABSOLUTE VALUE, AND RETURN HALF.
+  # DO THIS FOR BOTH CW_COORDS AND CCW_COORDS, AND RETURN THE LARGER RESULT.
 
-  sum1 = 0
-  sum2 = 0
+  def shoelace(coords):
+    sum1 = 0
+    sum2 = 0
+    for i in range(len(coords)):
+      coord = coords[i]
+      next_coord = coords[0] if i == len(coords) - 1 else coords[i + 1]
+      sum1 += coord[0] * next_coord[1]
+      sum2 += coord[1] * next_coord[0]
+    return(abs(sum1 - sum2) // 2)
 
-  for i in range(len(COORDS)):
-    coord = COORDS[i]
-    next_coord = COORDS[0] if i == len(COORDS) - 1 else COORDS[i + 1]
-    sum1 += coord[0] * next_coord[1]
-    sum2 += coord[1] * next_coord[0]
+  res_cw = shoelace(CW_COORDS)
+  res_ccw = shoelace(CCW_COORDS)
 
-  return(abs(sum1 - sum2) // 2)
+  larger_result = max(res_cw, res_ccw)
+  smaller_result = min(res_cw, res_ccw)
+
+  if DISPLAY_EXTRA_INFO:
+    print(f"Interior area: {smaller_result}")
+    print(f"Dig lines area: {visited_count}")
+    print(f"Interior area + dig lines area: {smaller_result + visited_count} (this should equal total area)")
+    print(f"Total area: {larger_result}")
+
+  assert larger_result == smaller_result + visited_count
+  return larger_result
 
 
 # TEST CASES
