@@ -427,7 +427,7 @@ def dijkstra_with_movement_streak_restrictions2(part, input_str, DEBUG = False):
         if type(c) == type(1):
           row_to_print.append(str(c))
         else:
-          row_to_print.append( '\033[93m' + c + '\033[0m' )
+          row_to_print.append( '\033[1m' + '\033[93m' + c + '\033[0m' )
       print(''.join(row_to_print))
     print('')
 
