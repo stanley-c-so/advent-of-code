@@ -121,6 +121,9 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
+
+# SOLUTION 1: AT EVERY INDIVIDUAL STEP, ADD ANOTHER PQ NODE
+
 def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
 
   # PARSE INPUT DATA
@@ -268,12 +271,176 @@ def dijkstra_with_movement_streak_restrictions(part, input_str, DEBUG = False):
   return min_heat_loss
 
 
+# SOLUTION 2: USE A FOR LOOP TO MOVE STRAIGHT. THEN FORCE A TURN AND ADD THAT STATE AS A PQ NODE
+
+def dijkstra_with_movement_streak_restrictions2(part, input_str, DEBUG = False):
+
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
+  MAP = [ [ int(n) for n in row ] for row in input_arr ]
+
+
+  # CONSTANTS
+
+  H, W = len(MAP), len(MAP[0])
+
+  START_ROW, START_COL = 0, 0
+  END_ROW, END_COL = H - 1, W - 1
+
+  U, D, L, R = 'U', 'D', 'L', 'R'
+
+  DELTAS = {
+    U: (-1, 0),
+    D: (+1, 0),
+    L: (0, -1),
+    R: (0, +1),
+  }
+
+  TURN_LEFT = {
+    U: L,
+    D: R,
+    L: D,
+    R: U,
+  }
+
+  TURN_RIGHT = {
+    U: R,
+    D: L,
+    L: U,
+    R: D,
+  }
+
+  MAX_STREAK = 3 if part == 1 else 10                                                   # PART 1: MUST TURN AFTER STREAK 3
+                                                                                        # PART 2: MUST TURN AFTER STREAK 10
+
+  MIN_STREAK = 1 if part == 1 else 4                                                    # PART 1: NO MINIMUM STREAK - CAN STOP ANY TIME
+                                                                                        # PART 2: STREAK MUST BE AT LEAST 4 TO STOP
+
+
+  # DATA STRUCTURE
+
+  MEMO = {}                                                                             # keys are states which include (r, c, direction)
+                                                                                        # values are the lowest heat_loss to reach that state
+
+
+  # INIT
+
+  PQ = PriorityQueue()
+  PQ.put( (0, (START_ROW, START_COL, D, None)) )                                        # try both starting by moving down...
+  PQ.put( (0, (START_ROW, START_COL, R, None)) )                                        # ...as well as by moving right
+  
+  PQ.put( (0, (START_ROW, START_COL, U, None)) )                                        # (include U to support any start location)
+  PQ.put( (0, (START_ROW, START_COL, L, None)) )                                        # (include L to support any start location)
+
+  min_heat_loss = float('inf')
+  min_heat_loss_state = None                                                            # NOTE: this is only required for printing diagram
+
+
+  # ANALYZE
+
+  TIME_AT_START = time.time()
+  if not DEBUG: print('RUNNING REAL DATA ANALYSIS (PLEASE WAIT)...')
+
+  while not PQ.empty():
+
+    # Extract data
+    (heat_loss, data) = PQ.get()
+    r, c, direction, prev_state = data                                                  # NOTE: prev_state is only required for printing diagram
+    state = r, c, direction
+
+    # Memo - serialized state includes: coords and direction
+    if state not in MEMO:
+      MEMO[state] = { 'heat_loss': float('inf'), 'prev_state': None }
+    if MEMO[state]['heat_loss'] <= heat_loss: continue                                  # if heat_loss is not better than memo, discontinue
+    MEMO[state]['heat_loss'] = heat_loss                                                # else, save new record
+    MEMO[state]['prev_state'] = prev_state                                              # (also save prev_state if you want to print diagram)
+
+    # If reached end, update min_heat_loss
+    if (r == END_ROW and c == END_COL):
+
+      if heat_loss < min_heat_loss:
+        min_heat_loss = heat_loss
+        min_heat_loss_state = state
+
+    # Else, move straight the required number of times, then make a turn
+    else:
+
+      turn_left_dir = TURN_LEFT[direction]
+      turn_right_dir = TURN_RIGHT[direction]
+      dy, dx = DELTAS[direction]
+      new_r, new_c = r, c
+      new_heat_loss = heat_loss
+
+      for n in range(1, MAX_STREAK + 1):
+        
+        new_r += dy
+        new_c += dx
+        if not (0 <= new_r < H and 0 <= new_c < W): break
+        new_heat_loss += MAP[new_r][new_c]
+
+        if n >= MIN_STREAK:
+          # Turn left
+          PQ.put(
+            (
+              new_heat_loss,
+              (new_r, new_c, turn_left_dir, state)
+            )
+          )
+          # Turn right
+          PQ.put(
+            (
+              new_heat_loss,
+              (new_r, new_c, turn_right_dir, state)
+            )
+          )
+
+  if min_heat_loss_state == None:
+    print('ERROR: NO SOLUTION FOUND')
+    return None
+
+  if DISPLAY_EXTRA_INFO:
+    path = []
+    curr_state = min_heat_loss_state
+    while curr_state != None:
+      path.append(curr_state)
+      curr_state = MEMO[curr_state]['prev_state']
+    path.reverse()
+
+    ARROWS = { U: '^', D: 'v', L: '<', R: '>' }
+    r, c = START_ROW, START_COL
+    for i in range(len(path) - 1):
+      curr_r, curr_c, curr_direction = path[i]
+      next_r, next_c, next_direction = path[i + 1]
+      total_dy, total_dx = next_r - curr_r, next_c - curr_c
+      steps = max(abs(total_dy), abs(total_dx))
+      dy = int(bool(total_dy)) * (-1 if total_dy < 0 else 1)
+      dx = int(bool(total_dx)) * (-1 if total_dx < 0 else 1)
+      for _ in range(steps):
+        curr_r += dy
+        curr_c += dx
+        MAP[curr_r][curr_c] = ARROWS[curr_direction]
+
+    for row in MAP:
+      row_to_print = []
+      for c in row:
+        if type(c) == type(1):
+          row_to_print.append(str(c))
+        else:
+          row_to_print.append( '\033[93m' + c + '\033[0m' )
+      print(''.join(row_to_print))
+    print('')
+
+  if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
+  return min_heat_loss
+
+
 # TEST CASES
 
 test_num = [1]
 test_input = None
 test_expected = None
-func = dijkstra_with_movement_streak_restrictions
+func = dijkstra_with_movement_streak_restrictions2
 skipped_tests = set([ 2, 3, 4, 5 ])
 skipped_tests = set([ 3, 4, 5 ])
 skipped_tests = set([ 4, 5 ])
