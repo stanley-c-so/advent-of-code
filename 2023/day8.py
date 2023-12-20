@@ -196,7 +196,7 @@ def find_sync_point_of_all_cycles(part, input_str, DEBUG = False):
       for i in range(len(node_list)):
         print(f"{node_list[i]}: {steps_list[i]} steps")
 
-    return reduce(lcm, steps_list)
+    return lcm(*steps_list)
 
 
 # TEST CASES

@@ -268,10 +268,12 @@ def analyze_pulses_sent_by_modules(part, input_str, DEBUG = False):
         # If we now know the period data for all RX feeders, return the LCM
         PERIOD_FOR_RX_FEEDER_INPUT_VALUES = PERIOD_FOR_RX_FEEDER_INPUT.values()
         if all([ val != None for val in PERIOD_FOR_RX_FEEDER_INPUT_VALUES]):
+          output = lcm(*PERIOD_FOR_RX_FEEDER_INPUT_VALUES)
           if DISPLAY_EXTRA_INFO:
             print(f"Module that feeds into rx: {RX_FEEDER}")
             print(f"Periods for modules that feed into {RX_FEEDER}: {tuple(PERIOD_FOR_RX_FEEDER_INPUT_VALUES)}")
-          return reduce(lcm, PERIOD_FOR_RX_FEEDER_INPUT_VALUES)
+            print(f"LCM of periods: {output}")
+          return output
 
 
       if not module in MODULES: continue                                              # prevent code from throwing error on final module with no destinations
