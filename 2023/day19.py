@@ -181,6 +181,15 @@ def graph_traversal_based_on_series_of_conditions(part, input_str, DEBUG = False
 
     def dfs(workflow, ranges):
 
+      # Edge case: invalid interval
+      for c in ranges:
+        interval = ranges[c]
+        if interval[0] > interval[1]:                                                     # in theory, when we apply a rule and recurse, if the original range was
+                                                                                          # out of bounds for the rule, then by forcing the rule, we would recurse with an
+                                                                                          # invalid interval (it starts after it ends). if this happens, we should return.
+          # assert 0                                                                        # (however, it seems like this never actually happens with our data.)
+          return
+
       ranges_copy = deep_copy_ranges(ranges)                                              # VERY IMPORTANT: MAKE A *DEEP COPY* OF THE RANGES OBJECT!
 
       # Base cases: A or R
@@ -200,25 +209,21 @@ def graph_traversal_based_on_series_of_conditions(part, input_str, DEBUG = False
           value = rule['value']
           if rule['comp'] == GREATER_THAN:
 
-            old_value = ranges_copy[value][0]
+            copy_if_rule = deep_copy_ranges(ranges_copy)                                  # assume rule applies, and copy ranges again...
+            copy_if_rule[value][0] = max(copy_if_rule[value][0], rule['threshold'] + 1)   # ...updating them according to the rule...
+            dfs(rule['destination'], copy_if_rule)                                        # ...and recurse
 
-            if ranges_copy[value][1] > rule['threshold']:                                 # if it is possible to match this rule...
-              ranges_copy[value][0] = max(ranges_copy[value][0], rule['threshold'] + 1)
-              dfs(rule['destination'], ranges_copy)                                       # ...recurse with updated ranges
-            
-            ranges_copy[value][0] = old_value                                             # and in any event, NEGATE the rule...
-            ranges_copy[value][1] = min(ranges_copy[value][1], rule['threshold'])         # ...and prepare for next rule (next loop iteration)
+            ranges_copy[value][1] = min(ranges_copy[value][1], rule['threshold'])         # then, for the original copy (for this loop iteration), NEGATE the rule...
+                                                                                          # ...thereby preparing for next rule (next loop iteration)
 
           elif rule['comp'] == LESS_THAN:
 
-            old_value = ranges_copy[value][1]
+            copy_if_rule = deep_copy_ranges(ranges_copy)                                  # assume rule applies, and copy ranges again...
+            copy_if_rule[value][1] = min(copy_if_rule[value][1], rule['threshold'] - 1)   # ...updating them according to the rule...
+            dfs(rule['destination'], copy_if_rule)                                        # ...and recurse
 
-            if ranges_copy[value][0] < rule['threshold']:                                 # if it is possible to match this rule...
-              ranges_copy[value][1] = min(ranges_copy[value][1], rule['threshold'] - 1)   # ...recurse with updated ranges
-              dfs(rule['destination'], ranges_copy)
-            
-            ranges_copy[value][1] = old_value                                             # and in any event, NEGATE the rule...
-            ranges_copy[value][0] = max(ranges_copy[value][0], rule['threshold'])         # ...and prepare for next rule (next loop iteration)
+            ranges_copy[value][0] = max(ranges_copy[value][0], rule['threshold'])         # then, for the original copy (for this loop iteration), NEGATE the rule...
+                                                                                          # ...thereby preparing for next rule (next loop iteration)
 
           else: assert False
 
