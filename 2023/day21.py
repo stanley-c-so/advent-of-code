@@ -258,6 +258,41 @@ def get_size_of_possible_destinations_after_n_steps(part, input_str, steps, DEBU
     Such that the inside area is unreachable. My input has two such prisons per instance of the map. Therefore, we cannot blindly count the checkerboard squares and subtract
     the wall count. We have to actually flood fill the board instance to see how many tiles are reachable.
 
+    * * *
+    
+    The regions are labeled as follows:
+
+                 ___ ___
+                | Ap| As|
+                |___|___|___
+                | A'| Ab| As|
+                |___|___|___|
+                  .
+                  .
+                  .
+             ___ ___ ___
+            | E'| A | F'|
+         ___|___|___|___|___       ___ ___
+        | E'| E | A'| F | F'| ... | Bb| Bs|
+        |___|___|___|___|___|     |___|___|
+    ... | D | D'| S | B'| B | ... | B'| Bp|
+        |___|___|___|___|___|     |___|___|
+        | H'| H | C'| G | G'| ...
+        |___|___|___|___|___|
+            | H'| C | G'| 
+            |___|___|___|
+
+    Basically, S is the initial grid instance. A is the line of instances going up, B to the right, C down, D to the left.
+    Note that for A, B, C, and D, the ones adjacent to S are their "prime" (alternate) versions with different counts due to parity.
+
+    At the very ends are "A_POINT", "B_POINT", etc. These cover less area. NOTABLY, THESE VALUES ARE DIFFERENT BETWEEN A, B, C, AND D,
+    AND MUTS BE MEASURED SEPRATELY DUE TO IRREGULARITY OF THE INPUT.
+
+    In the quadrants are E, F, G, H. The filled in instances, like with all the others, will be the same size as S ("SQUARE_FILLED")
+    or be "SQUARE_PRIME_FILLED" depending on parity. However, along the diagonal edges of the diagram, some of the slopes have more area
+    covered, while some have less covered. These are named "E_BIG" and "E_SMALL", etc. NOTABLY, THESE VALUES ARE DIFFERENT BETWEEN E, F, G,
+    AND H, AND MUST BE MEASURED SEPARATELY DUE TO IRREGULARITY OF THE INPUT.
+
     """
 
     SQUARE_FILLED = 'SQUARE_FILLED'
@@ -437,6 +472,12 @@ def get_size_of_possible_destinations_after_n_steps(part, input_str, steps, DEBU
 
     # For the real input, now you have all the measured values you need.
 
+    if DISPLAY_EXTRA_INFO:
+      print('--- Region sizes: ---')
+      for item in SPECIAL_REGIONS_DATA:
+        print(f"{item}: {SPECIAL_REGIONS_DATA[item]}")
+      print('')
+
     # This refers to the component of the formula for the final count that changes depending on the multiples of grid instances you have stepped out from the initial instance
     # (These values were manually discovered by measuring up to the first 4 grid instances away from the initial instance.)
     VARIABLE_VALUE = {
@@ -503,6 +544,7 @@ def get_size_of_possible_destinations_after_n_steps(part, input_str, steps, DEBU
       print('-- Number of each type: --')
       for item in COUNT:
         print(f"{item}: {COUNT[item]}")
+      print('')
 
     # Multiply the counts by the measured areas
     total = 0
