@@ -626,6 +626,8 @@ def get_size_of_possible_destinations_after_n_steps2(part, input_str, steps, DEB
 
   else:                                                                   # PART 2: COUNT POSSIBLE STOPPING POINTS FOR INFINITE INSTANCES OF THE MAP
 
+    ORIGINAL_STEPS = steps
+
     """
     The analysis in solution 1 shows that the area clearly grows as a quadratic function of x, where x is the number of multiples of grid heights,
     and the number of steps taken = 65 + x*H. (This may only hold when x is an even number, but for our actual puzzle, this is true.)
@@ -810,7 +812,7 @@ def get_size_of_possible_destinations_after_n_steps2(part, input_str, steps, DEB
 
     b = (AREAS_BY_STEPS[589] - c - 16*a) // 4
 
-    x = (steps - 65) // 131
+    x = (ORIGINAL_STEPS - 65) // 131
     output = a * x**2 + b * x + c
 
     if DISPLAY_EXTRA_INFO:
@@ -818,7 +820,7 @@ def get_size_of_possible_destinations_after_n_steps2(part, input_str, steps, DEB
       print(f"b = {b}")
       print(f"c = {c}")
       print('')
-      print(f"Solution for A({steps}) = {a}({x}^2) + {b}({x}) + {c}")
+      print(f"Solution for A({ORIGINAL_STEPS}) = {a}({x}^2) + {b}({x}) + {c}")
       print(f"= {a * x**2} + {b * (x)} + {c}")
       print(f"= {output}")
 
