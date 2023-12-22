@@ -191,6 +191,7 @@ def analyze_falling_blocks(part, input_str, DEBUG = False):
 
     if dx + dy + dz == 0:                                           # EDGE CASE: brick is 1x1x1 (because dx, dy, and dz are all 0)
       brick['points'].append([ xl, yl, zl ])
+      MAP.add((xl, yl, zl))
 
     elif dx != 0:                                                   # x orientation
       brick['orientation'] = X
@@ -220,26 +221,26 @@ def analyze_falling_blocks(part, input_str, DEBUG = False):
 
   # HELPER FUNCTIONS
 
-  def drop_bricks(BRICKS, MAP):                                     # drops all bricks into a static position, and returns the number of bricks that moved in the process
+  def drop_bricks_and_return_num_affected(BRICKS, MAP):             # drops all bricks into a static position, and returns the number of bricks that moved in the process
 
     bricks_that_fell = 0
 
     for brick in BRICKS:
-      brick_fell = False                                            # track whether this brick fell
+      brick_fell = False                                            # track whether this brick fell (NOTE: it is outside of the while loop!)
       while True:                                                   # keep iterating while this brick can fall
         can_fall = True
 
-        if brick['points'][0][2] == 1:                              # CASE 1: brick's lowest point is already resting on the floor
-                                                                    # (this works because: if Z orientation, we sorted blocks earlier; else, all blocks have same Z)
+        bottom_point = brick['points'][0]                           # (if Z orientation, it works because we sorted points earlier; else, all points have same Z!)
+
+        if bottom_point[2] == 1:                                    # CASE 1: brick's lowest point is already resting on the floor
           can_fall = False
 
         elif brick['orientation'] == Z:                             # CASE 2: Z oriented brick: ONLY check space below bottom-most point
-          bottom_brick = brick['points'][0]                         # this works because we sorted it during preprocessing!
-          [x, y, z] = bottom_brick
+          [x, y, z] = bottom_point
           if (x, y, z - 1) in MAP:                                  # negate can_fall if the space below the bottom point is occupied
             can_fall = False
         
-        else:                                                       # CASE 3: check every point along the block to see if any of them is resting on an occupied point
+        else:                                                       # CASE 3: check every point along the brick to see if any of them is resting on an occupied point
           for [x, y, z] in brick['points']:
             if (x, y, z - 1) in MAP:
               can_fall = False
@@ -254,8 +255,7 @@ def analyze_falling_blocks(part, input_str, DEBUG = False):
           [x, y, z] = brick['points'][i]
           brick['points'][i] = [x, y, z - 1]
           MAP.add((x, y, z - 1))
-          # MAP.remove((x, y, z))
-          MAP.discard((x, y, z))
+          MAP.remove((x, y, z))
           lowest = min(lowest, z - 1)                               # OPTIONAL: update information about its lowest point (optional because we no longer use it after preprocessing)
 
         brick['lowest'] = lowest                                    # OPTIONAL: update information about its lowest point (optional because we no longer use it after preprocessing)
@@ -275,7 +275,7 @@ def analyze_falling_blocks(part, input_str, DEBUG = False):
 
   # PRE-PROCESSING: DROP ALL BRICKS INTO A STATIC POSITION
 
-  drop_bricks(BRICKS, MAP)
+  drop_bricks_and_return_num_affected(BRICKS, MAP)
 
 
   if not DEBUG: print(f"(TOOK {(time.time() - TIME_AT_START)} SECS TO DO ALL PREPROCESSING)")
@@ -293,18 +293,18 @@ def analyze_falling_blocks(part, input_str, DEBUG = False):
 
     for i in range(len(BRICKS)):
 
-      # IMPORTANT: MAKE DEEP COPY TO GET SPLICE OF BRICKS WITHOUT CURRENT BRICK
+      # IMPORTANT: MAKE DEEP COPY OF BRICKS TO AVOID MODIFYING ORIGINAL
       deep_copy = deep_copy_bricks(BRICKS)
-      bricks_copy = deep_copy[:i] + deep_copy[i+1:]
+      bricks_copy = deep_copy[:i] + deep_copy[i+1:]                                         # splice away the brick we are disintegrating
 
-      # IMPORTANT: MAKE DEEP COPY OF MAP
+      # IMPORTANT: MAKE DEEP COPY OF MAP TO AVOID MODIFYING ORIGINAL
       MAP_copy = MAP.copy()
       brick_removed = deep_copy[i]
       for (x, y, z) in brick_removed['points']:
         MAP_copy.remove((x, y, z))
 
       # Use helper function with deep copied data structures
-      if drop_bricks(bricks_copy, MAP_copy) == 0:
+      if drop_bricks_and_return_num_affected(bricks_copy, MAP_copy) == 0:
         num_can_safely_disintegrate += 1
 
     if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START_OF_ANALYSIS)} SECS)")
@@ -318,18 +318,18 @@ def analyze_falling_blocks(part, input_str, DEBUG = False):
 
     for i in range(len(BRICKS)):
 
-      # IMPORTANT: MAKE DEEP COPY TO GET SPLICE OF BRICKS WITHOUT CURRENT BRICK
+      # IMPORTANT: MAKE DEEP COPY OF BRICKS TO AVOID MODIFYING ORIGINAL
       deep_copy = deep_copy_bricks(BRICKS)
-      bricks_copy = deep_copy[:i] + deep_copy[i+1:]
+      bricks_copy = deep_copy[:i] + deep_copy[i+1:]                                         # splice away the brick we are disintegrating
 
-      # IMPORTANT: MAKE DEEP COPY OF MAP
+      # IMPORTANT: MAKE DEEP COPY OF MAP TO AVOID MODIFYING ORIGINAL
       MAP_copy = MAP.copy()
       brick_removed = deep_copy[i]
       for (x, y, z) in brick_removed['points']:
         MAP_copy.remove((x, y, z))
 
       # Use helper function with deep copied data structures
-      total += drop_bricks(bricks_copy, MAP_copy)
+      total += drop_bricks_and_return_num_affected(bricks_copy, MAP_copy)
 
     if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START_OF_ANALYSIS)} SECS)")
     return total
