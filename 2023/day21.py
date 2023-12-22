@@ -165,6 +165,8 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
+# SOLUTION 1: JUST ANALYZE IT
+
 def get_size_of_possible_destinations_after_n_steps(part, input_str, steps, DEBUG = False):
 
   # CONSTANTS
@@ -555,12 +557,281 @@ def get_size_of_possible_destinations_after_n_steps(part, input_str, steps, DEBU
     return total
 
 
+# SOLUTION 2: FOR PART 2 REAL INPUT, DERIVE THE CONSTANTS OF THE QUADRATIC EXPRESSION
+
+def get_size_of_possible_destinations_after_n_steps2(part, input_str, steps, DEBUG = False):
+
+  # CONSTANTS
+
+  SPACE, WALL, START = '.', '#', 'S'
+
+  DELTAS = {
+    (-1, 0),
+    (+1, 0),
+    (0, -1),
+    (0, +1),
+  }
+
+
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
+  MAP = [ [ c for c in row ] for row in input_arr ]
+
+  H, W = len(MAP), len(MAP[0])
+
+  # Find start
+  start_row, start_col = None, None
+  for r in range(H):
+    for c in range(W):
+      if MAP[r][c] == START:
+        start_row = r
+        start_col = c
+    if start_row != None: break
+
+
+  # HELPER FUNCTION
+
+  def solve_for_one_instance(steps):
+    VISITED_EVEN, VISITED_ODD = set(), set()                              # we are basically alternating between these two data structures
+    VISITED_EVEN.add((start_row, start_col))
+    
+    locations = set()
+    locations.add((start_row, start_col))
+    for n in range(1, steps + 1):
+      new_locations = set()
+      VISITED = VISITED_EVEN if n % 2 == 0 else VISITED_ODD
+      for (r, c) in locations:
+        for (dy, dx) in DELTAS:
+          new_r, new_c = r + dy, c + dx
+          if not (0 <= new_r < H and 0 <= new_c < W) \
+            or MAP[new_r][new_c] == WALL \
+            or (new_r, new_c) in VISITED:
+            continue
+          VISITED.add((new_r, new_c))
+          new_locations.add((new_r, new_c))
+      locations = new_locations
+      if len(locations) == 0: break
+
+    return len(VISITED_EVEN if steps % 2 == 0 else VISITED_ODD)
+
+
+  # ANALYZE
+
+  TIME_AT_START = time.time()
+
+  if part == 1:                                                           # PART 1: COUNT POSSIBLE STOPPING POINTS FOR ONE INSTANCE OF THE MAP
+
+    return solve_for_one_instance(steps)
+
+  else:                                                                   # PART 2: COUNT POSSIBLE STOPPING POINTS FOR INFINITE INSTANCES OF THE MAP
+
+    """
+    The analysis in solution 1 shows that the area clearly grows as a quadratic function of x, where x is the number of multiples of grid heights,
+    and the number of steps taken = 65 + x*H. (This may only hold when x is an even number, but for our actual puzzle, this is true.)
+
+    A = ax^2 + bx + c
+
+    We can run the simulation to gather data for x = 0 (steps = 65), x = 2 (steps = 65 + 2*131 = 327), and x = 4 (steps = 65 + 4*131 = 589).
+    
+    We get that A(65) = 3944, A(327) = 97230, and A(589) = 314556.
+
+    We solve for a, b, and c as follows:
+
+    For x = 0:
+      A(65) = a(0^2) + b(0) + c = c
+      A(65) = c
+      c = 3944
+
+    For x = 2:
+      A(327) = 4a + 2b + c
+      b = (A(327) - c - 4a) / 2
+        = (97230 - 3944 - 4a) / 2
+
+    For x = 4:
+      A(589) = 16a + 4b + c
+      b = (A(589) - c - 16a) / 4
+        = (314556 - 3944 - 16a) / 4
+
+    b = (97230 - 3944 - 4a) / 2 = (314556 - 3944 - 16a) / 4
+    => 8a = A(589) - 2(A(327)) + c
+    => a = (A(589) - 2(A(327)) + c) / 8
+         = (314556 - 2(97230) + 3944) / 8
+        = 15505
+
+    b = (97230 - 3944 - 4(15505)) / 2
+      = 15633
+
+    Therefore, A = 15505x^2 + 15633x + 3944
+    
+    For our actual input, x = (steps - start_row) / H = (26501365 - 65) / 131 = 202300
+
+    So A(26501365) = 15505(202300)^2 + 15633(202300) + 3944
+                   = 634546621450000 + 3162555900 + 3944
+                   = 634549784009844
+
+    """
+
+    # After x steps (if we care about x) save the current result
+    AREAS_BY_STEPS = {}
+
+    # Takes approximately 70 seconds
+    SKIP_SIMULATION_TO_SAVE_TIME = True
+    SKIP_SIMULATION_TO_SAVE_TIME = False
+
+    if not DEBUG and SKIP_SIMULATION_TO_SAVE_TIME:
+
+      AREAS_BY_STEPS[65] = 3944
+      AREAS_BY_STEPS[327] = 97230
+      AREAS_BY_STEPS[589] = 314556
+
+
+    # GET FILLED NUMS
+    # The reason why you can't just count checkerboard non-wall tiles to get these numbers is because there is a possibility
+    # of "prisons" (unreachable positions). Therefore it's better to adopt the part 1 code with a sufficiently large number,
+    # and part 1 will break early when it realizes that every possible location within one instance has been reached.
+    FILLED_AFTER_ODD = solve_for_one_instance((H + W) // 2 * 2 + 1)       # 7748
+    FILLED_AFTER_EVEN = solve_for_one_instance((H + W) // 2 * 2)          # 7757 (there are 2 prisons, so it's not 7759)
+
+
+    # Because you may be crossing over the edge from one instance to another, and you need to know which instance, and what relative r, c coords
+    def get_new_coords(instance_x, instance_y, r, c, dy, dx):
+      new_r, new_c = r + dy, c + dx
+      if (0 <= new_r < H and 0 <= new_c < W):
+        return (instance_x, instance_y, new_r, new_c)
+      elif (new_r < 0):
+        return (instance_x, instance_y + 1, H - 1, c)
+      elif (new_r == H):
+        return (instance_x, instance_y - 1, 0, c)
+      elif (new_c < 0):
+        return (instance_x - 1, instance_y, r, W - 1)
+      elif (new_c == W):
+        return (instance_x + 1, instance_y, r, 0)
+      else:
+        assert False
+
+    def get_current_area(locations, INSTANCES_THAT_ARE_DONE):
+      total = 0
+
+      # Add incomplete instances to total
+      for s in locations.values():
+        total += len(s)
+
+      # Add complete instances to total
+      for (instance_x, instance_y) in INSTANCES_THAT_ARE_DONE:
+        FILLED_NUMBER = (FILLED_AFTER_ODD if steps % 2 == 1 else FILLED_AFTER_EVEN) if instance_x % 2 == instance_y % 2 \
+                          else (FILLED_AFTER_EVEN if steps % 2 == 1 else FILLED_AFTER_ODD)
+        total += FILLED_NUMBER
+
+      return total
+
+
+    # Run the actual analysis for example cases, or for the real input if we are NOT skipping
+    if DEBUG or not SKIP_SIMULATION_TO_SAVE_TIME:
+
+      X_VALUES_WE_CARE_ABOUT = [ steps ] if DEBUG else [ start_row, start_row + 2*H, start_row + 4*H ]
+
+      print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
+
+      INSTANCES_THAT_ARE_DONE = {}                                        # mini-optimization: stop processing locations inside filled instances
+
+      locations = { (0, 0): set() }
+      if steps % 2 == 0:                                                  # even: start normally
+        locations[(0, 0)].add((start_row, start_col))
+      else:                                                               # odd: make 1 move in advance
+        for (dy, dx) in DELTAS:
+          if MAP[start_row + dy][start_col + dx] != WALL:
+            locations[(0, 0)].add((start_row + dy, start_col + dx))
+
+      # Cut steps down for real data (we have all the data we need after moving 4 instances out)
+      if not DEBUG: steps = start_row + H * 4
+
+      start_n = 1 if steps % 2 == 0 else 2                                # remember to skip first n if odd. then increase n by 2 per loop because we simulate a pair of moves
+      for n in range(start_n, steps + 1, 2):
+
+        new_locations = {}
+        for (instance_x, instance_y) in locations:
+          for (r, c) in locations[(instance_x, instance_y)]:
+
+            # Move n (1-indexed)
+            intermediate_locations = {}
+            for dy, dx in DELTAS:
+              intermediate_neighbor_instance_x, intermediate_neighbor_instance_y, intermediate_neighbor_r, intermediate_neighbor_c = get_new_coords(instance_x, instance_y, r, c, dy, dx)
+              if MAP[intermediate_neighbor_r][intermediate_neighbor_c] != WALL:
+                if (intermediate_neighbor_instance_x, intermediate_neighbor_instance_y) not in intermediate_locations:
+                  intermediate_locations[(intermediate_neighbor_instance_x, intermediate_neighbor_instance_y)] = set()
+                intermediate_locations[(intermediate_neighbor_instance_x, intermediate_neighbor_instance_y)].add((intermediate_neighbor_r, intermediate_neighbor_c))
+
+            # Move n + 1 (1-indexed)
+            for (intermediate_neighbor_instance_x, intermediate_neighbor_instance_y) in intermediate_locations:
+              for (intermediate_neighbor_r, intermediate_neighbor_c) in intermediate_locations[(intermediate_neighbor_instance_x, intermediate_neighbor_instance_y)]:
+                for dy, dx in DELTAS:
+                  final_neighbor_instance_x, final_neighbor_instance_y, final_neighbor_instance_r, final_neighbor_instance_c = get_new_coords(intermediate_neighbor_instance_x, intermediate_neighbor_instance_y, intermediate_neighbor_r, intermediate_neighbor_c, dy, dx)
+                  if MAP[final_neighbor_instance_r][final_neighbor_instance_c] != WALL:
+                    if (final_neighbor_instance_x, final_neighbor_instance_y) not in new_locations:
+                      new_locations[(final_neighbor_instance_x, final_neighbor_instance_y)] = set()
+                    new_locations[(final_neighbor_instance_x, final_neighbor_instance_y)].add((final_neighbor_instance_r, final_neighbor_instance_c))
+
+        for instance in locations:
+          instance_x, instance_y = instance
+          
+          FILLED_NUMBER = (FILLED_AFTER_ODD if steps % 2 == 1 else FILLED_AFTER_EVEN) if instance_x % 2 == instance_y % 2 \
+                            else (FILLED_AFTER_EVEN if steps % 2 == 1 else FILLED_AFTER_ODD)
+
+          if len(locations[instance]) == FILLED_NUMBER:
+            INSTANCES_THAT_ARE_DONE[instance] = FILLED_NUMBER
+
+        for instance in new_locations.copy():                             # COPY, so you don't modify new_locations itself in the middle of iteration
+          if instance in INSTANCES_THAT_ARE_DONE:
+            del new_locations[instance]
+
+        locations = new_locations
+
+        if (n + 1) in X_VALUES_WE_CARE_ABOUT:
+          AREAS_BY_STEPS[n + 1] = get_current_area(locations, INSTANCES_THAT_ARE_DONE)
+
+      # For the examples, we should be able to reach the end via this brute force analysis, so return the total
+      if DEBUG:
+
+        print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
+        return AREAS_BY_STEPS[steps]
+        
+    else: print('USING PRE-DISCOVERED VALUES TO SAVE TIME')
+
+    if DISPLAY_EXTRA_INFO:
+      print('Area results after the following numbers of steps:')
+      for x in AREAS_BY_STEPS:
+        print(f"{x}: {AREAS_BY_STEPS[x]}")
+      print('')
+
+    c = AREAS_BY_STEPS[65]
+
+    a = (AREAS_BY_STEPS[589] - 2*(AREAS_BY_STEPS[327]) + c) // 8
+
+    b = (AREAS_BY_STEPS[589] - c - 16*a) // 4
+
+    x = (steps - 65) // 131
+    output = a * x**2 + b * x + c
+
+    if DISPLAY_EXTRA_INFO:
+      print(f"a = {a}")
+      print(f"b = {b}")
+      print(f"c = {c}")
+      print('')
+      print(f"Solution for A({steps}) = {a}({x}^2) + {b}({x}) + {c}")
+      print(f"= {a * x**2} + {b * (x)} + {c}")
+      print(f"= {output}")
+
+    print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
+    return output
+
+
 # TEST CASES
 
 test_num = [1]
 test_input = None
 test_expected = None
-func = get_size_of_possible_destinations_after_n_steps
+func = get_size_of_possible_destinations_after_n_steps2
 skipped_tests = set([ 2, 3, 4, 5, 6, 7, 8, 9, 10 ])
 skipped_tests = set([ 3, 4, 5, 6, 7, 8, 9, 10 ])
 skipped_tests = set([ 7, 8, 9, 10 ])
