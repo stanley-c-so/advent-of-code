@@ -245,9 +245,8 @@ function NAME_OF_FUNC_HERE (part, inputStr, DEBUG = false) {
         foundCycle = true;
         const period = t - SEEN[serializedState];
         const remainingTime = NUM_ROUNDS - t;
-        t = (NUM_ROUNDS - (remainingTime % period) + 1) - period;             // subtract period ONLY to display a full period at the end
-
         console.log(`ON ROUND ${t}, WE FOUND A REPEAT OF A STATE FROM ${SEEN[serializedState]}`);
+        t = (NUM_ROUNDS - (remainingTime % period) + 1) - period;             // subtract period ONLY to display a full period at the end
         console.log(`CYCLE PERIOD: ${period}`);
         console.log(`FAST FORWARDING TO t = ${t}`);
         continue;
