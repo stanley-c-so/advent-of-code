@@ -13,6 +13,7 @@ Due to strong, probably-magical winds, the hailstones are all flying through the
 20, 25, 34 @ -2, -2, -4
 12, 31, 28 @ -1, -2, -1
 20, 19, 15 @  1, -5, -3
+
 Each line of text corresponds to the position and velocity of a single hailstone. The positions indicate where the hailstones are right now (at time 0). The velocities are constant and indicate exactly how far each hailstone will move in one nanosecond.
 
 Each line of text uses the format px py pz @ vx vy vz. For instance, the hailstone specified by 20, 19, 15 @ 1, -5, -3 has initial X position 20, Y position 19, Z position 15, X velocity 1, Y velocity -5, and Z velocity -3. After one nanosecond, the hailstone would be at 21, 14, 12.
@@ -68,6 +69,7 @@ However, you'll need to search a much larger test area if you want to see if any
 
 Considering only the X and Y axes, check all pairs of hailstones' future paths for intersections. How many of these intersections occur within the test area?
 
+
 --- Part Two ---
 
 Upon further analysis, it doesn't seem like any hailstones will naturally collide. It's up to you to fix that!
@@ -97,6 +99,7 @@ Collision position: 6, 19, 22
 Hailstone: 20, 19, 15 @ 1, -5, -3
 Collision time: 1
 Collision position: 21, 14, 12
+
 Above, each hailstone is identified by its initial position and its velocity. Then, the time and position of that hailstone's collision with your rock are given.
 
 After 1 nanosecond, the rock has exactly the same position as one of the hailstones, obliterating it into ice dust! Another hailstone is smashed to bits two nanoseconds after that. After a total of 6 nanoseconds, all of the hailstones have been destroyed.
