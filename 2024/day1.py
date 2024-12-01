@@ -124,7 +124,7 @@ def analyze_two_column_list_of_nums(part, input_str, DEBUG = False):
     left_nums.sort()
     right_nums.sort()
 
-    for i in range(len(left_nums)):
+    for i in range(len(input_arr)):
       total += abs(left_nums[i] - right_nums[i])    # add the absolute difference in the comparison to the total
 
   else:                                             # PART 2: for each left num, we need to know how often it appears in the right side list
