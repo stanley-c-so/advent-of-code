@@ -152,7 +152,7 @@ FILENAME = pathlib.Path(__file__).name
 FILENAME_SPLIT = FILENAME.split('.py')[0].split('day')
 DAY_NUM = FILENAME_SPLIT[1] if len(FILENAME_SPLIT) > 1 else None
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-INPUT_PATH = CURRENT_DIR + '\\' + (f"day{DAY_NUM}-input.txt" if DAY_NUM else 'template-input.txt')
+INPUT_PATH = CURRENT_DIR + '\\' + (f"day{str(DAY_NUM).zfill(2)}-input.txt" if DAY_NUM else 'template-input.txt')
 actual_input = open(INPUT_PATH, 'r').read()
 
 sample_input = """3   4
