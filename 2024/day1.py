@@ -115,8 +115,6 @@ def analyze_two_column_list_of_nums(part, input_str, DEBUG = False):
 
   # ANALYZE
 
-  TIME_AT_START = time.time()
-
   total = 0
 
   if part == 1:                                     # PART 1: compare lowest left to lowest right, next lowest left to next lowest right, etc.
