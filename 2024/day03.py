@@ -85,6 +85,7 @@ def search_string_for_uncorrupted_commands(part, input_str, DEBUG = False):
     factor2 = []
     curr_factor = factor1                                                                               # start on factor1...
     error = False
+    found_close_parens = False
 
     for c in segment:
       if c in DIGITS:
@@ -92,12 +93,13 @@ def search_string_for_uncorrupted_commands(part, input_str, DEBUG = False):
       elif c == COMMA:
         curr_factor = factor2                                                                           # ...and switch to factor2 on finding comma
       elif c == CLOSE_PARENS:                                                                           # close parens ends the segment
+        found_close_parens = True
         break
       else:                                                                                             # non-digit, non-comma, non-close is a fail
         error = True
         break
     
-    if len(factor1) == 0 or len(factor2) == 0:                                                          # not having both factors is a fail
+    if len(factor1) == 0 or len(factor2) == 0 or not found_close_parens:                                # not having both factors or close parens is a fail
       error = True
 
     if not error:
