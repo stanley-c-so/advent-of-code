@@ -115,11 +115,8 @@ def topological_sort(part, input_str, DEBUG = False):
 
   [rules_data, input_data] = input_str.split('\n\n')
 
-  rules_strs_list = rules_data.split('\n')
-  rules_list = [ tuple( int(n) for n in rule_str.split('|') ) for rule_str in rules_strs_list ]       # i.e. [ (73, 89), (78, 59), ... ]
-
-  input_strs_list = input_data.split('\n')
-  input_list = [ tuple( int(n) for n in input_str.split(',') ) for input_str in input_strs_list ]     # i.e. [ (18, 46, ...), ... ]
+  rules_list = [ tuple( int(n) for n in rule_str.split('|') ) for rule_str in rules_data.split('\n') ]       # i.e. [ (73, 89), (78, 59), ... ]
+  input_list = [ tuple( int(n) for n in input_str.split(',') ) for input_str in input_data.split('\n') ]     # i.e. [ (18, 46, ...), ... ]
   
 
   # UTILITY
@@ -134,12 +131,11 @@ def topological_sort(part, input_str, DEBUG = False):
 
   total = 0
 
+  # iterate through lines of input
   for nums in input_list:
 
     # create O(1) lookup to determine whether a given number appears before or after another one
-    idx_by_num = {}
-    for i in range(len(nums)):
-      idx_by_num[nums[i]] = i
+    idx_by_num = { nums[i]: i for i in range(len(nums)) }
 
     # iterate through rules list to look for rule violations
     error = False
@@ -172,7 +168,6 @@ def topological_sort(part, input_str, DEBUG = False):
           visited.add(node)
           for neighbor in GRAPH[node]: visit(neighbor)
           backward_ordering.append(node)
-
         for node in GRAPH: visit(node)
 
         total += get_middle_num_of_correct_line(backward_ordering)
