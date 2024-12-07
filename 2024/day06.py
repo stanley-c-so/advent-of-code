@@ -250,15 +250,15 @@ def analyze_movement_within_grid_with_obstacles(part, input_str, DEBUG = False):
     return 0 <= r < H and 0 <= c < W
 
   def simulate_until_oob_or_loop(r, c, deltas):
-    visited = set()                                                             # elements are (r, c)
-    visited_with_deltas = set()                                                 # elements are (r, c, deltas)
+
+    visited = {}
 
     while in_bounds(r, c):
 
-      visited.add((r, c))
-      if (r, c, deltas) in visited_with_deltas:
-        return { "spaces_visited": len(visited), "loop": True }                 # loop detected
-      visited_with_deltas.add((r, c, deltas))
+      if (r, c) not in visited: visited[(r, c)] = set()
+      if deltas in visited[(r, c)]:
+        return { "visited_data": visited, "loop": True }                        # loop detected
+      visited[(r, c)].add(deltas)
 
       dy, dx = deltas
       next_r, next_c = r + dy, c + dx
@@ -267,7 +267,7 @@ def analyze_movement_within_grid_with_obstacles(part, input_str, DEBUG = False):
       else:
         r, c = next_r, next_c
 
-    return { "spaces_visited": len(visited), "loop": False }                    # oob
+    return { "visited_data": visited, "loop": False }                           # oob
 
 
   # ANALYZE
@@ -279,10 +279,12 @@ def analyze_movement_within_grid_with_obstacles(part, input_str, DEBUG = False):
     print(f"H = {H}")
     print(f"W = {W}")
 
+  res = simulate_until_oob_or_loop(start_r, start_c, start_deltas)
+  guard_original_path_coords = list(res["visited_data"].keys())
+
   if part == 1:                                                                 # PART 1: get total number of spaces visited before oob
 
-    res = simulate_until_oob_or_loop(start_r, start_c, start_deltas)
-    return res["spaces_visited"]
+    return len(guard_original_path_coords)
 
   else:                                                                         # PART 2: count number of spaces which, if turned into wall, would cause loop
 
@@ -290,16 +292,15 @@ def analyze_movement_within_grid_with_obstacles(part, input_str, DEBUG = False):
 
     total = 0
 
-    for row in range(H):
-      for col in range(W):
-        if (row, col) == (start_r, start_c): continue                           # do not count the guard's starting position
-        if GRID[row][col] != WALL:
-          GRID[row][col] = WALL
-          res = simulate_until_oob_or_loop(start_r, start_c, start_deltas)
-          if res["loop"]: total += 1
-          GRID[row][col] = EMPTY
+    for (row, col) in guard_original_path_coords:                               # it only makes sense to consider blocking spaces along guard's original path
+      if (row, col) == (start_r, start_c): continue                             # do not count the guard's starting position
+      if GRID[row][col] == WALL: continue
+      GRID[row][col] = WALL
+      res = simulate_until_oob_or_loop(start_r, start_c, start_deltas)
+      if res["loop"]: total += 1
+      GRID[row][col] = EMPTY
 
-    if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")     # ~28.77 seconds
+    if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")     # ~5.92 seconds
     return total
 
 
