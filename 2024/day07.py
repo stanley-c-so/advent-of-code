@@ -67,7 +67,12 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def backtrack_every_possible_permutation(part, input_str, DEBUG = False):
+"""
+SOLUTION 1:
+
+Backtracking. Naturally allows trying every possible permutation of operations between operands.
+"""
+def try_every_possible_permutation(part, input_str, DEBUG = False):
 
   # PARSE INPUT DATA
 
@@ -92,7 +97,7 @@ def backtrack_every_possible_permutation(part, input_str, DEBUG = False):
     # backtrack
     def go(i, curr):                                                                      # curr is the running total, already including num at i
       nonlocal found_answer
-      if found_answer: return
+      if found_answer or curr > answer: return                                            # micro-optimization: discontinue if curr is already too big
       # if (i, curr) in visited: return                                                   # see note above
       # visited.add((i, curr))                                                            # see note above
 
@@ -113,7 +118,73 @@ def backtrack_every_possible_permutation(part, input_str, DEBUG = False):
     go(0, operands[0])                                                                    # init curr with first operand, operands[0]
     if found_answer: total += answer
 
-  if part == 2 and not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")   # ~2.21 seconds
+  if part == 2 and not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")   # ~1.45 seconds
+  return total
+
+
+"""
+SOLUTION 2:
+
+No backtracking. Instead, recognize that there are k permutations of operations, where k == base ** num_of_operators
+(where base is the number of operator types - i.e. 2 in part 1, or 3 in part 2). Each number from 0 through k-1 maps
+to one of these permutations by being converted into base-num_of_operators form, such that the digit 0 represents +,
+the digit 1 represents *, and the digit 2 represents ||.
+
+MUCH slower than solution 1 - probably because it's taking longer to generate the base representations for each permutation.
+"""
+def try_every_possible_permutation2(part, input_str, DEBUG = False):
+
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
+
+
+  # UTILITY
+
+  # REF: https://stackoverflow.com/questions/2267362/how-to-convert-an-integer-to-a-string-in-any-base
+  def baseN(num, b, numerals="0123456789abcdefghijklmnopqrstuvwxyz"):
+    return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])
+
+
+  # ANALYZE
+
+  TIME_AT_START = time.time()
+  if part == 2 and not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
+
+  total = 0
+
+  for line in input_arr:
+    [LS, RS] = line.split(': ')
+    answer = int(LS)
+    operands = [ int(n) for n in RS.split(' ') ]
+
+    num_of_operator_types = 2 if part == 1 else 3                                         # PARTS 1 AND 2: try + or * as operators
+                                                                                          # PART 2 ONLY: try || as an operator (concatenating running total with next num)
+    base = num_of_operator_types
+
+    num_of_operators = len(operands) - 1
+
+    for k in range(base ** num_of_operators):
+      curr = operands[0]
+      base_representation = baseN(k, base).zfill(num_of_operators)                        # use representation of every possible k to designate a permutation
+      for i in range(len(base_representation)):
+        if curr > answer: break                                                           # micro-optimization: discontinue if curr is already too big
+        digit = base_representation[i]
+        next_num = operands[i + 1]
+        if digit == '0':                                                                  # represents +
+          curr += next_num
+        elif digit == '1':                                                                # represents *
+          curr *= next_num
+        elif digit == '2':                                                                # represents || (PART 2 ONLY)
+          curr = int(str(curr) + str(next_num))
+        else:
+          assert False
+
+      if curr == answer:
+        total += answer
+        break
+
+  if part == 2 and not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")   # ~23.87 seconds
   return total
 
 
@@ -122,7 +193,8 @@ def backtrack_every_possible_permutation(part, input_str, DEBUG = False):
 test_num = [1]
 test_input = None
 test_expected = None
-func = backtrack_every_possible_permutation
+func = try_every_possible_permutation
+# func = try_every_possible_permutation2
 skipped_tests = set([ 2, 3, 4 ])
 skipped_tests = set([ 3, 4 ])
 skipped_tests = set([ 4 ])
