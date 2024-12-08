@@ -274,15 +274,25 @@ def analyze_movement_within_grid_with_obstacles(part, input_str, DEBUG = False):
 
   TIME_AT_START = time.time()
 
-  if DISPLAY_EXTRA_INFO:
-    print(f"Grid size:")
-    print(f"H = {H}")
-    print(f"W = {W}")
-
   res = simulate_until_oob_or_loop(start_r, start_c, start_deltas)
   guard_original_path_coords = list(res["visited_data"].keys())
 
   if part == 1:                                                                 # PART 1: get total number of spaces visited before oob
+
+    if DISPLAY_EXTRA_INFO:
+      print(f"Grid size:")
+      print(f"H = {H}")
+      print(f"W = {W}")
+
+      guard_original_path_coords_set = set(guard_original_path_coords)
+
+      for row in range(H):
+        GUARD_PATH = 'o'
+        line = []
+        for col in range(W):
+          point = input_arr[row][col]
+          line.append(point if point != EMPTY else GUARD_PATH if (row, col) in guard_original_path_coords_set else EMPTY)
+        print(''.join(line))
 
     return len(guard_original_path_coords)
 
