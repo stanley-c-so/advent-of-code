@@ -183,6 +183,18 @@ def find_points_collinear_with_pairings_of_key_points(part, input_str, DEBUG = F
         dy = coords2[0] - coords1[0]
         dx = coords2[1] - coords1[1]
 
+        # NOTE: what if dy and dx have a GCD > 1? then in part 2, the distance between antinodes would be smaller than the distance
+        # between the two antennae. there would be antinodes between them, and similarly a lot more not between them.
+        # i suppose this would also of interest in part 1, but for the part of the description that says:
+        # "This means that for any pair of antennas with the same frequency, there are two antinodes, one on either side of them."
+        # nevertheless, i will leave this block here.
+        GCD = gcd(dy, dx)
+        if GCD > 1:
+          print('confirm whether any distances can be simplified')
+          assert 0                                                    # it turns out that my data has no such pair where GCD > 1
+        dy = dy // GCD
+        dx = dx // GCD
+
         if part == 1:                                                 # PART 1: only 2 antinodes: at points where distance to one
                                                                       # antenna is twice that of distance to other
 
@@ -197,15 +209,6 @@ def find_points_collinear_with_pairings_of_key_points(part, input_str, DEBUG = F
         else:                                                         # PART 2: ALL coords that line up with any pair of antennae
                                                                       # is an antinode
 
-          # NOTE: what if dy and dx have a GCD > 1? then the distance between antinodes would be smaller than the distance
-          # between the two antennae. there would be antinodes between them, and similarly a lot more not between them.
-          GCD = gcd(dy, dx)
-          if GCD > 1:
-            print('confirm whether any distances can be simplified')
-            assert 0                                                  # it turns out that my data has no such pair where GCD > 1
-          dy = dy // GCD
-          dx = dx // GCD
-
           # antinodes closer to coords1
           (r, c) = coords1
           while in_bounds((r, c)):
@@ -219,6 +222,15 @@ def find_points_collinear_with_pairings_of_key_points(part, input_str, DEBUG = F
             antinode_coords.add((r, c))
             r += dy
             c += dx
+
+  if DISPLAY_EXTRA_INFO:
+    ANTINODE = '#'
+    for row in range(H):
+      line = []
+      for col in range(W):
+        symbol = input_arr[row][col]
+        line.append(symbol if symbol != EMPTY else ANTINODE if (row, col) in antinode_coords else EMPTY)
+      print(' '.join(line))
 
   return len(antinode_coords)
 
