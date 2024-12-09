@@ -96,10 +96,10 @@ def defragment_disk(part, input_str, DEBUG = False):
 
   # DATA STRUCTURES
 
-  DATA_BY_ID = {}
-  FREE_BLOCK_INDICES = []
+  DATA_BY_ID = {}                                                                             # holds start idx and length information
+  FREE_BLOCK_INDICES = []                                                                     # holds start idx and length information
 
-  DISK = []
+  DISK = []                                                                                   # stores the representation of the data
 
 
   # UTILITY
@@ -108,7 +108,7 @@ def defragment_disk(part, input_str, DEBUG = False):
     total = 0
     for i in range(len(DISK)):
       if DISK[i] != EMPTY:
-        total += i * int(DISK[i])
+        total += i * DISK[i]
     return total
 
   def clean_up_free_block_indices():
@@ -133,7 +133,7 @@ def defragment_disk(part, input_str, DEBUG = False):
     FREE_BLOCK_INDICES.append({ 'idx': free_block_start_idx, 'length': free_block_length })   # for part 2
     for _ in range(free_block_length): DISK.append(EMPTY)
 
-  clean_up_free_block_indices()
+  clean_up_free_block_indices()                                                               # micro-optimization
 
 
   # ANALYZE
@@ -164,44 +164,32 @@ def defragment_disk(part, input_str, DEBUG = False):
       print(f"Highest ID: {highest_id}")
       print(f"Length of disk: {len(DISK)}")
 
-    for id in range(highest_id, -1, -1):
+    for id in range(highest_id, -1, -1):                                                      # consider all IDs, starting with the highest, going down
 
       file_data = DATA_BY_ID[id]
       file_start_idx = file_data['idx']
       file_length = file_data['length']
 
-      for free_block_idx in range(len(FREE_BLOCK_INDICES)):
+      for free_block_idx in range(len(FREE_BLOCK_INDICES)):                                   # consider all free blocks, from left to right
 
         free_block_start_idx = FREE_BLOCK_INDICES[free_block_idx]['idx']
         free_block_length = FREE_BLOCK_INDICES[free_block_idx]['length']
 
         if free_block_length >= file_length and free_block_start_idx < file_start_idx:        # empty block must be big enough AND be to the left of data
 
-          for i in range(file_length):
+          for i in range(file_length):                                                        # swap the data...
             DISK[free_block_start_idx + i] = id
             DISK[file_start_idx + i] = EMPTY
           
-          FREE_BLOCK_INDICES[free_block_idx]['idx'] += file_length
-          FREE_BLOCK_INDICES[free_block_idx]['length'] -= file_length
+          FREE_BLOCK_INDICES[free_block_idx]['idx'] += file_length                            # ...and update the free block's start idx...
+          FREE_BLOCK_INDICES[free_block_idx]['length'] -= file_length                         # ...as well as length
           break
 
+      clean_up_free_block_indices()                                                           # micro-optimization
 
-      clean_up_free_block_indices()
+    if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")                   # ~2.41 seconds
 
-      # print(f"CURR ID: {id}")
-      # for i in range(min(10, len(FREE_BLOCK_INDICES))):
-      #   print(FREE_BLOCK_INDICES[i])
-      # # print(FREE_BLOCK_INDICES)
-      # # print(''.join([ str(n) for n in DISK ]))
-      # print('-' * 100)
-
-    if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
-
-  # print("+++ AFTER")
-  # print(DISK)
   return checksum(DISK)
-  
-  # 8551696246309
 
 
 # TEST CASES
