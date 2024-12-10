@@ -144,7 +144,7 @@ def paths_from_0_through_9_on_a_grid(part, input_str, DEBUG = False):
   # PARSE INPUT DATA
 
   input_arr = input_str.split('\n')
-  GRID = [ [ int(n) for n in row ] for row in input_arr ]
+  GRID = [ [ (n if n == '.' else int(n)) for n in row ] for row in input_arr ]
 
 
   # CONSTANTS
@@ -225,6 +225,53 @@ sample_input = """89010123
 01329801
 10456732"""
 
+sample_input2 = """...0...
+...1...
+...2...
+6543456
+7.....7
+8.....8
+9.....9"""
+
+sample_input3 = """..90..9
+...1.98
+...2..7
+6543456
+765.987
+876....
+987...."""
+
+sample_input4 = """10..9..
+2...8..
+3...7..
+4567654
+...8..3
+...9..2
+.....01"""
+
+sample_input5 = """.....0.
+..4321.
+..5..2.
+..6543.
+..7..4.
+..8765.
+..9...."""
+
+sample_input6 = """..90..9
+...1.98
+...2..7
+6543456
+765.987
+876....
+987...."""
+
+sample_input7 = """012345
+123456
+234567
+345678
+4.6789
+56789."""
+
 # Test case 1
 test_input = {
   'part': 1,
@@ -237,12 +284,39 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 # Test case 2
 test_input = {
   'part': 1,
+  'input_str': sample_input2,
+  'DEBUG': True,
+}
+test_expected = 2
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 3
+test_input = {
+  'part': 1,
+  'input_str': sample_input3,
+  'DEBUG': True,
+}
+test_expected = 4
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 4
+test_input = {
+  'part': 1,
+  'input_str': sample_input4,
+  'DEBUG': True,
+}
+test_expected = 1 + 2
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 5
+test_input = {
+  'part': 1,
   'input_str': actual_input,
 }
 test_expected = 582
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
-# Test case 3
+# Test case 6
 test_input = {
   'part': 2,
   'input_str': sample_input,
@@ -251,7 +325,34 @@ test_input = {
 test_expected = 81
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
-# Test case 4
+# Test case 7
+test_input = {
+  'part': 2,
+  'input_str': sample_input5,
+  'DEBUG': True,
+}
+test_expected = 3
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 8
+test_input = {
+  'part': 2,
+  'input_str': sample_input6,
+  'DEBUG': True,
+}
+test_expected = 13
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 9
+test_input = {
+  'part': 2,
+  'input_str': sample_input7,
+  'DEBUG': True,
+}
+test_expected = 121 + 106
+test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
+
+# Test case 10
 test_input = {
   'part': 2,
   'input_str': actual_input,
