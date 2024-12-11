@@ -90,6 +90,7 @@ def analyze_amount_of_growth_of_num_list(part, input_str, DEBUG = False):
   # UTILITY
 
   MEMO = {}
+  cache_hits = 0
   def get_len_additions_by_num_and_iterations(num, iterations):
     if num not in MEMO: MEMO[num] = {}
     if iterations not in MEMO[num]:
@@ -110,6 +111,10 @@ def analyze_amount_of_growth_of_num_list(part, input_str, DEBUG = False):
           total += get_len_additions_by_num_and_iterations(new_num, iterations - 1)
         MEMO[num][iterations] += total
 
+    else:
+      nonlocal cache_hits
+      cache_hits += 1
+
     return MEMO[num][iterations]
 
 
@@ -120,8 +125,15 @@ def analyze_amount_of_growth_of_num_list(part, input_str, DEBUG = False):
   NUM_ITERATIONS = 25 if part == 1 else 75                                                                  # PART 1: run 25 iterations
                                                                                                             # PART 2: run 75 iterations
 
-  return len(STONES) + sum(get_len_additions_by_num_and_iterations(num, NUM_ITERATIONS) for num in STONES)  # initial length is len(STONES)
+  res = len(STONES) + sum(get_len_additions_by_num_and_iterations(num, NUM_ITERATIONS) for num in STONES)   # initial length is len(STONES)
                                                                                                             # add the number of len additions per stone
+
+  if DISPLAY_EXTRA_INFO:
+    print(f'Number of unique numbers: {len(MEMO)}')
+    print(f'Number of cached number/iteration results: {sum(len(MEMO[key]) for key in MEMO)}')
+    print(f'Number of cache hits: {cache_hits}')
+
+  return res
 
 
 # TEST CASES
