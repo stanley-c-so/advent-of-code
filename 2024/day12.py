@@ -155,6 +155,11 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
+"""
+SOLUTION 1:
+
+My original solution. Use a grid mask to keep track of fence data. When a new side is found, fill out the entire side.
+"""
 def analyze_area_perimeter_and_num_sides_of_regions(part, input_str, DEBUG = False):
 
   # PARSE INPUT DATA
@@ -213,7 +218,7 @@ def analyze_area_perimeter_and_num_sides_of_regions(part, input_str, DEBUG = Fal
       region_type = GRID[row][col]
       region_area = 0                                                           # for parts 1 and 2
       region_perimeter = 0                                                      # for part 1 only
-      num_sides = 0                                                             # for part 2 only
+      region_sides = 0                                                          # for part 2 only
 
       # DFS
       stack = [ (row, col) ]
@@ -239,7 +244,7 @@ def analyze_area_perimeter_and_num_sides_of_regions(part, input_str, DEBUG = Fal
 
             if FENCE_DATA[r][c][(dy, dx)]: continue                             # we are already aware of this fence, having found this side previously. skip
 
-            num_sides += 1                                                      # new side discovered (part 2)
+            region_sides += 1                                                   # new side discovered (part 2)
 
             # discover the rest of the current side, and mark fences
             for pdy, pdx in PERPENDICULAR_DELTAS[(dy, dx)]:                     # walk perpendicularly in both directions
@@ -258,12 +263,113 @@ def analyze_area_perimeter_and_num_sides_of_regions(part, input_str, DEBUG = Fal
 
         total_price += region_area * region_perimeter
 
-      else:                                                                     # PART 2: PRICE IS BSAED ON REGION AREA * NUMBER OF SIDES OF REGION
+      else:                                                                     # PART 2: PRICE IS BASED ON REGION AREA * NUMBER OF SIDES OF REGION
 
-        total_price += region_area * num_sides
+        total_price += region_area * region_sides
 
   return total_price
 
+
+"""
+SOLUTION 2:
+
+Count the corners: A polygon has the same number of sides as it has corners.
+"""
+def analyze_area_perimeter_and_num_sides_of_regions2(part, input_str, DEBUG = False):
+
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
+  GRID = [ [ c for c in row ] for row in input_arr ]
+
+
+  # CONSTANTS
+
+  H, W = len(GRID), len(GRID[0])
+
+  DELTAS = (+1, 0), (-1, 0), (0, +1), (0, -1)
+
+
+  # UTILITY
+
+  def in_bounds(r, c):
+    return 0 <= r < H and 0 <= c < W
+  
+  def same_region(nr, nc, region_type):                                         # given a neighbor (nr, nc) (relative to some (r, c)), is it the same region?
+    return in_bounds(nr, nc) and GRID[nr][nc] == region_type                    # it is iff it's in bounds and has the same type as (r, c) (region_type)
+  
+
+  # ANALYZE
+
+  TIME_AT_START = time.time()
+
+  total_price = 0
+  visited = set()
+
+  for row in range(H):
+    for col in range(W):
+      if (row, col) in visited: continue                                        # flood fill to find regions
+
+      ### new region discovered ###
+
+      # init
+      region_type = GRID[row][col]
+      region_area = 0                                                           # for parts 1 and 2
+      region_perimeter = 0                                                      # for part 1 only
+      region_sides = 0                                                          # for part 2 only
+
+      # DFS
+      stack = [ (row, col) ]
+      while stack:
+        (r, c) = stack.pop()
+        if (r, c) in visited: continue
+        visited.add((r, c))                                                     # new cell within region discovered
+
+        region_area += 1
+        local_perimeter = 4                                                     # init local perimeter at 4, but decrement when neighboring cells are the same region
+
+        # HANDLE DFS AND LOCAL PERIMETER
+
+        for dy, dx in DELTAS:                                                   # for all 4 cardinal directions...
+          nr, nc = r + dy, c + dx
+
+          if same_region(nr, nc, region_type):                                  # if neighbor is in bounds and has a matching region type...
+
+            stack.append((nr, nc))                                              # ...continue DFS
+            local_perimeter -= 1                                                # ...decrement local perimeter, as no fence is needed
+
+        region_perimeter += local_perimeter                                     # for part 1
+
+        # COUNT THE SIDES BY COUNTING THE CORNERS
+
+        ARE_NEIGHBORING_CELLS_SAME_REGION = [ [None] * 3 for _ in range(3) ]
+        for dy in range(-1, 2):
+          for dx in range(-1, 2):
+            nr, nc = r + dy, c + dx
+            ARE_NEIGHBORING_CELLS_SAME_REGION[dy + 1][dx + 1] = same_region(nr, nc, region_type)
+
+        [ [TL, U, TR], [L, _, R], [BL, D, BR] ] = ARE_NEIGHBORING_CELLS_SAME_REGION
+
+        if not L and not U: region_sides += 1                                   # TL convex corner
+        if not R and not U: region_sides += 1                                   # TR convex corner
+        if not L and not D: region_sides += 1                                   # BL convex corner
+        if not R and not D: region_sides += 1                                   # BR convex corner
+
+        if L and U and not TL: region_sides += 1                                # TL concave corner
+        if R and U and not TR: region_sides += 1                                # TR concave corner
+        if L and D and not BL: region_sides += 1                                # BL concave corner
+        if R and D and not BR: region_sides += 1                                # BR concave corner
+
+
+      if part == 1:                                                             # PART 1: PRICE IS BASED ON REGION AREA * REGION PERIMETER
+
+        total_price += region_area * region_perimeter
+
+      else:                                                                     # PART 2: PRICE IS BASED ON REGION AREA * NUMBER OF SIDES OF REGION
+
+        total_price += region_area * region_sides
+
+  return total_price
 
 # TEST CASES
 
@@ -271,6 +377,7 @@ test_num = [1]
 test_input = None
 test_expected = None
 func = analyze_area_perimeter_and_num_sides_of_regions
+func = analyze_area_perimeter_and_num_sides_of_regions2
 skipped_tests = set([ 2, 3, 4, 5, 6, 7, 8, 9, 10 ])
 skipped_tests = set([ 4, 5, 6, 7, 8, 9, 10 ])
 skipped_tests = set([ 5, 6, 7, 8, 9, 10 ])
