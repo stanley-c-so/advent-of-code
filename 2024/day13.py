@@ -110,11 +110,17 @@ def find_whole_number_combination_of_additions_to_match_target(part, input_str, 
   input_arr = input_str.split('\n\n')
   for machine_data in input_arr:
     data = machine_data.split('\n')
-
-    A_values = [ int(d.split('+')[1]) for d in data[0].split(': ')[1].split(', ') ]       # e.g. if "Button A: X+94, Y+34" then this is [ 94, 34 ]
+    
+    A_values_with_commas = data[0].split(': ')[1].split(', ')
+    assert all('+' in d for d in A_values_with_commas)                                    # verify we only ever have positive values
+    A_values = [ int(d.split('+')[1]) for d in A_values_with_commas ]                     # e.g. if "Button A: X+94, Y+34" then this is [ 94, 34 ]
     [ Xa, Ya ] = A_values
-    B_values = [ int(d.split('+')[1]) for d in data[1].split(': ')[1].split(', ') ]       # e.g. if "Button B: X+22, Y+67" then this is [ 22, 67 ]
+
+    B_values_with_commas = data[1].split(': ')[1].split(', ')
+    assert all('+' in d for d in B_values_with_commas)                                    # verify we only ever have positive values
+    B_values = [ int(d.split('+')[1]) for d in B_values_with_commas ]                     # e.g. if "Button B: X+22, Y+67" then this is [ 22, 67 ]
     [ Xb, Yb ] = B_values
+
     T_values = [ int(d.split('=')[1]) for d in data[2].split(': ')[1].split(', ') ]       # e.g. if "Prize: X=8400, Y=5400" then this is [ 8400, 5400 ]
     [ Xt, Yt ] = T_values
 
@@ -159,8 +165,8 @@ def find_whole_number_combination_of_additions_to_match_target(part, input_str, 
 
     A = (Xt - Xb * B) / Xa
 
-    valid_A = A == floor(A)
-    valid_B = B == floor(B)
+    valid_A = A == floor(A) and A >= 0
+    valid_B = B == floor(B) and B >= 0
     valid = valid_A and valid_B
 
     token_cost = floor(A * BUTTON_A_TOKEN_COST + B * BUTTON_B_TOKEN_COST) if valid else 0
