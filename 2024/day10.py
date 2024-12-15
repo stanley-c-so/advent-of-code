@@ -139,7 +139,7 @@ DISPLAY_EXTRA_INFO = True
 """
 Surprisingly, no optimization required. Even with the input data, the naive BFS is lightning fast!
 """
-def paths_from_0_through_9_on_a_grid(part, input_str, DEBUG = False):
+def paths_from_0_through_9_on_a_grid(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
 
@@ -312,6 +312,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 1,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 582
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
@@ -356,6 +357,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 2,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 1302
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)

@@ -93,7 +93,7 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def find_whole_number_combination_of_additions_to_match_target(part, input_str, DEBUG = False):
+def find_whole_number_combination_of_additions_to_match_target(part, input_str, DEBUG = False, *args):
 
   # CONSTANTS
 
@@ -246,6 +246,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 1,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 36870
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
@@ -256,13 +257,14 @@ test_input = {
   'input_str': sample_input,
   'DEBUG': True,
 }
-test_expected = 875318608908
+test_expected = 875318608908  # NOTE: Not given by problem description
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
 # Test case 4
 test_input = {
   'part': 2,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 78101482023732
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)

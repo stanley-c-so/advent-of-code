@@ -90,7 +90,7 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def analyze_two_column_list_of_nums(part, input_str, DEBUG = False):
+def analyze_two_column_list_of_nums(part, input_str, DEBUG = False, *args):
 
   # DATA STRUCTURES
 
@@ -175,6 +175,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 1,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 2430334
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
@@ -192,6 +193,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 2,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 28786472
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)

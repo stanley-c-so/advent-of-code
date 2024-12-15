@@ -72,7 +72,7 @@ SOLUTION 1:
 
 Backtracking. Naturally allows trying every possible permutation of operations between operands.
 """
-def try_every_possible_permutation(part, input_str, DEBUG = False):
+def try_every_possible_permutation(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
 
@@ -132,7 +132,7 @@ the digit 1 represents *, and the digit 2 represents ||.
 
 MUCH slower than solution 1 - probably because it's taking longer to generate the base representations for each permutation.
 """
-def try_every_possible_permutation2(part, input_str, DEBUG = False):
+def try_every_possible_permutation2(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
 
@@ -232,6 +232,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 1,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 20281182715321
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
@@ -249,6 +250,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 2,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 159490400628354
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)

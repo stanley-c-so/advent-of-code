@@ -134,7 +134,7 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def find_points_collinear_with_pairings_of_key_points(part, input_str, DEBUG = False):
+def find_points_collinear_with_pairings_of_key_points(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
 
@@ -281,6 +281,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 1,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 369
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
@@ -298,6 +299,7 @@ test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, high
 test_input = {
   'part': 2,
   'input_str': actual_input,
+  'DEBUG': False,
 }
 test_expected = 1169
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
