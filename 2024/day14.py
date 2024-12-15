@@ -267,6 +267,25 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
 
   # UTILITY
 
+  def calculate_safety_factor(ROBOTS):
+    quadrantTL = 0
+    quadrantTR = 0
+    quadrantBL = 0
+    quadrantBR = 0
+
+    for robot in ROBOTS:
+      top_half = robot['Py'] < H // 2
+      bottom_half = H // 2 < robot['Py']
+      left_half = robot['Px'] < W // 2
+      right_half = W // 2 < robot['Px']
+
+      if top_half and left_half: quadrantTL += 1
+      if top_half and right_half: quadrantTR += 1
+      if bottom_half and left_half: quadrantBL += 1
+      if bottom_half and right_half: quadrantBR += 1
+
+    return quadrantTL * quadrantTR * quadrantBL * quadrantBR
+
   def serialize(GRID_FOR_DRAW):
     output = [ [ [] for _ in range(W) ] for _ in range(H) ]
     INTRACELL_DELIMITER = ','
@@ -301,9 +320,18 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
 
   # ANALYZE
 
+  TIME_AT_START = time.time()
+
+  if part == 2 and not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
+
   part_2_output = None
   GRID_AT_SOLUTION = None
   part_2_period = None
+
+  cumulative_safety_factor = calculate_safety_factor(ROBOTS)
+  lowest_safety_factor = cumulative_safety_factor
+  highest_safety_factor = cumulative_safety_factor
+  safety_factor_at_part_2_solution = None
 
   TIME = 100 if part == 1 else maxsize                                        # PART 1: SIMULATE 100 SECONDS
                                                                               # PART 2: SIMULATE INDEFINITELY UNTIL EASTER EGG FOUND
@@ -318,6 +346,7 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
       GRID_FOR_DRAW[robot['Py']][robot['Px']].append(str(i))
 
     if part == 2:                                                             # part 2 only: check for easter egg / cycle
+
       serial = serialize(GRID_FOR_DRAW)
       if serial in seen:                                                      # DISPLAY_EXTRA_INFO only: find the period
         part_2_period = t - seen[serial]
@@ -325,38 +354,35 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
         print(f"Previously saw this arrangement at time = {seen[serial]} seconds")
         print(f"Period is {part_2_period} seconds")
         print('')
+        print(f"Average safety factor: {cumulative_safety_factor / t}")
+        print(f"Highest safety factor: {highest_safety_factor}")
+        print(f"Lowest safety factor: {lowest_safety_factor}")
+        print(f"Safety factor at part 2 solution: {safety_factor_at_part_2_solution}")
+        print('')
         break
       seen[serial] = t
+
+      safety_factor = calculate_safety_factor(ROBOTS)
+      cumulative_safety_factor += safety_factor
+      lowest_safety_factor = min(lowest_safety_factor, safety_factor)
+      highest_safety_factor = max(highest_safety_factor, safety_factor)
+
       if convert_to_str_to_check_against_solution(GRID_FOR_DRAW) == SOLUTION: # part 2 win condition
         part_2_output = t
         GRID_AT_SOLUTION = deepcopy(GRID_FOR_DRAW)
+        safety_factor_at_part_2_solution = safety_factor
         if not DISPLAY_EXTRA_INFO: break
 
   if part == 1:                                                               # PART 1: COUNT ROBOTS IN EACH QUADRANT
 
-    quadrantTL = 0
-    quadrantTR = 0
-    quadrantBL = 0
-    quadrantBR = 0
-
-    for robot in ROBOTS:
-      top_half = robot['Py'] < H // 2
-      bottom_half = H // 2 < robot['Py']
-      left_half = robot['Px'] < W // 2
-      right_half = W // 2 < robot['Px']
-
-      if top_half and left_half: quadrantTL += 1
-      if top_half and right_half: quadrantTR += 1
-      if bottom_half and left_half: quadrantBL += 1
-      if bottom_half and right_half: quadrantBR += 1
-
-    return quadrantTL * quadrantTR * quadrantBL * quadrantBR
+    return calculate_safety_factor(ROBOTS)
 
   else:                                                                       # PART 2: RETURN t AT WHICH EASTER EGG APPEARS
     
     assert part_2_output != None
     assert GRID_AT_SOLUTION != None
     draw(GRID_AT_SOLUTION, part_2_output)
+    if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
     return part_2_output
 
 
