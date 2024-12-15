@@ -348,7 +348,7 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
     if part == 2:                                                             # part 2 only: check for easter egg / cycle
 
       serial = serialize(GRID_FOR_DRAW)
-      if serial in seen:                                                      # DISPLAY_EXTRA_INFO only: find the period
+      if serial in seen:                                                      # find the period
         part_2_period = t - seen[serial]
         print(f"Currently at time = {t} seconds")
         print(f"Previously saw this arrangement at time = {seen[serial]} seconds")
@@ -359,19 +359,28 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
         print(f"Lowest safety factor: {lowest_safety_factor}")
         print(f"Safety factor at part 2 solution: {safety_factor_at_part_2_solution}")
         print('')
+        print(f"Expected solution at t = {part_2_output}")
+        print('')
         break
       seen[serial] = t
 
       safety_factor = calculate_safety_factor(ROBOTS)
       cumulative_safety_factor += safety_factor
-      lowest_safety_factor = min(lowest_safety_factor, safety_factor)
+      # lowest_safety_factor = min(lowest_safety_factor, safety_factor)
       highest_safety_factor = max(highest_safety_factor, safety_factor)
 
-      if convert_to_str_to_check_against_solution(GRID_FOR_DRAW) == SOLUTION: # part 2 win condition
+      if safety_factor < lowest_safety_factor:
+        lowest_safety_factor = safety_factor
         part_2_output = t
         GRID_AT_SOLUTION = deepcopy(GRID_FOR_DRAW)
         safety_factor_at_part_2_solution = safety_factor
-        if not DISPLAY_EXTRA_INFO: break
+
+
+      # if convert_to_str_to_check_against_solution(GRID_FOR_DRAW) == SOLUTION: # part 2 win condition
+      #   part_2_output = t
+      #   GRID_AT_SOLUTION = deepcopy(GRID_FOR_DRAW)
+      #   safety_factor_at_part_2_solution = safety_factor
+      #   if not DISPLAY_EXTRA_INFO: break
 
   if part == 1:                                                               # PART 1: COUNT ROBOTS IN EACH QUADRANT
 
@@ -381,6 +390,7 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
     
     assert part_2_output != None
     assert GRID_AT_SOLUTION != None
+    assert convert_to_str_to_check_against_solution(GRID_AT_SOLUTION) == SOLUTION
     draw(GRID_AT_SOLUTION, part_2_output)
     if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
     return part_2_output
