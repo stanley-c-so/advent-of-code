@@ -366,21 +366,12 @@ def find_easter_egg_image_from_movement_of_pixels_within_grid(part, input_str, D
 
       safety_factor = calculate_safety_factor(ROBOTS)
       cumulative_safety_factor += safety_factor
-      # lowest_safety_factor = min(lowest_safety_factor, safety_factor)
       highest_safety_factor = max(highest_safety_factor, safety_factor)
-
       if safety_factor < lowest_safety_factor:
         lowest_safety_factor = safety_factor
         part_2_output = t
         GRID_AT_SOLUTION = deepcopy(GRID_FOR_DRAW)
         safety_factor_at_part_2_solution = safety_factor
-
-
-      # if convert_to_str_to_check_against_solution(GRID_FOR_DRAW) == SOLUTION: # part 2 win condition
-      #   part_2_output = t
-      #   GRID_AT_SOLUTION = deepcopy(GRID_FOR_DRAW)
-      #   safety_factor_at_part_2_solution = safety_factor
-      #   if not DISPLAY_EXTRA_INFO: break
 
   if part == 1:                                                               # PART 1: COUNT ROBOTS IN EACH QUADRANT
 
