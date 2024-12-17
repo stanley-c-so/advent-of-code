@@ -151,6 +151,11 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
+"""
+SOLUTION 1:
+
+DFS
+"""
 def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
@@ -163,6 +168,7 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
   # CONSTANTS
 
   WALL, EMPTY, START, END = '#', '.', 'S', 'E'
+  ON_BEST_PATH = 'O'
 
   DELTAS = (0, +1), (+1, 0), (0, -1), (-1, 0)                                             # ORDER IS IMPORTANT
                                                                                           # each subsequent delta is a right turn
@@ -172,6 +178,7 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
 
   H, W = len(GRID), len(GRID[0])
 
+  start_dir = 0
   start_row, start_col = None, None
   end_row, end_col = None, None
   for row in range(H):
@@ -184,10 +191,24 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
   # UTILITY
 
   def draw(ref_set):
+    class bcolors:
+      # HEADER = '\033[95m'
+      # OKBLUE = '\033[94m'
+      # OKCYAN = '\033[96m'
+      OKGREEN = '\033[92m'
+      WARNING = '\033[93m'
+      # FAIL = '\033[91m'
+      ENDC = '\033[0m'
+      # BOLD = '\033[1m'
+      # UNDERLINE = '\033[4m'
+    
     for row in range(H):
       row_to_draw = []
       for col in range(W):
-        if (row, col) in ref_set: row_to_draw.append('O')
+        if GRID[row][col] == START: row_to_draw.append(f"{bcolors.OKGREEN}{START}{bcolors.ENDC}")
+        elif GRID[row][col] == END: row_to_draw.append(f"{bcolors.OKGREEN}{END}{bcolors.ENDC}")
+        elif (row, col) in ref_set: row_to_draw.append(f"{bcolors.WARNING}{ON_BEST_PATH if (row, col) in INTERSECTIONS_AND_CORNERS_AND_ENDPOINT else ON_BEST_PATH.lower()}{bcolors.ENDC}")
+        elif GRID[row][col] == EMPTY: row_to_draw.append(' ')
         else: row_to_draw.append(GRID[row][col])
       print(''.join(row_to_draw))
     print('')
@@ -232,7 +253,7 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
   best_cost = float('inf')
   part_2_reverse_path = []
 
-  stack = [ ( start_row, start_col, 0, 0, None ) ]                                        # initial cost: 0, initial dir: 0, initial prev_landmark: None
+  stack = [ ( start_row, start_col, start_dir, 0, None ) ]                                # initial cost: 0, initial dir: 0, initial prev_landmark: None
 
   while stack:
     (row, col, curr_dir, cost, prev_landmark) = stack.pop()
@@ -295,7 +316,7 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
 
   if part == 1:                                                                           # PART 1: GET BEST COST TO REACH THE END
 
-    return best_cost
+    return best_cost                                                                      # ~10.94 seconds
   
   else:                                                                                   # PART 2: GET TOTAL AREA OF ALL BEST PATHS TO THE END
 
@@ -330,7 +351,256 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
     if DISPLAY_EXTRA_INFO:
       draw(part_2_output)
 
-    return len(part_2_output)
+    return len(part_2_output)                                                             # ~10.33 seconds
+
+
+"""
+SOLUTION 2:
+
+Dijkstra's algorithm. BLAZING FAST!
+"""
+def best_path_through_maze_with_costs_for_moving_and_turning2(part, input_str, DEBUG = False, *args):
+
+  # PARSE INPUT DATA
+
+  input_arr = input_str.split('\n')
+
+  GRID = [ [ c for c in row ] for row in input_arr ]
+
+
+  # CONSTANTS
+
+  WALL, EMPTY, START, END = '#', '.', 'S', 'E'
+  ON_BEST_PATH = 'O'
+
+  DELTAS = (0, +1), (+1, 0), (0, -1), (-1, 0)                                             # ORDER IS IMPORTANT
+                                                                                          # each subsequent delta is a right turn
+
+  COST_GO = 1
+  COST_TURN = 1000
+
+  H, W = len(GRID), len(GRID[0])
+
+  start_dir = 0
+  start_row, start_col = None, None
+  end_row, end_col = None, None
+  for row in range(H):
+    for col in range(W):
+      if GRID[row][col] == START: start_row, start_col = row, col
+      if GRID[row][col] == END: end_row, end_col = row, col
+  assert (start_row, start_col) != (None, None) and (end_row, end_col) != (None, None)
+
+
+  # UTILITY
+
+  def draw(ref_set):
+    class bcolors:
+      # HEADER = '\033[95m'
+      # OKBLUE = '\033[94m'
+      # OKCYAN = '\033[96m'
+      OKGREEN = '\033[92m'
+      WARNING = '\033[93m'
+      # FAIL = '\033[91m'
+      ENDC = '\033[0m'
+      # BOLD = '\033[1m'
+      # UNDERLINE = '\033[4m'
+    
+    for row in range(H):
+      row_to_draw = []
+      for col in range(W):
+        if GRID[row][col] == START: row_to_draw.append(f"{bcolors.OKGREEN}{START}{bcolors.ENDC}")
+        elif GRID[row][col] == END: row_to_draw.append(f"{bcolors.OKGREEN}{END}{bcolors.ENDC}")
+        elif (row, col) in ref_set: row_to_draw.append(f"{bcolors.WARNING}{ON_BEST_PATH if (row, col) in INTERSECTIONS_AND_CORNERS_AND_TERMINALS else ON_BEST_PATH.lower()}{bcolors.ENDC}")
+        elif GRID[row][col] == EMPTY: row_to_draw.append(' ')
+        else: row_to_draw.append(GRID[row][col])
+      print(''.join(row_to_draw))
+    print('')
+
+  def sexy_draw(ref_set):
+    class bcolors:
+      # HEADER = '\033[95m'
+      # OKBLUE = '\033[94m'
+      # OKCYAN = '\033[96m'
+      OKGREEN = '\033[92m'
+      WARNING = '\033[93m'
+      # FAIL = '\033[91m'
+      ENDC = '\033[0m'
+      # BOLD = '\033[1m'
+      # UNDERLINE = '\033[4m'
+
+    visited = set()
+    stack = [ (start_row, start_col) ]
+    while stack:
+      (row, col) = stack.pop()
+      if (row, col) in visited: continue
+      visited.add((row, col))
+
+      # explore neighbors
+      for dy, dx in DELTAS:
+        if (row + dy, col + dx) in ref_set:
+          stack.append((row + dy, col + dx))
+
+      os.system('cls' if os.name == 'nt' else 'clear')
+      for r in range(H):
+        row_to_draw = []
+        for c in range(W):
+          if GRID[r][c] == START: row_to_draw.append(f"{bcolors.OKGREEN}{START}{bcolors.ENDC}")
+          elif GRID[r][c] == END: row_to_draw.append(f"{bcolors.OKGREEN}{END}{bcolors.ENDC}")
+          elif (r, c) in visited: row_to_draw.append(f"{bcolors.WARNING}{ON_BEST_PATH if (r, c) in INTERSECTIONS_AND_CORNERS_AND_TERMINALS else ON_BEST_PATH.lower()}{bcolors.ENDC}")
+          elif GRID[r][c] == EMPTY: row_to_draw.append(' ')
+          else: row_to_draw.append(GRID[r][c])
+        print(''.join(row_to_draw))
+      print('')
+      time.sleep(0.005)
+
+
+  # DATA STRUCTURES
+
+  INTERSECTIONS_AND_CORNERS_AND_TERMINALS = set()                                         # stores all landmarks where you may have to turn (or stop)
+  for row in range(H):
+    for col in range(W):
+      if GRID[row][col] == START:
+        INTERSECTIONS_AND_CORNERS_AND_TERMINALS.add((row, col))                           # landmark: start (need this for the graph!)
+      elif GRID[row][col] == END:
+        INTERSECTIONS_AND_CORNERS_AND_TERMINALS.add((row, col))                           # landmark: endpoint
+      elif GRID[row][col] == EMPTY:
+        empty_neighbors = 0
+        for dy, dx in DELTAS:
+          nr, nc = row + dy, col + dx
+          if GRID[nr][nc] == EMPTY:                                                       # assume in bounds as map is always surrounded by wall
+            empty_neighbors += 1
+        if empty_neighbors > 2:
+          INTERSECTIONS_AND_CORNERS_AND_TERMINALS.add((row, col))                         # landmark: 3- or 4-way intersection
+        elif empty_neighbors == 2:
+          if GRID[row + 1][col] == EMPTY and GRID[row - 1][col] == EMPTY: continue        # (vertical line - not a corner)
+          if GRID[row][col + 1] == EMPTY and GRID[row][col - 1] == EMPTY: continue        # (horizontal line - not a corner)
+          INTERSECTIONS_AND_CORNERS_AND_TERMINALS.add((row, col))                         # landmark: corner
+
+  if DISPLAY_EXTRA_INFO:
+    if DEBUG:
+      print(f"KEY POINTS (intersections, corners, endpoints):")
+      print(f"{INTERSECTIONS_AND_CORNERS_AND_TERMINALS}")
+    print(f"Landmark count: {len(INTERSECTIONS_AND_CORNERS_AND_TERMINALS)}")
+    print('')
+
+
+  COST = {}
+  PREV_LANDMARK = {}
+  GRAPH = {}
+  for (row, col) in INTERSECTIONS_AND_CORNERS_AND_TERMINALS:
+    for curr_dir in range(4):
+
+      # COST: Create entry
+      COST[(row, col, curr_dir)] = float('inf')
+
+      # PREV_LANDMARK: Create entry
+      PREV_LANDMARK[(row, col, curr_dir)] = set()
+
+      # GRAPH: Create edge to same node but different direction
+      if (row, col, curr_dir) not in GRAPH:
+        GRAPH[(row, col, curr_dir)] = []
+        for i in (1, 3):
+          GRAPH[(row, col, curr_dir)].append({
+            'neighbor': (row, col, (curr_dir + i) % 4),
+            'cost': COST_TURN,
+          })
+
+      # GRAPH: Create edge to neighbor
+      (dy, dx) = DELTAS[curr_dir]
+      r, c = row + dy, col + dx
+      while GRID[r][c] != WALL and (r, c) not in INTERSECTIONS_AND_CORNERS_AND_TERMINALS:
+        r += dy
+        c += dx
+      if GRID[r][c] != WALL:
+        GRAPH[(row, col, curr_dir)].append({
+          'neighbor': (r, c, curr_dir),
+          'cost': (abs(r - row) + abs(c - col)) * COST_GO,
+        })
+
+
+  # ANALYZE
+
+  if not DEBUG: print('RUNNING REAL DATA ANALYSIS (PLEASE WAIT)...')
+  TIME_AT_START = time.time()
+
+  best_cost = float('inf')
+  part_2_reverse_path = []
+
+  PQ = PriorityQueue()
+  PQ.put(( 0, (start_row, start_col, start_dir, None) ))
+
+  while not PQ.empty():
+    (cost, data) = PQ.get()
+    (row, col, curr_dir, prev_landmark) = data
+
+    if cost > best_cost:
+      # print(f"exceeded best_cost {best_cost} with cost {cost}")
+      continue
+
+    if cost > COST[(row, col, curr_dir)]:
+      continue
+
+    if cost == COST[(row, col, curr_dir)]:
+      PREV_LANDMARK[(row, col, curr_dir)].add(prev_landmark)
+      continue
+
+    COST[(row, col, curr_dir)] = cost
+    PREV_LANDMARK[(row, col, curr_dir)] = { prev_landmark }
+
+    if GRID[row][col] == END:
+
+      best_cost = min(best_cost, cost)
+      
+      part_2_reverse_path.append((row, col, curr_dir))
+
+    else:
+
+      for next_data in GRAPH[(row, col, curr_dir)]:
+        next_row, next_col, next_dir = next_data['neighbor']
+        next_cost = cost + next_data['cost']
+        PQ.put(( next_cost, (next_row, next_col, next_dir, (row, col, curr_dir)) ))
+
+  if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
+
+  if part == 1:
+
+    return best_cost                                                                      # ~0.04 seconds
+
+  else:
+
+    part_2_output = { (end_row, end_col) }                                                # init with endpoint included
+
+    part_2_reverse_path = [                                                               # filter out states that did not achieve best cost
+      final_landmark for final_landmark in part_2_reverse_path
+      if COST[final_landmark] == best_cost
+    ]
+
+    visited = set()
+    while part_2_reverse_path:
+      landmark = part_2_reverse_path.pop()
+      if landmark in visited or landmark == None: continue                                # landmark can be None when reaching start position
+      visited.add(landmark)
+
+      (row, col, curr_dir) = landmark
+
+      for prev_landmark in PREV_LANDMARK[landmark]:
+        if prev_landmark == None:                                                         # when reaching start
+          continue
+        elif row == prev_landmark[0] and col == prev_landmark[1]:                         # previous move was a 90 degree turn
+          part_2_reverse_path.append(prev_landmark)
+        else:                                                                             # retrace path to prev_landmark
+          r, c = row, col
+          while not (r == prev_landmark[0] and c == prev_landmark[1]):
+            r -= DELTAS[curr_dir][0]
+            c -= DELTAS[curr_dir][1]
+            part_2_output.add((r, c))
+          part_2_reverse_path.append((r, c, curr_dir))
+
+    if DISPLAY_EXTRA_INFO:
+      draw(part_2_output)
+      # sexy_draw(part_2_output)
+
+    return len(part_2_output)                                                             # ~0.04 seconds
 
 
 # TEST CASES
@@ -339,6 +609,8 @@ test_num = [1]
 test_input = None
 test_expected = None
 func = best_path_through_maze_with_costs_for_moving_and_turning
+func = best_path_through_maze_with_costs_for_moving_and_turning2
+skipped_tests = set([ 2, 3, 4, 5, 6 ])
 skipped_tests = set([ 3, 4, 5, 6 ])
 skipped_tests = set([ 4, 5, 6 ])
 skipped_tests = set([ 3, 6 ])
