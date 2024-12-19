@@ -357,7 +357,7 @@ def best_path_through_maze_with_costs_for_moving_and_turning(part, input_str, DE
 """
 SOLUTION 2:
 
-Dijkstra's algorithm. BLAZING FAST!
+Dijkstra's / Heuristic / A* algorithm. BLAZING FAST!
 """
 def best_path_through_maze_with_costs_for_moving_and_turning2(part, input_str, DEBUG = False, *args):
 
@@ -392,6 +392,10 @@ def best_path_through_maze_with_costs_for_moving_and_turning2(part, input_str, D
 
 
   # UTILITY
+
+  def heuristic(row, col):
+    # return abs(end_row - row) + abs(end_col - col)                                        # manhattan distance to target
+    return (sqrt((end_row - row)**2 + (end_col - col)**2))                                # actual distance to target
 
   def draw(ref_set):
     class bcolors:
@@ -527,7 +531,12 @@ def best_path_through_maze_with_costs_for_moving_and_turning2(part, input_str, D
   part_2_reverse_path = []
 
   PQ = PriorityQueue()
-  PQ.put(( 0, (start_row, start_col, start_dir, None) ))
+  PQ.put((
+    0,                                                                                    # dijkstra
+    # heuristic(start_row, start_col),                                                      # heuristic (DOESN'T WORK WITH MY HEURISTIC)
+    # 0 + heuristic(start_row, start_col),                                                  # A* (DOESN'T WORK WITH MY HEURISTIC)
+    (start_row, start_col, start_dir, None)
+  ))
 
   while not PQ.empty():
     (cost, data) = PQ.get()
@@ -557,7 +566,9 @@ def best_path_through_maze_with_costs_for_moving_and_turning2(part, input_str, D
 
       for next_data in GRAPH[(row, col, curr_dir)]:
         next_row, next_col, next_dir = next_data['neighbor']
-        next_cost = cost + next_data['cost']
+        next_cost = cost + next_data['cost']                                              # dijkstra
+        # next_cost = heuristic(next_row, next_col)                                         # heuristic (DOESN'T WORK WITH MY HEURISTIC)
+        # next_cost = (cost + next_data['cost']) + heuristic(next_row, next_col)            # A* (DOESN'T WORK WITH MY HEURISTIC)
         PQ.put(( next_cost, (next_row, next_col, next_dir, (row, col, curr_dir)) ))
 
   if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")
