@@ -156,34 +156,8 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
         PATH = [ (END_ROW, END_COL) ]
         while PATH[-1] != (START_ROW, START_COL):
           PATH.append(PREV_COORDS_BY_COORDS[PATH[-1]])
-
-        PATH_SET = set(PATH)
-
-        if part == 1 and DISPLAY_EXTRA_INFO:
           
-          class bcolors:
-            # HEADER = '\033[95m'
-            # OKBLUE = '\033[94m'
-            # OKCYAN = '\033[96m'
-            OKGREEN = '\033[92m'
-            WARNING = '\033[93m'
-            FAIL = '\033[91m'
-            ENDC = '\033[0m'
-            # BOLD = '\033[1m'
-            # UNDERLINE = '\033[4m'
-
-          for row in range(H):
-            row_to_draw = []
-            for col in range(W):
-              if (row, col) == (START_ROW, START_COL): row_to_draw.append(f"{bcolors.OKGREEN}{START}{bcolors.ENDC}")
-              elif (row, col) == (END_ROW, END_COL): row_to_draw.append(f"{bcolors.OKGREEN}{END}{bcolors.ENDC}")
-              elif (row, col) in PATH_SET: row_to_draw.append(f"{bcolors.WARNING}{PATH_NODE}{bcolors.ENDC}")
-              elif GRID[row][col] == CORRUPTED: row_to_draw.append(f"{bcolors.FAIL}{CORRUPTED}{bcolors.ENDC}")
-              elif GRID[row][col] == SAFE: row_to_draw.append(f"{SAFE}")
-              else: assert False, f"UNRECOGNIZED CHARACTER AT ({row}, {col}): {GRID[row][col]}"
-            print(''.join(row_to_draw))
-          
-        return moves, PATH_SET                                                            # don't just return moves; also return
+        return moves, set(PATH)                                                           # don't just return moves; also return
                                                                                           # a set of all coordinates on the best path,
                                                                                           # so that we have to rerun BFS in part 2 ONLY
                                                                                           # when a safe coord on the current path gets corrupted
@@ -202,28 +176,57 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
 
   if part == 1:                                                                           # PART 1: RUN SIMULATION AFTER `part_1_bytes` CELLS GET CORRUPTED
 
+    # Corrupt the first `path_1_bytes` cells
     for i in range(part_1_bytes):
       [X, Y] = FALL_DATA[i]
       GRID[Y][X] = CORRUPTED
 
-    moves, _ = BFS(GRID)                                                                  # we only care about the moves, not the PATH_SET
+    # Then simulate and return the required information
+    moves, PATH_SET = BFS(GRID)                                                           # we only care about PATH_SET for DISPLAY_EXTRA_INFO
+
+    if DISPLAY_EXTRA_INFO:
+          
+      class bcolors:
+        # HEADER = '\033[95m'
+        # OKBLUE = '\033[94m'
+        # OKCYAN = '\033[96m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        # BOLD = '\033[1m'
+        # UNDERLINE = '\033[4m'
+
+      for row in range(H):
+        row_to_draw = []
+        for col in range(W):
+          if (row, col) == (START_ROW, START_COL): row_to_draw.append(f"{bcolors.OKGREEN}{START}{bcolors.ENDC}")
+          elif (row, col) == (END_ROW, END_COL): row_to_draw.append(f"{bcolors.OKGREEN}{END}{bcolors.ENDC}")
+          elif (row, col) in PATH_SET: row_to_draw.append(f"{bcolors.WARNING}{PATH_NODE}{bcolors.ENDC}")
+          elif GRID[row][col] == CORRUPTED: row_to_draw.append(f"{bcolors.FAIL}{CORRUPTED}{bcolors.ENDC}")
+          elif GRID[row][col] == SAFE: row_to_draw.append(f"{SAFE}")
+          else: assert False, f"UNRECOGNIZED CHARACTER AT ({row}, {col}): {GRID[row][col]}"
+        print(''.join(row_to_draw))
+
     return moves
 
   else:                                                                                   # PART 2: FIND THE CRITICAL CELL THAT BLOCKS ALL PATHS
 
     if not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
 
-    PATH = None
+    OLD_PATH = None
+    PATH_SET = None
     for i in range(len(FALL_DATA)):
       [X, Y] = FALL_DATA[i]
       GRID[Y][X] = CORRUPTED
 
-      if PATH == None or (Y, X) in PATH:                                                  # optimization: ONLY run BFS when (1) first time, or (2) a
+      if PATH_SET == None or (Y, X) in PATH_SET:                                          # optimization: ONLY run BFS when (1) first time, or (2) a
                                                                                           # cell *on the current best path* gets corrupted.
                                                                                           # otherwise, no need to rerun BFS when the current path
                                                                                           # isn't blocked!
 
-        moves, PATH = BFS(GRID)
+        OLD_PATH = PATH_SET                                                               # for DISPLAY_EXTRA_INFO
+        moves, PATH_SET = BFS(GRID)
 
         if moves == FAIL:                                                                 # at this point, there are no more paths
 
@@ -234,7 +237,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
               OKBLUE = '\033[94m'
               # OKCYAN = '\033[96m'
               OKGREEN = '\033[92m'
-              # WARNING = '\033[93m'
+              WARNING = '\033[93m'
               FAIL = '\033[91m'
               ENDC = '\033[0m'
               # BOLD = '\033[1m'
@@ -246,6 +249,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
                 if (row, col) == (START_ROW, START_COL): row_to_draw.append(f"{bcolors.OKGREEN}{START}{bcolors.ENDC}")
                 elif (row, col) == (END_ROW, END_COL): row_to_draw.append(f"{bcolors.OKGREEN}{END}{bcolors.ENDC}")
                 elif (row, col) == (Y, X): row_to_draw.append(f"{bcolors.OKBLUE}{CORRUPTED}{bcolors.ENDC}")
+                elif (row, col) in OLD_PATH: row_to_draw.append(f"{bcolors.WARNING}{PATH_NODE}{bcolors.ENDC}")
                 elif GRID[row][col] == CORRUPTED: row_to_draw.append(f"{bcolors.FAIL}{CORRUPTED}{bcolors.ENDC}")
                 elif GRID[row][col] == SAFE: row_to_draw.append(f"{SAFE}")
                 else: assert False, f"UNRECOGNIZED CHARACTER AT ({row}, {col}): {GRID[row][col]}"
