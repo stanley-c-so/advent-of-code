@@ -1,9 +1,181 @@
 """
 
-COPY + PASTE PUZZLE DESCRIPTION HERE (PART 1)
+--- Day 20: Race Condition ---
+
+The Historians are quite pixelated again. This time, a massive, black building looms over you - you're right outside the CPU!
+
+While The Historians get to work, a nearby program sees that you're idle and challenges you to a race. Apparently, you've arrived just in time for the frequently-held race condition festival!
+
+The race takes place on a particularly long and twisting code path; programs compete to see who can finish in the fewest picoseconds. The winner even gets their very own mutex!
+
+They hand you a map of the racetrack (your puzzle input). For example:
+
+###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..E#...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+The map consists of track (.) - including the start (S) and end (E) positions (both of which also count as track) - and walls (#).
+
+When a program runs through the racetrack, it starts at the start position. Then, it is allowed to move up, down, left, or right; each such move takes 1 picosecond. The goal is to reach the end position as quickly as possible. In this example racetrack, the fastest time is 84 picoseconds.
+
+Because there is only a single path from the start to the end and the programs all go the same speed, the races used to be pretty boring. To make things more interesting, they introduced a new rule to the races: programs are allowed to cheat.
+
+The rules for cheating are very strict. Exactly once during a race, a program may disable collision for up to 2 picoseconds. This allows the program to pass through walls as if they were regular track. At the end of the cheat, the program must be back on normal track again; otherwise, it will receive a segmentation fault and get disqualified.
+
+So, a program could complete the course in 72 picoseconds (saving 12 picoseconds) by cheating for the two moves marked 1 and 2:
+
+###############
+#...#...12....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..E#...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+Or, a program could complete the course in 64 picoseconds (saving 20 picoseconds) by cheating for the two moves marked 1 and 2:
+
+###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..E#...12..#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+This cheat saves 38 picoseconds:
+
+###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..E#...#...#
+###.####1##.###
+#...###.2.#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+This cheat saves 64 picoseconds and takes the program directly to the end:
+
+###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..21...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+Each cheat has a distinct start position (the position where the cheat is activated, just before the first move that is allowed to go through walls) and end position; cheats are uniquely identified by their start position and end position.
+
+In this example, the total number of cheats (grouped by the amount of time they save) are as follows:
+
+There are 14 cheats that save 2 picoseconds.
+There are 14 cheats that save 4 picoseconds.
+There are 2 cheats that save 6 picoseconds.
+There are 4 cheats that save 8 picoseconds.
+There are 2 cheats that save 10 picoseconds.
+There are 3 cheats that save 12 picoseconds.
+There is one cheat that saves 20 picoseconds.
+There is one cheat that saves 36 picoseconds.
+There is one cheat that saves 38 picoseconds.
+There is one cheat that saves 40 picoseconds.
+There is one cheat that saves 64 picoseconds.
+You aren't sure what the conditions of the racetrack will be like, so to give yourself as many options as possible, you'll need a list of the best cheats. How many cheats would save you at least 100 picoseconds?
 
 
-COPY + PASTE PUZZLE DESCRIPTION HERE (PART 2)
+--- Part Two ---
+
+The programs seem perplexed by your list of cheats. Apparently, the two-picosecond cheating rule was deprecated several milliseconds ago! The latest version of the cheating rule permits a single cheat that instead lasts at most 20 picoseconds.
+
+Now, in addition to all the cheats that were possible in just two picoseconds, many more cheats are possible. This six-picosecond cheat saves 76 picoseconds:
+
+###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#1#####.#.#.###
+#2#####.#.#...#
+#3#####.#.###.#
+#456.E#...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+Because this cheat has the same start and end positions as the one above, it's the same cheat, even though the path taken during the cheat is different:
+
+###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S12..#.#.#...#
+###3###.#.#.###
+###4###.#.#...#
+###5###.#.###.#
+###6.E#...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############
+Cheats don't need to use all 20 picoseconds; cheats can last any amount of time up to and including 20 picoseconds (but can still only end when the program is on normal track). Any cheat time not used is lost; it can't be saved for another cheat later.
+
+You'll still need a list of the best cheats, but now there are even more to choose between. Here are the quantities of cheats in this example that save 50 picoseconds or more:
+
+There are 32 cheats that save 50 picoseconds.
+There are 31 cheats that save 52 picoseconds.
+There are 29 cheats that save 54 picoseconds.
+There are 39 cheats that save 56 picoseconds.
+There are 25 cheats that save 58 picoseconds.
+There are 23 cheats that save 60 picoseconds.
+There are 20 cheats that save 62 picoseconds.
+There are 19 cheats that save 64 picoseconds.
+There are 12 cheats that save 66 picoseconds.
+There are 14 cheats that save 68 picoseconds.
+There are 12 cheats that save 70 picoseconds.
+There are 22 cheats that save 72 picoseconds.
+There are 4 cheats that save 74 picoseconds.
+There are 3 cheats that save 76 picoseconds.
+Find the best cheats using the updated cheating rules. How many cheats would save you at least 100 picoseconds?
 
 """
 
@@ -24,19 +196,15 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
+def shortest_path_through_maze_with_one_time_walk_through_walls_for_max_distance_allowed(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
 
   input_arr = input_str.split('\n')
-  # input_arr = [ block.split('\n') for block in input_str.split('\n\n') ]
-  # print(input_arr)
 
   GRID = [ [ c for c in row ] for row in input_arr ]
-  # print(GRID)
 
   (min_time_saved, ) = args
-  print(f"MIN TIME SAVED: {min_time_saved}")
 
 
   # CONSTANTS
@@ -48,7 +216,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
 
   DELTAS = (0, +1), (+1, 0), (0, -1), (-1, 0)
 
-  
+
   # DISCOVERY
 
   start_row, start_col = None, None
@@ -61,113 +229,116 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
   assert (end_row, end_col) != (None, None)
 
 
-  def simulate(TOTAL_CHEAT_LEN, baseline=float('inf')):
+  def simulate_backward_no_cheats():
     Q = deque()
-    Q.append((start_row, start_col, None, 0, TOTAL_CHEAT_LEN))
+    Q.append((end_row, end_col, 0))
 
-    output = []
-    # output = {}
+    output = {}
 
-    visited = set()
     while len(Q):
-      (row, col, cheat_data, moves, cheat_len_remaining) = Q.popleft()
+      (row, col, moves) = Q.popleft()
 
-      if baseline - moves < min_time_saved: break
-
-      state = (row, col, cheat_data)
-
-      if (row, col) == (end_row, end_col):                                              # WIN CONDITION: REACHED THE END
-
-        cheat_entry = None if cheat_data == None else (cheat_data[0], cheat_data[1])
-        cheat_exit = None if cheat_data == None else (cheat_data[2], cheat_data[3])
-
-        if cheat_data != None and (cheat_data[2], cheat_data[3]) == (None, None):       # edge case where you step out of the wall and immediately hit exit
-          cheat_exit = (end_row, end_col)
-
-        output.append({
-          'moves': moves,
-          'cheat_entry': cheat_entry,
-          'cheat_exit': cheat_exit,
-        })
-
-        continue
-      
-      if state in visited: continue                                                     # guard
-
-      if cheat_data != None:                                                            # optimization: prevents revisiting pre-cheat coords
-        # (entry_row, entry_col, exit_row, exit_col) = cheat_data
-        state_before_cheat = (row, col, None)
-        if state_before_cheat in visited: continue
-
-      visited.add(state)
+      if (row, col) in output and output[(row, col)] <= moves: continue
+      output[(row, col)] = moves
 
       for dy, dx in DELTAS:
         nr, nc = row + dy, col + dx
 
-        if not (0 <= nr < H and 0 <= nc < W): continue                                  # guard against oob
-
-        if GRID[nr][nc] == WALL:                                                        # entering wall...
-
-          if TOTAL_CHEAT_LEN == 0: continue                                             # if cheats disabled, continue
-
-          if cheat_len_remaining == 0: continue                                         # if cannot keep cheat going, continue
-
-          next_cheat_data = cheat_data
-
-          if GRID[row][col] != WALL:
-            next_cheat_data = (row, col, None, None)
-
-          Q.append((nr, nc, next_cheat_data, moves + 1, cheat_len_remaining - 1))
-
-        else:                                                                           # entering empty...
-
-          next_cheat_data = cheat_data
-
-          if GRID[row][col] == WALL:                                                    # ending cheat
-            cheat_len_remaining = 0
-            entry_row = cheat_data[0]
-            entry_col = cheat_data[1]
-            next_cheat_data = (entry_row, entry_col, nr, nc)
-
-          Q.append((nr, nc, next_cheat_data, moves + 1, cheat_len_remaining))
-
-        # if TOTAL_CHEAT_LEN > 0 and cheat_data == None and GRID[nr][nc] == WALL:
-        #   Q.append((nr, nc, (nr, nc, None, None), moves + 1))
-
-        # if GRID[nr][nc] != WALL:
-        #   Q.append((nr, nc, cheat_data, moves + 1))
+        if not (0 <= nr < H and 0 <= nc < W): continue
+        if GRID[nr][nc] == WALL: continue
+        Q.append((nr, nc, moves + 1))
 
     return output
 
+  SHORTEST_PATH_TO_END_WITHOUT_CHEATS = simulate_backward_no_cheats()                               # save a reference for each non-wall location: what is the shortest distance from there to the end?
+  BASELINE = SHORTEST_PATH_TO_END_WITHOUT_CHEATS[(start_row, start_col)]                            # BASELINE time taken with no cheats is the shortest distance from start to the end
+
+
+  # UTILITY
+
+  def manhattan_distance(r1, c1, r2, c2):
+    return abs(r1 - r2) + abs(c1 - c2)
+
 
   # ANALYZE
+
+  def simulate(TOTAL_CHEAT_LEN):
+    Q = deque()
+    Q.append((start_row, start_col, 0))
+
+    output = {}                                                                                     # keys are unique (cheat_entry_row, cheat_entry_col, cheat_exit_row, cheat_exit_col) tuples (or None for no cheat);
+                                                                                                    # values are sets of possible total moves to end for solutions involving that specific cheat serial
+
+    visited = {}                                                                                    # keys are coords, values are moves. ASSUME NO CHEAT YET:
+                                                                                                    # (once we cheat, we can calculate everything after, so we don't need to save that for BFS)
+    while len(Q):
+      (row, col, moves) = Q.popleft()                                                               # again, THIS STATE ASSUMES NO CHEAT YET
+
+      if BASELINE - moves < min_time_saved: break                                                   # STOP CONDITION: you are no longer saving the minimum required amount of time
+
+      if (row, col) == (end_row, end_col):                                                          # REACHED THE END WITHOUT CHEATING
+
+        assert False                                                                                # this should never happen anyway, because the stop condition guards against taking too much time (with min_time_saved)
+
+        if None not in output: output[None] = {}
+        if None not in output[None]: output[None][None] = float('inf')
+        output[None][None] = min(output[None][None], moves)
+        continue
+
+      if (row, col) in visited and visited[(row, col)] <= moves: continue                           # guard against revisiting coordinates pre-cheat
+      visited[(row, col)] = moves
+
+      ### CONTINUE BFS WITHOUT CHEATING ###
+
+      for dy, dx in DELTAS:
+        nr, nc = row + dy, col + dx
+        if not (0 <= nr < H and 0 <= nc < W): continue                                              # guard against oob
+        if GRID[nr][nc] == WALL: continue                                                           # no cheating allowed!
+        Q.append((nr, nc, moves + 1))
+
+      ### ACTIVATE CHEAT, AS THIS QUEUE ASSUMES NO CHEATING YET, AND CALCULATE ALL THE WAY TO THE END (SO WE DO NOT CONTINUE BFS POST-CHEAT) ###
+
+      for nr in range(row - TOTAL_CHEAT_LEN, row + TOTAL_CHEAT_LEN + 1):                            # activating the cheat allows you to step freely in a diamond area (manhattan distance == TOTAL_CHEAT_LEN)
+        for nc in range(col - TOTAL_CHEAT_LEN, col + TOTAL_CHEAT_LEN + 1):
+          if not (0 <= nr < H and 0 <= nc < W): continue                                            # guard against oob
+          if GRID[nr][nc] == WALL: continue                                                         # no ending in a wall - after the cheat, you MUST be in a non-wall space
+
+          cheat_distance = manhattan_distance(row, col, nr, nc)
+          if cheat_distance > TOTAL_CHEAT_LEN: continue                                             # outside of manhattan distance diamond area
+
+          moves_from_cheat_exit_to_end = SHORTEST_PATH_TO_END_WITHOUT_CHEATS[(nr, nc)]              # once cheat is over, we are ONLY interested in the best path to the end
+          total_moves_with_this_cheat = moves + cheat_distance + moves_from_cheat_exit_to_end
+
+          cheat_serial = (row, col, nr, nc)
+          output[cheat_serial] = total_moves_with_this_cheat
+
+    return output
+
 
   if not DEBUG: print('RUNNING REAL DATA ANALYSIS (PLEASE WAIT)...')
 
   TIME_AT_START = time.time()
 
-  TOTAL_CHEAT_LEN = 2 - 1 if part == 1 else 20 - 1
+  TOTAL_CHEAT_LEN = 2 if part == 1 else 20                                                          # PART 1: CHEAT FOR UP TO 2 STEPS (LAST STEP MUST NOT BE WALL)
+                                                                                                    # PART 2: CHEAT FOR UP TO 20 STEPS (LAST STEP MUST NOT BE WALL)
 
-  baseline = simulate(0)[0]['moves']
-  print(f"BASELINE TIME: {baseline}")
-  print('')
+  res = simulate(TOTAL_CHEAT_LEN)
 
-  res = simulate(TOTAL_CHEAT_LEN, baseline)
-  # if DEBUG:
-  #   print(f"1 cheat times: {res}")
-  #   print('')
-  print(f"res: {res}")
-  print('')
+  aggregate_info = {}
+  for cheat_serial in res:
+    time_saved = BASELINE - res[cheat_serial]
+    if time_saved >= min_time_saved:
+      if time_saved not in aggregate_info: aggregate_info[time_saved] = 0
+      aggregate_info[time_saved] += 1
 
-  res_filtered = [ baseline - r['moves'] for r in res if baseline - r['moves'] >= min_time_saved ]
-  # if DEBUG:
-  #   print(f"1 cheat times, where min_time_saved is saved: {res_filtered}")
-  #   print('')
-  print(f"time saved, where min_time_saved is saved: {res_filtered}")
-  print('')
+  if DEBUG and DISPLAY_EXTRA_INFO:
+    for time_saved in aggregate_info:
+      if time_saved >= min_time_saved:
+        print(f"Number of cheats that save {time_saved} moves: {aggregate_info[time_saved]}")
+    print('')
 
-  if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")   # ~47.41 seconds
-  return len(res_filtered)
+  if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")                           # ~2.86 seconds
+  return sum(aggregate_info.values())
 
 
 # TEST CASES
@@ -175,12 +346,11 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
 test_num = [1]
 test_input = None
 test_expected = None
-func = NAME_OF_FUNC_HERE
+func = shortest_path_through_maze_with_one_time_walk_through_walls_for_max_distance_allowed
 skipped_tests = set([ 2, 3, 4 ])
 skipped_tests = set([ 3, 4 ])
 skipped_tests = set([ 4 ])
 skipped_tests = set([  ])
-skipped_tests = set([ 1, 2, 4 ])
 lowest_test = 0
 highest_test = 0
 
@@ -244,5 +414,5 @@ test_input = {
   'DEBUG': False,
   'min_time_saved': 100,
 }
-test_expected = None
+test_expected = 1020507
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
