@@ -242,9 +242,20 @@ def simulate_and_analyze_data_from_hashing_sequence(part, input_str, DEBUG = Fal
           POSSIBLE_SEQUENCES[sequence][buyer_idx] = data[i + 3]['price']
 
     best_revenue = 0
-    for revenue_data in POSSIBLE_SEQUENCES.values():                          # find the best revenue among all existing sequences
+    best_sequence = None
+    for sequence in POSSIBLE_SEQUENCES:                                       # find the best revenue among all existing sequences
+      revenue_data = POSSIBLE_SEQUENCES[sequence]
       revenue = sum([ (0 if r == None else r) for r in revenue_data ])
-      best_revenue = max(best_revenue, revenue)
+      if revenue > best_revenue:
+        best_revenue = revenue
+        best_sequence = sequence
+
+    if DISPLAY_EXTRA_INFO:
+      print(f"For best sequence {best_sequence}:")
+      for i in range(len(BUYER_DATA)):
+        r = POSSIBLE_SEQUENCES[best_sequence][i]
+        if r != None:
+          print(f"Buyer with index {i} will pay {r}")
 
     if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")   # ~6.10 seconds
     return best_revenue
