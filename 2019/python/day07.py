@@ -165,7 +165,7 @@ def intcode(part, input_str, DEBUG = False, *args):
 
         param1 = PROGRAM[ptr + 1]                                   # value to read factor1
         param2 = PROGRAM[ptr + 2]                                   # value to read factor2
-        param3 = PROGRAM[ptr + 3]                                   # address to write sum
+        param3 = PROGRAM[ptr + 3]                                   # address to write product
 
         factor1 = PROGRAM[param1] if mode1 == '0' else param1
         factor2 = PROGRAM[param2] if mode2 == '0' else param2
