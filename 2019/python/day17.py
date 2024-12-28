@@ -151,7 +151,12 @@ def intcode(part, input_str, DEBUG = False, *args):
     return [ ord(c) for c in s ]
 
   def ascii_list_to_str(lst):
-    return ''.join([ chr(c) for c in lst ])
+    return ''.join([ chr(n) for n in lst ])
+  
+  def is_ascii_range(n):
+    HIGHEST_VALID_ASCII = 55295
+    return 0 <= n <= HIGHEST_VALID_ASCII
+
 
   def simulate(PROGRAM, INPUT):
 
@@ -320,6 +325,7 @@ def intcode(part, input_str, DEBUG = False, *args):
   MEMORY, OUTPUT = simulate(PROGRAM, INPUT)
 
   if part == 2:
+    assert not is_ascii_range(OUTPUT[-1]), f"FINAL OUTPUT {OUTPUT[-1]} SHOULD BE OUTSIDE NORMAL ASCII RANGE"
     part_2_rtn = OUTPUT.pop()                                                             # the final number in output is the answer
 
   RAW_MAP_AS_STR = ascii_list_to_str(OUTPUT)
