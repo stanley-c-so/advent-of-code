@@ -382,7 +382,7 @@ test_input = {
 test_expected = 7720
 test(func, test_input, test_expected, test_num, skipped_tests, lowest_test, highest_test)
 
-# Test case 5
+# Test case 2
 test_input = {
   'part': 2,
   'input_str': actual_input,
