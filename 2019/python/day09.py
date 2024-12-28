@@ -116,49 +116,38 @@ def intcode(part, input_str, DEBUG = False, *args):
       assert mode2 in '012', f"INVALID MODE FOR OPERAND 2: {mode2}"
       assert mode3 in '012', f"INVALID MODE FOR OPERAND 3: {mode3}"
 
-      if opcode == '01':                                                                  # ADD
+      param1 = PROGRAM_get(ptr + 1)
+      param2 = PROGRAM_get(ptr + 2)
+      param3 = PROGRAM_get(ptr + 3)
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read addend1
-        param2 = PROGRAM_get(ptr + 2)                                                     # value to read addend2
-        param3 = PROGRAM_get(ptr + 3)                                                     # address to write sum
+      if opcode == '01':                                                                  # ADD
 
         addend1 = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         addend2 = PROGRAM_get(param2) if mode2 == '0' else param2 if mode2 == '1' else PROGRAM_get(param2 + relative_base)
-
         res = addend1 + addend2
 
         assert mode3 in '02', f"INVALID MODE FOR OPERAND 3: {mode3}"
         write_idx = param3 if mode3 == '0' else (param3 + relative_base)
-
         PROGRAM_write(write_idx, res)
 
         ptr += 4
 
       elif opcode == '02':                                                                # MULTIPLY
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read factor1
-        param2 = PROGRAM_get(ptr + 2)                                                     # value to read factor2
-        param3 = PROGRAM_get(ptr + 3)                                                     # address to write product
-
         factor1 = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         factor2 = PROGRAM_get(param2) if mode2 == '0' else param2 if mode2 == '1' else PROGRAM_get(param2 + relative_base)
-
         res = factor1 * factor2
         
         assert mode3 in '02', f"INVALID MODE FOR OPERAND 3: {mode3}"
         write_idx = param3 if mode3 == '0' else (param3 + relative_base)
-
         PROGRAM_write(write_idx, res)
 
         ptr += 4
 
       elif opcode == '03':                                                                # INPUT
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # address to write input
-
         assert mode1 in '02', f"INVALID MODE FOR OPERAND 1: {mode1}"
         assert 0 <= input_ptr < len(INPUT), f"OUT OF INPUTS WITH input_ptr: {input_ptr}"
-
         write_idx = param1 if mode1 == '0' else (param1 + relative_base)
         PROGRAM_write(write_idx, INPUT[input_ptr])                                        # given in function call
         input_ptr += 1
@@ -167,18 +156,12 @@ def intcode(part, input_str, DEBUG = False, *args):
 
       elif opcode == '04':                                                                # OUTPUT
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read output
-
         output = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
-
         OUTPUT.append(output)
 
         ptr += 2
 
       elif opcode == '05':                                                                # JUMP IF TRUE
-
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read operand1
-        param2 = PROGRAM_get(ptr + 2)                                                     # value to read operand2
 
         operand1 = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         operand2 = PROGRAM_get(param2) if mode2 == '0' else param2 if mode2 == '1' else PROGRAM_get(param2 + relative_base)
@@ -190,9 +173,6 @@ def intcode(part, input_str, DEBUG = False, *args):
 
       elif opcode == '06':                                                                # JUMP IF FALSE
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read operand1
-        param2 = PROGRAM_get(ptr + 2)                                                     # value to read operand2
-
         operand1 = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         operand2 = PROGRAM_get(param2) if mode2 == '0' else param2 if mode2 == '1' else PROGRAM_get(param2 + relative_base)
 
@@ -203,13 +183,8 @@ def intcode(part, input_str, DEBUG = False, *args):
 
       elif opcode == '07':                                                                # LESS THAN
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read operand1
-        param2 = PROGRAM_get(ptr + 2)                                                     # value to read operand2
-        param3 = PROGRAM_get(ptr + 3)                                                     # address to write result
-
         operand1 = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         operand2 = PROGRAM_get(param2) if mode2 == '0' else param2 if mode2 == '1' else PROGRAM_get(param2 + relative_base)
-
         res = 1 if operand1 < operand2 else 0
 
         assert mode3 in '02', f"INVALID MODE FOR OPERAND 3: {mode3}"
@@ -220,13 +195,8 @@ def intcode(part, input_str, DEBUG = False, *args):
 
       elif opcode == '08':                                                                # EQUAL TO
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # value to read operand1
-        param2 = PROGRAM_get(ptr + 2)                                                     # value to read operand2
-        param3 = PROGRAM_get(ptr + 3)                                                     # address to write result
-
         operand1 = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         operand2 = PROGRAM_get(param2) if mode2 == '0' else param2 if mode2 == '1' else PROGRAM_get(param2 + relative_base)
-
         res = 1 if operand1 == operand2 else 0
         
         assert mode3 in '02', f"INVALID MODE FOR OPERAND 3: {mode3}"
@@ -237,12 +207,8 @@ def intcode(part, input_str, DEBUG = False, *args):
 
       elif opcode == '09':                                                                # OUTPUT
 
-        param1 = PROGRAM_get(ptr + 1)                                                     # address to read new relative base delta
-
         delta = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
-
         relative_base += delta
-        # print(f"NEW RELATIVE BASE: {relative_base}")
 
         ptr += 2
 
@@ -262,7 +228,7 @@ def intcode(part, input_str, DEBUG = False, *args):
   if part == 2 and not DEBUG: print('RUNNING PART 2 ANALYSIS (PLEASE WAIT)...')
   TIME_AT_START = time.time()
 
-  MEMORY, OUTPUT = simulate(PROGRAM.copy(), INPUT)
+  MEMORY, OUTPUT = simulate(PROGRAM, INPUT)
 
   if DISPLAY_EXTRA_INFO:
     if DEBUG:
