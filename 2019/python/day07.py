@@ -110,13 +110,11 @@ def intcode(part, input_str, DEBUG = False, *args):
   def in_bounds(idx, PROGRAM):
     return 0 <= idx < len(PROGRAM)
 
-  def simulate(MACHINE):
+  def update_ptrs_before_returning(MACHINE, ptr, input_ptr):        # FOR THIS PROBLEM ONLY
+    MACHINE['ptr'] = ptr                                            # i didn't want to change the code too much
+    MACHINE['input_ptr'] = input_ptr                                # so i only update MACHINE before returning
 
-    def update_ptrs_before_returning():                             # FOR THIS PROBLEM ONLY
-      nonlocal ptr
-      nonlocal input_ptr
-      MACHINE['ptr'] = ptr                                          # i didn't want to change the code too much
-      MACHINE['input_ptr'] = input_ptr                              # so i only update MACHINE before returning
+  def simulate(MACHINE):
 
     PROGRAM = MACHINE['MEMORY']
     INPUT = MACHINE['input']                                        # contains full history of inputs
@@ -204,7 +202,7 @@ def intcode(part, input_str, DEBUG = False, *args):
                                                                     # UNTIL WE COME BACK TO IT.
                                                                     # (Return, but save state, so we can recall
                                                                     # this simulate function again later)
-          update_ptrs_before_returning()                            # FOR THIS PROBLEM ONLY
+          update_ptrs_before_returning(MACHINE, ptr, input_ptr)     # FOR THIS PROBLEM ONLY
           return (MACHINE, OUTPUT, False)
 
       elif opcode == '05':                                          # JUMP IF TRUE
@@ -276,7 +274,7 @@ def intcode(part, input_str, DEBUG = False, *args):
         ptr += 4
 
       elif opcode == '99':                                          # TERMINATE
-        update_ptrs_before_returning()                              # FOR THIS PROBLEM ONLY
+        update_ptrs_before_returning(MACHINE, ptr, input_ptr)       # FOR THIS PROBLEM ONLY
         return (MACHINE, OUTPUT, True)
 
       else:
