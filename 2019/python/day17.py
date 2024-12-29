@@ -328,15 +328,15 @@ def intcode(part, input_str, DEBUG = False, *args):
     assert not is_ascii_range(OUTPUT[-1]), f"FINAL OUTPUT {OUTPUT[-1]} SHOULD BE OUTSIDE NORMAL ASCII RANGE"
     part_2_rtn = OUTPUT.pop()                                                             # the final number in output is the answer
 
-  RAW_MAP_AS_STR = ascii_list_to_str(OUTPUT)
-  GRID = [ [ c for c in row ] for row in RAW_MAP_AS_STR.split('\n') if row ]
+  RAW_OUTPUT_AS_STR = ascii_list_to_str(OUTPUT)
+  GRID = [ [ c for c in row ] for row in RAW_OUTPUT_AS_STR.split('\n') if row ]
 
   H, W = len(GRID), len(GRID[0])
 
   SCAFFOLD, EMPTY = '#', '.'
 
   if DISPLAY_EXTRA_INFO:
-    print(RAW_MAP_AS_STR)
+    print(RAW_OUTPUT_AS_STR)
 
   if part == 1:                                                                           # PART 1: FIND ALL INTERSECTIONS IN THE PATH
 
