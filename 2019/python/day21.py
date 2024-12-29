@@ -284,6 +284,7 @@ def intcode(part, input_str, DEBUG = False, *args):
 
   # ANALYZE
 
+  if not DEBUG: print('RUNNING REAL DATA ANALYSIS (PLEASE WAIT)...')
   TIME_AT_START = time.time()
 
   MAX_LINES = 15                                                                          # doesn't count WALK/RUN
@@ -484,6 +485,7 @@ def intcode(part, input_str, DEBUG = False, *args):
 
   assert rtn != None, f"DID NOT FIND A SOLUTION"
   print(f"Final output: {rtn}")
+  if not DEBUG: print(f"(RUN TOOK {(time.time() - TIME_AT_START)} SECS)")                 # ~0.56 seconds for part 2
   return rtn
 
 
