@@ -228,7 +228,7 @@ def intcode(part, input_str, DEBUG = False, *args):
         assert mode1 in '02', f"INVALID MODE FOR OPERAND 1: {mode1}"
         assert 0 <= input_ptr < len(INPUT), f"OUT OF INPUTS WITH input_ptr: {input_ptr}"
         write_idx = param1 if mode1 == '0' else (param1 + relative_base)
-        PROGRAM_write(write_idx, INPUT[input_ptr])                                        # given in function call
+        PROGRAM_write(write_idx, INPUT[input_ptr])
         input_ptr += 1
 
         ptr += 2
