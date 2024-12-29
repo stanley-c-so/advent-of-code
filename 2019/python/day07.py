@@ -117,7 +117,7 @@ def intcode(part, input_str, DEBUG = False, *args):
   def simulate(MACHINE):
 
     PROGRAM = MACHINE['MEMORY']
-    INPUT = MACHINE['input']                                        # contains full history of inputs
+    INPUT = MACHINE['INPUT']                                        # contains full history of inputs
 
     ptr = MACHINE['ptr']
     input_ptr = MACHINE['input_ptr']
@@ -302,7 +302,7 @@ def intcode(part, input_str, DEBUG = False, *args):
 
     AMPS = [ {
       'MEMORY': PROGRAM.copy(),
-      'input': [],
+      'INPUT': [],
       'ptr': 0,
       'input_ptr': 0,
     } for _ in range(NUM_AMPS) ]
@@ -316,11 +316,11 @@ def intcode(part, input_str, DEBUG = False, *args):
       ### EACH ITERATION IS ONE AMP RUNNING ITS PROGRAM UNTIL OUTPUT OR TERMINATE ###
       for amp_idx in range(NUM_AMPS):
 
-        if len(AMPS[amp_idx]['input']) == 0:                        # supply the phase setting ONCE
+        if len(AMPS[amp_idx]['INPUT']) == 0:                        # supply the phase setting ONCE
           phase_setting = PHASE_SETTINGS[amp_idx]
-          AMPS[amp_idx]['input'].append(phase_setting)
+          AMPS[amp_idx]['INPUT'].append(phase_setting)
 
-        AMPS[amp_idx]['input'].append(next_amp_input)               # always supply the next amp input
+        AMPS[amp_idx]['INPUT'].append(next_amp_input)               # always supply the next amp input
         
         MACHINE, OUTPUT, terminated = simulate(AMPS[amp_idx])
 
