@@ -341,6 +341,8 @@ def intcode(part, input_str, DEBUG = False, *args):
 
       if terminated: break
 
+    if not terminated: assert False, f"TRIPPED INFINITE LOOP GUARD: EXCEEDED {INFINITE_LOOP_GUARD} ITERATIONS"
+
   return max_thruster_signal
 
 

@@ -279,7 +279,7 @@ def intcode(part, input_str, DEBUG = False, *args):
 
         assert False, f"UNRECOGNIZED OPCODE: {opcode}"
 
-    assert False, f"OUT OF BOUNDS WITH POINTER AT: {ptr}"
+    assert False, f"TRIPPED INFINITE LOOP GUARD: EXCEEDED {INFINITE_LOOP_GUARD} ITERATIONS"
 
 
   # ANALYZE
