@@ -284,7 +284,7 @@ def intcode(part, input_str, DEBUG = False, *args):
 
         ptr += 4
 
-      elif opcode == '09':                                                                # OUTPUT
+      elif opcode == '09':                                                                # CHANGE RELATIVE BASE
 
         delta = PROGRAM_get(param1) if mode1 == '0' else param1 if mode1 == '1' else PROGRAM_get(param1 + relative_base)
         relative_base += delta
