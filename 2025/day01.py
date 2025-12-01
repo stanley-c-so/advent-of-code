@@ -106,7 +106,7 @@ from _test import test
 DISPLAY_EXTRA_INFO = True
 # DISPLAY_EXTRA_INFO = False
 
-def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
+def safe_dial(part, input_str, DEBUG = False, *args):
 
   # PARSE INPUT DATA
 
@@ -115,7 +115,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
 
   # INIT
 
-  pos = 50
+  pos = 50                                                # dial always starts at 50
   part_1_output = 0
   part_2_output = 0
 
@@ -153,7 +153,7 @@ def NAME_OF_FUNC_HERE(part, input_str, DEBUG = False, *args):
 test_num = [1]
 test_input = None
 test_expected = None
-func = NAME_OF_FUNC_HERE
+func = safe_dial
 skipped_tests = set([ 2, 3, 4 ])
 skipped_tests = set([ 3, 4 ])
 skipped_tests = set([ 4 ])
