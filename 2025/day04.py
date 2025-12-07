@@ -247,9 +247,9 @@ def repeatedly_remove_cells_with_insufficient_neighboring_cells(part, input_str,
         line_copy = line.copy()
         for col in range(W):
           if line_copy[col] == REMOVED:
-            line_copy[col] = f'{bcolors.FAIL}x{bcolors.ENDC}'
+            line_copy[col] = f'{bcolors.FAIL}{REMOVED}{bcolors.ENDC}'
           if line_copy[col] == ROLL:
-            line_copy[col] = f'{bcolors.WARNING}@{bcolors.ENDC}'
+            line_copy[col] = f'{bcolors.WARNING}{ROLL}{bcolors.ENDC}'
         print(''.join(line_copy))
 
     # REMOVE THOSE CELLS
