@@ -226,6 +226,30 @@ def repeatedly_remove_cells_with_insufficient_neighboring_cells(part, input_str,
           if neighboring_rolls < 4:
             to_be_removed.append((row, col))
     
+    if DEBUG and DISPLAY_EXTRA_INFO:
+
+      class bcolors:
+        # HEADER = '\033[95m'
+        # OKBLUE = '\033[94m'
+        # OKCYAN = '\033[96m'
+        # OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        # BOLD = '\033[1m'
+        # UNDERLINE = '\033[4m'
+
+      for (row, col) in to_be_removed:
+        GRID[row][col] = 'x'
+      for line in GRID:
+        line_copy = line.copy()
+        for col in range(W):
+          if line_copy[col] == 'x':
+            line_copy[col] = f'{bcolors.FAIL}x{bcolors.ENDC}'
+          if line_copy[col] == '@':
+            line_copy[col] = f'{bcolors.WARNING}@{bcolors.ENDC}'
+        print(''.join(line_copy))
+
     # REMOVE THOSE CELLS
     for (row, col) in to_be_removed:
       GRID[row][col] = EMPTY
