@@ -239,14 +239,16 @@ def repeatedly_remove_cells_with_insufficient_neighboring_cells(part, input_str,
         # BOLD = '\033[1m'
         # UNDERLINE = '\033[4m'
 
+      REMOVED = 'x'
+
       for (row, col) in to_be_removed:
-        GRID[row][col] = 'x'
+        GRID[row][col] = REMOVED
       for line in GRID:
         line_copy = line.copy()
         for col in range(W):
-          if line_copy[col] == 'x':
+          if line_copy[col] == REMOVED:
             line_copy[col] = f'{bcolors.FAIL}x{bcolors.ENDC}'
-          if line_copy[col] == '@':
+          if line_copy[col] == ROLL:
             line_copy[col] = f'{bcolors.WARNING}@{bcolors.ENDC}'
         print(''.join(line_copy))
 
