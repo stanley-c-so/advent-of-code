@@ -249,8 +249,27 @@ def analyze_tree_relationship_with_laser_edges_and_beam_splitter_nodes(part, inp
           line[col] = BEAM
 
   if part == 1 and DISPLAY_EXTRA_INFO:
-    for line in GRID:
-      print(''.join(line))
+
+    class bcolors:
+      # HEADER = '\033[95m'
+      # OKBLUE = '\033[94m'
+      # OKCYAN = '\033[96m'
+      OKGREEN = '\033[92m'
+      WARNING = '\033[93m'
+      FAIL = '\033[91m'
+      ENDC = '\033[0m'
+      # BOLD = '\033[1m'
+      # UNDERLINE = '\033[4m'
+
+    for row in range(H):
+      line = GRID[row]
+      line_copy = line.copy()
+      for col in range(W):
+        if line_copy[col] == BEAM:
+          line_copy[col] = f'{bcolors.WARNING}{BEAM}{bcolors.ENDC}'
+        if line_copy[col] == SPLITTER:
+          line_copy[col] = f'{bcolors.OKGREEN if (row, col) in SPLITTERS_REACHED_BY_BEAM else bcolors.FAIL}{SPLITTER}{bcolors.ENDC}'
+      print(''.join(line_copy))
 
 
   # ANALYZE
