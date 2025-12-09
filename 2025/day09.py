@@ -244,7 +244,6 @@ def choose_two_points_as_opposite_corners_to_maximize_rectangle(part, input_str,
           return False
 
         if (x, y) not in MEMO_IS_INTERIOR:
-          COND = (x1, y1) == (9, 5) and (x2, y2) == (2, 3)
           if is_corner(x, y) or is_boundary(x, y):
             MEMO_IS_INTERIOR[(x, y)] = True
           else:
