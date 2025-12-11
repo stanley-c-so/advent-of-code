@@ -131,14 +131,14 @@ def solve_linear_programming_problem(part, input_str, DEBUG = False, *args):
                                                                                         # EACH 'EQUATION' MAPS TO JUST ODD/EVEN, NOT A SPECIFIC CONSTANT
 
     """
-    We tackle this with backtracking and it just works.
+    We tackle this with recursion and it just works.
     """
   
     output = 0
 
     for machine_idx in range(len(MACHINES)):
 
-      # BACKTRACKING FUNCTION
+      # RECURSIVE FUNCTION
       def go(button_idx, state, buttons_pressed):
 
         # BASE CASE
@@ -170,7 +170,7 @@ def solve_linear_programming_problem(part, input_str, DEBUG = False, *args):
           CANDIDATES.sort(key=lambda candidate: len(candidate[1]))
           return (True, CANDIDATES[0][1]) if CANDIDATES else (False, [])
 
-      # KICK-START BACKTRACKING
+      # KICK-START RECURSION
       initial_state = [False] * len(MACHINES[machine_idx]['goal'])
       initial_buttons_pressed = []
       (res, buttons_pressed) = go(0, initial_state, initial_buttons_pressed)
