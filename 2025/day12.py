@@ -146,7 +146,8 @@ def exact_cover_problem(part, input_str, DEBUG = False, *args):
 
   """
   ChatGPT helped me write this solver code using PuLP for the legit solution.
-  I'm estimating it would take a few hours to get through 1,000 problems.
+  I'm estimating it would take 1-2 hours to get through 1,000 problems.
+  (It ended up taking about 77 minutes to get through all 1,000 problems.)
   """
 
   import pulp
