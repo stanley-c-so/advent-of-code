@@ -113,7 +113,7 @@ from _test import test
 
 # OPTIONAL VARIABLES
 DISPLAY_EXTRA_INFO = True
-DISPLAY_EXTRA_INFO = False
+# DISPLAY_EXTRA_INFO = False
 
 def exact_cover_problem(part, input_str, DEBUG = False, *args):
 
@@ -256,7 +256,19 @@ def exact_cover_problem(part, input_str, DEBUG = False, *args):
     return [''.join(row) for row in grid]
 
 
-  def legit_solver(CANVAS_W, CANVAS_H, REQUIRED):
+  def legit_solver(CANVAS_W, CANVAS_H, REQUIRED, problem_num):
+
+    class bcolors:
+      # HEADER = '\033[95m'
+      # OKBLUE = '\033[94m'
+      # OKCYAN = '\033[96m'
+      OKGREEN = '\033[92m'
+      WARNING = '\033[93m'
+      FAIL = '\033[91m'
+      ENDC = '\033[0m'
+      # BOLD = '\033[1m'
+      # UNDERLINE = '\033[4m'
+
     if len(REQUIRED) != len(PARSED_TEMPLATES):
       raise ValueError('REQUIRED length must match number of PARSED_TEMPLATES.')
 
@@ -264,15 +276,15 @@ def exact_cover_problem(part, input_str, DEBUG = False, *args):
     for i in range(len(PARSED_TEMPLATES)):
       total_filled += len(PARSED_TEMPLATES[i]) * REQUIRED[i]
     if total_filled > CANVAS_W * CANVAS_H:
-      print('IMPOSSIBLE by area alone (required filled cells > canvas cells).')
+      print(f'PROBLEM {problem_num} | {bcolors.FAIL}IMPOSSIBLE by area alone (required filled cells > canvas cells).{bcolors.ENDC}')
       return 0
 
     chosen, placements = solve_packing_pulp(CANVAS_W, CANVAS_H, REQUIRED, PARSED_TEMPLATES, time_limit_sec=120, msg=False)
     if chosen is None:
-      print('No feasible solution found (or timed out).')
+      print(f'PROBLEM {problem_num} | {bcolors.FAIL}No feasible solution found (or timed out).{bcolors.ENDC}')
       return 0
 
-    print('Found a solution!')
+    print(f'PROBLEM {problem_num} | {bcolors.OKGREEN}Found a solution!{bcolors.ENDC}')
     if DEBUG:
       art = render_solution(CANVAS_W, CANVAS_H, chosen)
       print('\n'.join(art))
@@ -288,7 +300,18 @@ def exact_cover_problem(part, input_str, DEBUG = False, *args):
   Thus you can just count the total space taken up by your required counts and bypass the mapping problem entirely.
   """
 
-  def hack_solver(CANVAS_W, CANVAS_H, REQUIRED):
+  def hack_solver(CANVAS_W, CANVAS_H, REQUIRED, problem_num):
+    class bcolors:
+      # HEADER = '\033[95m'
+      # OKBLUE = '\033[94m'
+      # OKCYAN = '\033[96m'
+      OKGREEN = '\033[92m'
+      WARNING = '\033[93m'
+      FAIL = '\033[91m'
+      ENDC = '\033[0m'
+      # BOLD = '\033[1m'
+      # UNDERLINE = '\033[4m'
+
     if len(REQUIRED) != len(PARSED_TEMPLATES):
       raise ValueError('REQUIRED length must match number of PARSED_TEMPLATES.')
 
@@ -297,11 +320,13 @@ def exact_cover_problem(part, input_str, DEBUG = False, *args):
       total_filled += len(PARSED_TEMPLATES[i]) * REQUIRED[i]
     
     CANVAS_AREA = CANVAS_W * CANVAS_H
+    valid = total_filled <= CANVAS_AREA
     if DISPLAY_EXTRA_INFO:
       print(f'Canvas size: {CANVAS_W} x {CANVAS_H} = {CANVAS_AREA}')
       print(f'Minimum space required: {total_filled}')
-      print(f'% space filled: {total_filled / CANVAS_AREA * 100}%')
-    return int(total_filled <= CANVAS_AREA)
+      print(f'% space filled: {bcolors.OKGREEN if valid else bcolors.FAIL}{total_filled / CANVAS_AREA * 100}%{bcolors.ENDC}')
+      print(f'PROBLEM {problem_num} | Result: {bcolors.OKGREEN + 'VALID' if valid else bcolors.FAIL + 'INVALID'}{bcolors.ENDC}')
+    return int(valid)
 
 
   TIME_AT_START = time.time()
@@ -314,9 +339,8 @@ def exact_cover_problem(part, input_str, DEBUG = False, *args):
   output = 0
   for i in range(len(PROBLEMS)):
     problem = PROBLEMS[i]
-    if DEBUG or DISPLAY_EXTRA_INFO: print(f'===== PROBLEM {i + 1} =====')
-    output += (legit_solver if DEBUG else actual_input_solver)(problem['width'], problem['height'], problem['counts'])
-    if DEBUG or DISPLAY_EXTRA_INFO: print('')
+    output += (legit_solver if DEBUG else actual_input_solver)(problem['width'], problem['height'], problem['counts'], i)
+    print('')
 
     if floor((time.time() - TIME_AT_START) / 60) == NEXT_MIN_TARGET:
       print(f"{NEXT_MIN_TARGET} mins have passed since beginning this run")
